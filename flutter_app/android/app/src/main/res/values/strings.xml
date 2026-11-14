@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GeoiD-vpn</string>
+    <string name="canal_desc">Estado de la conexión VPN</string>
+    <string name="notificacion_texto">Túnel activo</string>
+</resources>

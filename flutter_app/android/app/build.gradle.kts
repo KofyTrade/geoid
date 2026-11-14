@@ -70,3 +70,8 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Motor AmneziaWG compilado con gomobile (mismo AAR que usaba la app Kotlin).
+    implementation(files("libs/awg.aar"))
+}
