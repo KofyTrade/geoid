@@ -36,3 +36,4 @@ tools/
 # --- Capturas de trabajo ---
 app/_*.png
 app/*.png
+gh-login.txt*
