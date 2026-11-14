@@ -1,0 +1,129 @@
+package com.kofy.vlessgen
+
+import android.content.Intent
+import android.graphics.drawable.Drawable
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.ListView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
+/**
+ * v0.4 — Selector de aplicaciones.
+ *
+ * Lista las apps con lanzador instaladas y guarda en SharedPreferences("apps")
+ * el conjunto de paquetes marcados. [VpnTunnelService] lee ese conjunto y llama
+ * a addAllowedApplication() por cada uno.
+ *
+ * La lista se llena con ListView + BaseAdapter (sin dependencias nuevas).
+ */
+class AppsActivity : AppCompatActivity() {
+
+    private data class App(val paquete: String, val nombre: String, val icono: Drawable)
+
+    private val seleccion = mutableSetOf<String>()
+    private var todas: List<App> = emptyList()
+    private var visibles: List<App> = emptyList()
+
+    private lateinit var adaptador: Adaptador
+    private lateinit var tvResumen: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_apps)
+
+        tvResumen = findViewById(R.id.tvResumen)
+        val lista = findViewById<ListView>(R.id.lvApps)
+        val buscar = findViewById<EditText>(R.id.etBuscar)
+
+        getSharedPreferences("apps", MODE_PRIVATE)
+            .getStringSet("seleccion", emptySet())
+            ?.let { seleccion.addAll(it) }
+
+        todas = cargarApps()
+        visibles = todas
+
+        adaptador = Adaptador()
+        lista.adapter = adaptador
+
+        // El checkbox es solo indicador: se conmuta pulsando la fila entera.
+        // Asi evitamos los clasicos bugs de reciclado de vistas en ListView.
+        lista.setOnItemClickListener { _, _, posicion, _ ->
+            val app = visibles[posicion]
+            if (!seleccion.add(app.paquete)) seleccion.remove(app.paquete)
+            adaptador.notifyDataSetChanged()
+            pintarResumen()
+        }
+
+        buscar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val q = s?.toString()?.trim()?.lowercase().orEmpty()
+                visibles = if (q.isEmpty()) todas else todas.filter {
+                    it.nombre.lowercase().contains(q) || it.paquete.lowercase().contains(q)
+                }
+                adaptador.notifyDataSetChanged()
+            }
+        })
+
+        pintarResumen()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        getSharedPreferences("apps", MODE_PRIVATE)
+            .edit()
+            .putStringSet("seleccion", seleccion)
+            .apply()
+    }
+
+    private fun cargarApps(): List<App> {
+        val intento = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+        val resueltos = packageManager.queryIntentActivities(intento, 0)
+        val vistos = mutableSetOf<String>()
+        val lista = mutableListOf<App>()
+
+        for (r in resueltos) {
+            val pkg = r.activityInfo.packageName
+            if (pkg == packageName) continue
+            if (!vistos.add(pkg)) continue
+            lista.add(App(pkg, r.loadLabel(packageManager).toString(), r.loadIcon(packageManager)))
+        }
+        return lista.sortedBy { it.nombre.lowercase() }
+    }
+
+    private fun pintarResumen() {
+        tvResumen.text = if (seleccion.isEmpty()) {
+            "Sin seleccion: pasaran TODAS las apps por la VPN"
+        } else {
+            "${seleccion.size} app(s) marcada(s): solo esas usaran la VPN"
+        }
+    }
+
+    private inner class Adaptador : BaseAdapter() {
+        override fun getCount(): Int = visibles.size
+        override fun getItem(position: Int): Any = visibles[position]
+        override fun getItemId(position: Int): Long = position.toLong()
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val vista = convertView ?: LayoutInflater.from(this@AppsActivity)
+                .inflate(R.layout.item_app, parent, false)
+
+            val app = visibles[position]
+            vista.findViewById<ImageView>(R.id.ivIcono).setImageDrawable(app.icono)
+            vista.findViewById<TextView>(R.id.tvNombre).text = app.nombre
+            vista.findViewById<TextView>(R.id.tvPaquete).text = app.paquete
+            vista.findViewById<CheckBox>(R.id.cbSeleccion).isChecked = seleccion.contains(app.paquete)
+            return vista
+        }
+    }
+}

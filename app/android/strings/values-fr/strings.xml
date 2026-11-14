@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Geoid</string>
+    <string name="marca">GEOID</string>
+
+    <string name="estado_conectado">CONNECTÉ</string>
+    <string name="estado_desconectado">DÉCONNECTÉ</string>
+    <string name="conectar">Connecter</string>
+    <string name="desconectar">Déconnecter</string>
+    <string name="aplicaciones">Applications</string>
+    <string name="registro">Journal</string>
+    <string name="velocidad_inicial">0 Ko/s</string>
+    <string name="ping_inicial">-- ms</string>
+    <string name="bloquear_anuncios">Bloquer les publicités</string>
+    <string name="todas_las_apps">Toutes les applications</string>
+    <string name="perfiles_boton">Profils : %1$s</string>
+    <string name="anadir_perfil">Ajouter un profil</string>
+
+    <plurals name="apps_seleccionadas">
+        <item quantity="one">%1$d application sélectionnée</item>
+        <item quantity="other">%1$d applications sélectionnées</item>
+    </plurals>
+
+    <string name="apps_titulo">Applications</string>
+    <string name="buscar_app">Rechercher une application</string>
+    <string name="seleccionar_todas">Tout sélectionner</string>
+    <string name="apps_todas_usan">Toutes les applications utilisent le VPN</string>
+    <string name="apps_todavia_cargando">Chargement…</string>
+
+    <plurals name="apps_resumen">
+        <item quantity="one">%1$d sélectionnée · seule celle-ci utilise le VPN</item>
+        <item quantity="other">%1$d sélectionnées · seules celles-ci utilisent le VPN</item>
+    </plurals>
+
+    <string name="perfiles_titulo">Profils</string>
+    <string name="perfiles_vacio">Aucun profil pour le moment. Créez-en un avec le bouton ci-dessous.</string>
+    <string name="perfiles_en_uso">Utilisé : %1$s · appui long pour modifier ou supprimer</string>
+    <string name="perfiles_toca">Touchez un profil pour l\'utiliser</string>
+    <string name="perfil_activo">ACTIF</string>
+    <string name="nuevo_perfil">+  Nouveau profil</string>
+    <string name="renombrar">Renommer</string>
+    <string name="editar_configuracion">Modifier la configuration</string>
+    <string name="borrar">Supprimer</string>
+    <string name="guardar">Enregistrer</string>
+    <string name="cancelar">Annuler</string>
+    <string name="renombrar_perfil">Renommer le profil</string>
+    <string name="nombre_perfil">Nom du profil</string>
+    <string name="nombre_ejemplo">Nom (par exemple : Mon serveur)</string>
+    <string name="pega_conf">Collez ici le contenu du .conf</string>
+    <string name="elegir_archivo">Choisir un fichier .conf</string>
+    <string name="borrar_perfil_titulo">Supprimer le profil ?</string>
+    <string name="perfil_borrado">Profil supprimé</string>
+    <string name="usando_perfil">Utilisation : %1$s</string>
+    <string name="conf_cargada">Configuration chargée, appuyez sur Enregistrer</string>
+    <string name="archivo_vacio">Le fichier est vide</string>
+    <string name="archivo_no_valido">Ce fichier ne ressemble pas à un .conf AmneziaWG</string>
+    <string name="error_leer_archivo">Impossible de lire le fichier : %1$s</string>
+    <string name="nombre_vacio">Le nom ne peut pas être vide</string>
+    <string name="datos_incompletos">Données manquantes : PrivateKey, PublicKey ou Endpoint</string>
+    <string name="perfil_n">Profil %1$d</string>
+    <string name="mi_servidor">Mon serveur</string>
+    <string name="sin_servidor">sans serveur</string>
+
+    <string name="importar_titulo">Importer un profil</string>
+    <string name="guardar_perfil">Enregistrer le profil</string>
+    <string name="no_archivo">Aucun fichier reçu</string>
+    <string name="perfil_importado">Profil importé</string>
+    <string name="perfil_anadido">Profil « %1$s » ajouté</string>
+
+    <string name="notificacion_texto">VPN connecté (AmneziaWG)</string>
+    <string name="canal_desc">État de la connexion VPN</string>
+    <string name="error_tun">Android a refusé l\'interface TUN</string>
+    <string name="error_config">La configuration AmneziaWG est absente</string>
+
+    <string name="permiso_denegado">Autorisation VPN refusée</string>
+    <string name="reconectando">Reconnexion pour appliquer le changement</string>
+    <string name="diagnostico">Diagnostic</string>
+    <string name="compartir">Partager</string>
+    <string name="cerrar">Fermer</string>
+    <string name="enviar">Envoyer</string>
+    <string name="diagnostico_estado">État : %1$s</string>
+    <string name="diagnostico_servidor">Serveur : %1$s</string>
+    <string name="diagnostico_mtu">MTU : %1$s</string>
+    <string name="diagnostico_dns">DNS : %1$s</string>
+    <string name="diagnostico_anuncios">Bloquer les pubs : %1$s</string>
+    <string name="diagnostico_recibido">Reçu : %1$s</string>
+    <string name="diagnostico_enviado">Envoyé : %1$s</string>
+    <string name="diagnostico_handshake">Handshake : %1$s</string>
+    <string name="diagnostico_sin_datos">Aucune donnée du moteur (tunnel arrêté).</string>
+    <string name="si">oui</string>
+    <string name="no">non</string>
+    <string name="sin_configuracion">(aucune configuration)</string>
+    <string name="desconocido">—</string>
+</resources>

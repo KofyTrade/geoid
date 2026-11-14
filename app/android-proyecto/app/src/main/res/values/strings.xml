@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Geoid</string>
+    <string name="marca">GEOID</string>
+
+    <!-- Pantalla principal -->
+    <string name="estado_conectado">CONNECTED</string>
+    <string name="estado_desconectado">DISCONNECTED</string>
+    <string name="conectar">Connect</string>
+    <string name="desconectar">Disconnect</string>
+    <string name="aplicaciones">Apps</string>
+    <string name="registro">Log</string>
+    <string name="velocidad_inicial">0 KB/s</string>
+    <string name="ping_inicial">-- ms</string>
+    <string name="bloquear_anuncios">Block ads</string>
+    <string name="todas_las_apps">All apps</string>
+    <string name="perfiles_boton">Profiles: %1$s</string>
+    <string name="anadir_perfil">Add profile</string>
+
+    <plurals name="apps_seleccionadas">
+        <item quantity="one">%1$d app selected</item>
+        <item quantity="other">%1$d apps selected</item>
+    </plurals>
+
+    <!-- Pantalla de aplicaciones -->
+    <string name="apps_titulo">Apps</string>
+    <string name="buscar_app">Search app</string>
+    <string name="seleccionar_todas">Select all</string>
+    <string name="apps_todas_usan">All apps use the VPN</string>
+    <string name="apps_todavia_cargando">Loading…</string>
+
+    <plurals name="apps_resumen">
+        <item quantity="one">%1$d selected · only that one uses the VPN</item>
+        <item quantity="other">%1$d selected · only those use the VPN</item>
+    </plurals>
+
+    <!-- Perfiles -->
+    <string name="perfiles_titulo">Profiles</string>
+    <string name="perfiles_vacio">No profiles yet. Create one with the button below.</string>
+    <string name="perfiles_en_uso">In use: %1$s · long press to edit or delete</string>
+    <string name="perfiles_toca">Tap a profile to use it</string>
+    <string name="perfil_activo">ACTIVE</string>
+    <string name="nuevo_perfil">+  New profile</string>
+    <string name="renombrar">Rename</string>
+    <string name="editar_configuracion">Edit configuration</string>
+    <string name="borrar">Delete</string>
+    <string name="guardar">Save</string>
+    <string name="cancelar">Cancel</string>
+    <string name="renombrar_perfil">Rename profile</string>
+    <string name="nombre_perfil">Profile name</string>
+    <string name="nombre_ejemplo">Name (for example: My server)</string>
+    <string name="pega_conf">Paste the .conf content here</string>
+    <string name="elegir_archivo">Choose .conf file</string>
+    <string name="borrar_perfil_titulo">Delete profile?</string>
+    <string name="perfil_borrado">Profile deleted</string>
+    <string name="usando_perfil">Using: %1$s</string>
+    <string name="conf_cargada">Configuration loaded, tap Save</string>
+    <string name="archivo_vacio">The file is empty</string>
+    <string name="archivo_no_valido">That file doesn\'t look like an AmneziaWG .conf</string>
+    <string name="error_leer_archivo">Could not read the file: %1$s</string>
+    <string name="nombre_vacio">The name can\'t be empty</string>
+    <string name="datos_incompletos">Missing data: PrivateKey, PublicKey or Endpoint</string>
+    <string name="perfil_n">Profile %1$d</string>
+    <string name="mi_servidor">My server</string>
+    <string name="sin_servidor">no server</string>
+
+    <!-- Importar -->
+    <string name="importar_titulo">Import profile</string>
+    <string name="guardar_perfil">Save profile</string>
+    <string name="no_archivo">No file received</string>
+    <string name="perfil_importado">Imported profile</string>
+    <string name="perfil_anadido">Profile \"%1$s\" added</string>
+
+    <!-- Servicio -->
+    <string name="notificacion_texto">VPN connected (AmneziaWG)</string>
+    <string name="canal_desc">VPN connection status</string>
+    <string name="error_tun">Android denied the TUN interface</string>
+    <string name="error_config">AmneziaWG configuration is missing</string>
+
+    <!-- Diálogos y avisos -->
+    <string name="permiso_denegado">VPN permission denied</string>
+    <string name="reconectando">Reconnecting to apply the change</string>
+    <string name="diagnostico">Diagnostics</string>
+    <string name="compartir">Share</string>
+    <string name="cerrar">Close</string>
+    <string name="enviar">Send</string>
+    <string name="diagnostico_estado">Status: %1$s</string>
+    <string name="diagnostico_servidor">Server: %1$s</string>
+    <string name="diagnostico_mtu">MTU: %1$s</string>
+    <string name="diagnostico_dns">DNS: %1$s</string>
+    <string name="diagnostico_anuncios">Block ads: %1$s</string>
+    <string name="diagnostico_recibido">Received: %1$s</string>
+    <string name="diagnostico_enviado">Sent: %1$s</string>
+    <string name="diagnostico_handshake">Handshake: %1$s</string>
+    <string name="diagnostico_sin_datos">No engine data (tunnel stopped).</string>
+    <string name="si">yes</string>
+    <string name="no">no</string>
+    <string name="sin_configuracion">(no configuration)</string>
+    <string name="desconocido">—</string>
+</resources>

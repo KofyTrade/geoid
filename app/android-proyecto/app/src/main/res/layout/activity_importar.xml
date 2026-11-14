@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#05161A"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="28dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:text="@string/importar_titulo"
+        android:textColor="#E8FBF7"
+        android:textSize="26sp" />
+
+    <TextView
+        android:id="@+id/tvArchivo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="#7FA8A4"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tvServidor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="#2EE6C5"
+        android:textSize="13sp" />
+
+    <EditText
+        android:id="@+id/etNombre"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="22dp"
+        android:background="@drawable/bg_busqueda"
+        android:hint="@string/nombre_perfil"
+        android:inputType="text"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
+        android:textColor="#E8FBF7"
+        android:textColorHint="#4E7C79"
+        android:textSize="14sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnGuardar"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/guardar_perfil"
+        android:textColor="#05161A"
+        android:textSize="15sp"
+        app:backgroundTint="#2EE6C5"
+        app:cornerRadius="27dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancelar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/cancelar"
+        android:textColor="#9BE8DC"
+        android:textSize="13sp"
+        app:backgroundTint="#00000000"
+        app:cornerRadius="24dp"
+        app:strokeColor="#1E5A58"
+        app:strokeWidth="1dp" />
+
+</LinearLayout>

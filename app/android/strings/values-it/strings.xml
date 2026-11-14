@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Geoid</string>
+    <string name="marca">GEOID</string>
+
+    <string name="estado_conectado">CONNESSO</string>
+    <string name="estado_desconectado">DISCONNESSO</string>
+    <string name="conectar">Connetti</string>
+    <string name="desconectar">Disconnetti</string>
+    <string name="aplicaciones">App</string>
+    <string name="registro">Registro</string>
+    <string name="velocidad_inicial">0 KB/s</string>
+    <string name="ping_inicial">-- ms</string>
+    <string name="bloquear_anuncios">Blocca annunci</string>
+    <string name="todas_las_apps">Tutte le app</string>
+    <string name="perfiles_boton">Profili: %1$s</string>
+    <string name="anadir_perfil">Aggiungi profilo</string>
+
+    <plurals name="apps_seleccionadas">
+        <item quantity="one">%1$d app selezionata</item>
+        <item quantity="other">%1$d app selezionate</item>
+    </plurals>
+
+    <string name="apps_titulo">App</string>
+    <string name="buscar_app">Cerca app</string>
+    <string name="seleccionar_todas">Seleziona tutte</string>
+    <string name="apps_todas_usan">Tutte le app usano la VPN</string>
+    <string name="apps_todavia_cargando">Caricamento…</string>
+
+    <plurals name="apps_resumen">
+        <item quantity="one">%1$d selezionata · solo questa usa la VPN</item>
+        <item quantity="other">%1$d selezionate · solo queste usano la VPN</item>
+    </plurals>
+
+    <string name="perfiles_titulo">Profili</string>
+    <string name="perfiles_vacio">Nessun profilo. Creane uno con il pulsante qui sotto.</string>
+    <string name="perfiles_en_uso">In uso: %1$s · tieni premuto per modificare o eliminare</string>
+    <string name="perfiles_toca">Tocca un profilo per usarlo</string>
+    <string name="perfil_activo">ATTIVO</string>
+    <string name="nuevo_perfil">+  Nuovo profilo</string>
+    <string name="renombrar">Rinomina</string>
+    <string name="editar_configuracion">Modifica configurazione</string>
+    <string name="borrar">Elimina</string>
+    <string name="guardar">Salva</string>
+    <string name="cancelar">Annulla</string>
+    <string name="renombrar_perfil">Rinomina profilo</string>
+    <string name="nombre_perfil">Nome del profilo</string>
+    <string name="nombre_ejemplo">Nome (per esempio: Il mio server)</string>
+    <string name="pega_conf">Incolla qui il contenuto del .conf</string>
+    <string name="elegir_archivo">Scegli file .conf</string>
+    <string name="borrar_perfil_titulo">Eliminare il profilo?</string>
+    <string name="perfil_borrado">Profilo eliminato</string>
+    <string name="usando_perfil">In uso: %1$s</string>
+    <string name="conf_cargada">Configurazione caricata, tocca Salva</string>
+    <string name="archivo_vacio">Il file è vuoto</string>
+    <string name="archivo_no_valido">Quel file non sembra un .conf di AmneziaWG</string>
+    <string name="error_leer_archivo">Impossibile leggere il file: %1$s</string>
+    <string name="nombre_vacio">Il nome non può essere vuoto</string>
+    <string name="datos_incompletos">Dati mancanti: PrivateKey, PublicKey o Endpoint</string>
+    <string name="perfil_n">Profilo %1$d</string>
+    <string name="mi_servidor">Il mio server</string>
+    <string name="sin_servidor">nessun server</string>
+
+    <string name="importar_titulo">Importa profilo</string>
+    <string name="guardar_perfil">Salva profilo</string>
+    <string name="no_archivo">Nessun file ricevuto</string>
+    <string name="perfil_importado">Profilo importato</string>
+    <string name="perfil_anadido">Profilo «%1$s» aggiunto</string>
+
+    <string name="notificacion_texto">VPN connessa (AmneziaWG)</string>
+    <string name="canal_desc">Stato della connessione VPN</string>
+    <string name="error_tun">Android ha negato l\'interfaccia TUN</string>
+    <string name="error_config">Manca la configurazione di AmneziaWG</string>
+
+    <string name="permiso_denegado">Permesso VPN negato</string>
+    <string name="reconectando">Riconnessione per applicare la modifica</string>
+    <string name="diagnostico">Diagnostica</string>
+    <string name="compartir">Condividi</string>
+    <string name="cerrar">Chiudi</string>
+    <string name="enviar">Invia</string>
+    <string name="diagnostico_estado">Stato: %1$s</string>
+    <string name="diagnostico_servidor">Server: %1$s</string>
+    <string name="diagnostico_mtu">MTU: %1$s</string>
+    <string name="diagnostico_dns">DNS: %1$s</string>
+    <string name="diagnostico_anuncios">Blocca annunci: %1$s</string>
+    <string name="diagnostico_recibido">Ricevuto: %1$s</string>
+    <string name="diagnostico_enviado">Inviato: %1$s</string>
+    <string name="diagnostico_handshake">Handshake: %1$s</string>
+    <string name="diagnostico_sin_datos">Nessun dato dal motore (tunnel fermo).</string>
+    <string name="si">sì</string>
+    <string name="no">no</string>
+    <string name="sin_configuracion">(nessuna configurazione)</string>
+    <string name="desconocido">—</string>
+</resources>

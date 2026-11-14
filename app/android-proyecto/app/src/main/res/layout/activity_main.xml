@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#05161A"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="26dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="18dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:letterSpacing="0.32"
+                android:text="@string/marca"
+                android:textColor="#5FD9C8"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvVpnEstado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:fontFamily="sans-serif-light"
+                android:letterSpacing="0.18"
+                android:text="@string/estado_desconectado"
+                android:textColor="#7FA8A4"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/panelStats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvVelocidad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="@string/velocidad_inicial"
+                android:textColor="#2EE6C5"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvPing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="monospace"
+                android:text="@string/ping_inicial"
+                android:textColor="#7FA8A4"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tvServidor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="monospace"
+                android:text=""
+                android:textColor="#4E7C79"
+                android:textSize="10sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.geoid.vpn.PolyhedronView
+        android:id="@+id/poliedro"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnVpn"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="@string/conectar"
+        android:textColor="#05161A"
+        android:textSize="16sp"
+        app:backgroundTint="#2EE6C5"
+        app:cornerRadius="30dp"
+        app:elevation="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnApps"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:text="@string/aplicaciones"
+            android:textColor="#9BE8DC"
+            android:textSize="13sp"
+            app:backgroundTint="#00000000"
+            app:cornerRadius="24dp"
+            app:strokeColor="#1E5A58"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegistro"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:text="@string/registro"
+            android:textColor="#9BE8DC"
+            android:textSize="13sp"
+            app:backgroundTint="#00000000"
+            app:cornerRadius="24dp"
+            app:strokeColor="#1E5A58"
+            app:strokeWidth="1dp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvAppsResumen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/todas_las_apps"
+        android:textColor="#7FA8A4"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/bloquear_anuncios"
+            android:textColor="#C9EFEA"
+            android:textSize="13sp" />
+
+        <Switch
+            android:id="@+id/swAnuncios"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:showText="false"
+            android:thumbTint="@color/switch_thumb"
+            android:trackTint="@color/switch_track" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnImportarConf"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:text="@string/anadir_perfil"
+        android:textColor="#5FD9C8"
+        android:textSize="12sp"
+        app:backgroundTint="#00000000"
+        app:cornerRadius="22dp" />
+
+</LinearLayout>

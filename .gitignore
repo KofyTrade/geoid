@@ -1,0 +1,38 @@
+# ---------------------------------------------------------------------------
+#  Geoid — archivos que NUNCA deben subirse al repositorio
+# ---------------------------------------------------------------------------
+
+# --- Secretos ---
+# Enlace de conexion (UUID, clave publica, short id)
+vpn-enlace.txt
+# Perfiles de AmneziaWG: contienen la clave privada del cliente
+awg/
+*.vpnuri
+*.vpnuri.png
+# Claves del servidor
+server_private.key
+server_public.key
+server_hpk.key
+keys/
+
+# --- Claves de firma ---
+*.jks
+*.keystore
+
+# --- Artefactos de compilacion ---
+*.apk
+*.aab
+*.aar
+build/
+.gradle/
+.idea/
+local.properties
+captures/
+*.hprof
+
+# --- Herramientas descargadas (6 GB) ---
+tools/
+
+# --- Capturas de trabajo ---
+app/_*.png
+app/*.png

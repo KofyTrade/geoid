@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Geoid</string>
+    <string name="marca">GEOID</string>
+
+    <string name="estado_conectado">ПОДКЛЮЧЕНО</string>
+    <string name="estado_desconectado">ОТКЛЮЧЕНО</string>
+    <string name="conectar">Подключить</string>
+    <string name="desconectar">Отключить</string>
+    <string name="aplicaciones">Приложения</string>
+    <string name="registro">Журнал</string>
+    <string name="velocidad_inicial">0 КБ/с</string>
+    <string name="ping_inicial">-- мс</string>
+    <string name="bloquear_anuncios">Блокировать рекламу</string>
+    <string name="todas_las_apps">Все приложения</string>
+    <string name="perfiles_boton">Профили: %1$s</string>
+    <string name="anadir_perfil">Добавить профиль</string>
+
+    <plurals name="apps_seleccionadas">
+        <item quantity="one">%1$d приложение выбрано</item>
+        <item quantity="few">%1$d приложения выбрано</item>
+        <item quantity="many">%1$d приложений выбрано</item>
+        <item quantity="other">%1$d приложения выбрано</item>
+    </plurals>
+
+    <string name="apps_titulo">Приложения</string>
+    <string name="buscar_app">Поиск приложения</string>
+    <string name="seleccionar_todas">Выбрать все</string>
+    <string name="apps_todas_usan">Все приложения используют VPN</string>
+    <string name="apps_todavia_cargando">Загрузка…</string>
+
+    <plurals name="apps_resumen">
+        <item quantity="one">%1$d выбрано · только оно использует VPN</item>
+        <item quantity="few">%1$d выбрано · только они используют VPN</item>
+        <item quantity="many">%1$d выбрано · только они используют VPN</item>
+        <item quantity="other">%1$d выбрано · только они используют VPN</item>
+    </plurals>
+
+    <string name="perfiles_titulo">Профили</string>
+    <string name="perfiles_vacio">Профилей пока нет. Создайте его кнопкой ниже.</string>
+    <string name="perfiles_en_uso">Используется: %1$s · удерживайте для изменения или удаления</string>
+    <string name="perfiles_toca">Нажмите на профиль, чтобы использовать его</string>
+    <string name="perfil_activo">АКТИВЕН</string>
+    <string name="nuevo_perfil">+  Новый профиль</string>
+    <string name="renombrar">Переименовать</string>
+    <string name="editar_configuracion">Изменить конфигурацию</string>
+    <string name="borrar">Удалить</string>
+    <string name="guardar">Сохранить</string>
+    <string name="cancelar">Отмена</string>
+    <string name="renombrar_perfil">Переименовать профиль</string>
+    <string name="nombre_perfil">Название профиля</string>
+    <string name="nombre_ejemplo">Название (например: Мой сервер)</string>
+    <string name="pega_conf">Вставьте сюда содержимое .conf</string>
+    <string name="elegir_archivo">Выбрать файл .conf</string>
+    <string name="borrar_perfil_titulo">Удалить профиль?</string>
+    <string name="perfil_borrado">Профиль удалён</string>
+    <string name="usando_perfil">Используется: %1$s</string>
+    <string name="conf_cargada">Конфигурация загружена, нажмите «Сохранить»</string>
+    <string name="archivo_vacio">Файл пустой</string>
+    <string name="archivo_no_valido">Этот файл не похож на .conf от AmneziaWG</string>
+    <string name="error_leer_archivo">Не удалось прочитать файл: %1$s</string>
+    <string name="nombre_vacio">Название не может быть пустым</string>
+    <string name="datos_incompletos">Не хватает данных: PrivateKey, PublicKey или Endpoint</string>
+    <string name="perfil_n">Профиль %1$d</string>
+    <string name="mi_servidor">Мой сервер</string>
+    <string name="sin_servidor">нет сервера</string>
+
+    <string name="importar_titulo">Импорт профиля</string>
+    <string name="guardar_perfil">Сохранить профиль</string>
+    <string name="no_archivo">Файл не получен</string>
+    <string name="perfil_importado">Импортированный профиль</string>
+    <string name="perfil_anadido">Профиль «%1$s» добавлен</string>
+
+    <string name="notificacion_texto">VPN подключена (AmneziaWG)</string>
+    <string name="canal_desc">Состояние подключения VPN</string>
+    <string name="error_tun">Android отклонил интерфейс TUN</string>
+    <string name="error_config">Нет конфигурации AmneziaWG</string>
+
+    <string name="permiso_denegado">Разрешение на VPN отклонено</string>
+    <string name="reconectando">Переподключение для применения изменений</string>
+    <string name="diagnostico">Диагностика</string>
+    <string name="compartir">Поделиться</string>
+    <string name="cerrar">Закрыть</string>
+    <string name="enviar">Отправить</string>
+    <string name="diagnostico_estado">Состояние: %1$s</string>
+    <string name="diagnostico_servidor">Сервер: %1$s</string>
+    <string name="diagnostico_mtu">MTU: %1$s</string>
+    <string name="diagnostico_dns">DNS: %1$s</string>
+    <string name="diagnostico_anuncios">Блокировка рекламы: %1$s</string>
+    <string name="diagnostico_recibido">Получено: %1$s</string>
+    <string name="diagnostico_enviado">Отправлено: %1$s</string>
+    <string name="diagnostico_handshake">Handshake: %1$s</string>
+    <string name="diagnostico_sin_datos">Нет данных от движка (туннель остановлен).</string>
+    <string name="si">да</string>
+    <string name="no">нет</string>
+    <string name="sin_configuracion">(нет конфигурации)</string>
+    <string name="desconocido">—</string>
+</resources>
