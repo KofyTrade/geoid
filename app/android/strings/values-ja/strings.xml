@@ -89,4 +89,8 @@
     <string name="no">いいえ</string>
     <string name="sin_configuracion">（設定なし）</string>
     <string name="desconocido">—</string>
+
+    <!-- Actualizaciones -->
+    <string name="nueva_version">新しいバージョン %1$s · タップしてダウンロード</string>
+    <string name="descargando">更新をダウンロード中…</string>
 </resources>

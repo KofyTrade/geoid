@@ -1,0 +1,61 @@
+name: Compilar y publicar
+
+# Se lanza al empujar una etiqueta de version (v1.1, v1.2...) o a mano.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  compilar:
+    name: APK firmado
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
+      - name: Preparar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Recuperar la clave de firma
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > geoid-release.jks
+
+      - name: Compilar el APK
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/geoid-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cd app/android-proyecto
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Renombrar el APK
+        run: |
+          mkdir -p salida
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF_NAME" ]; then VERSION="manual"; fi
+          cp app/android-proyecto/app/build/outputs/apk/release/app-release.apk \
+             "salida/GeoiD-vpn-${VERSION}.apk"
+          ls -lh salida/
+
+      - name: Publicar la version
+        uses: softprops/action-gh-release@v2
+        with:
+          files: salida/*.apk
+          name: GeoiD-vpn ${{ github.ref_name }}
+          body: |
+            APK firmado de GeoiD-vpn ${{ github.ref_name }}.
+
+            Instalalo sobre la version anterior: la app te avisara sola cuando
+            haya updates nuevos.
+          fail_on_unmatched_files: true

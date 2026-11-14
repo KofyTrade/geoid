@@ -95,4 +95,8 @@
     <string name="no">нет</string>
     <string name="sin_configuracion">(нет конфигурации)</string>
     <string name="desconocido">—</string>
+
+    <!-- Actualizaciones -->
+    <string name="nueva_version">Новая версия %1$s · нажмите, чтобы скачать</string>
+    <string name="descargando">Загрузка обновления…</string>
 </resources>

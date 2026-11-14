@@ -37,3 +37,9 @@ tools/
 app/_*.png
 app/*.png
 gh-login.txt*
+
+_*.xml
+
+*.jks
+firma-geoid.txt
+keystore.properties

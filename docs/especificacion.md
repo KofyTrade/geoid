@@ -1,7 +1,7 @@
 # Especificación — App VPN (hacia v3.0)
 
 > **v3.0 COMPLETADA** (14 nov, 13:11). Motor nuevo: **AmneziaWG** (WireGuard ofuscado).
-> Verificado: `{"ip":"193.29.224.164","country":"FI"}` y YouTube cargando con imágenes.
+> Verificado: `{"ip":"<IP_DEL_VPS>","country":"FI"}` y YouTube cargando con imágenes.
 >
 > ## Cómo se montó
 >

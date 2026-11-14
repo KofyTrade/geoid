@@ -91,4 +91,8 @@
     <string name="no">nein</string>
     <string name="sin_configuracion">(keine Konfiguration)</string>
     <string name="desconocido">—</string>
+
+    <!-- Actualizaciones -->
+    <string name="nueva_version">Neue Version %1$s · tippen zum Herunterladen</string>
+    <string name="descargando">Update wird heruntergeladen…</string>
 </resources>

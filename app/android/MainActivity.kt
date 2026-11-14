@@ -41,6 +41,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvVelocidad: TextView
     private lateinit var tvPing: TextView
     private lateinit var tvServidor: TextView
+    private lateinit var tvActualizacion: TextView
+
+    private var versionNueva: NuevaVersion? = null
+    private var yaComprobado = false
 
     private val COLOR_ACTIVO = 0xFF2EE6C5.toInt()
     private val COLOR_INACTIVO = 0xFF7FA8A4.toInt()
@@ -98,6 +102,14 @@ class MainActivity : AppCompatActivity() {
         tvVelocidad = findViewById(R.id.tvVelocidad)
         tvPing = findViewById(R.id.tvPing)
         tvServidor = findViewById(R.id.tvServidor)
+        tvActualizacion = findViewById(R.id.tvActualizacion)
+
+        // El banner de actualizacion descarga el APK nuevo al tocarlo.
+        tvActualizacion.setOnClickListener {
+            val nueva = versionNueva ?: return@setOnClickListener
+            Actualizador.descargar(this, nueva)
+            Toast.makeText(this, R.string.descargando, Toast.LENGTH_LONG).show()
+        }
 
         btnVpn.setOnClickListener {
             if (Estado.activo) {
@@ -134,6 +146,8 @@ class MainActivity : AppCompatActivity() {
 
         // Si venimos de la version de un solo perfil, se convierte en el primero.
         Perfiles.migrar(this)
+
+        buscarActualizacion()
     }
 
     override fun onResume() {
@@ -376,6 +390,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    /** Pregunta a GitHub si hay una version mas nueva y, si la hay, muestra el aviso. */
+    private fun buscarActualizacion() {
+        if (yaComprobado) return
+        yaComprobado = true
+
+        Thread {
+            val nueva = Actualizador.buscar() ?: return@Thread
+            val instalada = Actualizador.versionInstalada(this)
+            if (!Actualizador.esMasNueva(nueva.numero, instalada)) return@Thread
+
+            runOnUiThread {
+                versionNueva = nueva
+                tvActualizacion.text = getString(R.string.nueva_version, nueva.numero)
+                tvActualizacion.visibility = View.VISIBLE
+            }
+        }.start()
+    }
     // -------------------------------------------------------------- servicios
     private fun arrancar(conectar: Boolean) {
         val accion =

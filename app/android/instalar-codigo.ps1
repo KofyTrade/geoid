@@ -196,6 +196,16 @@ foreach ($p in $permisos) {
     }
 }
 
+if ($xmlMan -notmatch 'WRITE_EXTERNAL_STORAGE') {
+    $xmlMan = $xmlMan.Replace(
+        '<application',
+        ('    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"' +
+         ' android:maxSdkVersion="28" />' + "`n`n    <application")
+    )
+    $cambiado = $true
+    Ok 'permiso: WRITE_EXTERNAL_STORAGE (solo hasta Android 9)'
+}
+
 if ($xmlMan -notmatch 'AppsActivity') {
     $actividad = @"
         <activity

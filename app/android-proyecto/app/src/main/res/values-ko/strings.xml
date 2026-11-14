@@ -89,4 +89,8 @@
     <string name="no">아니요</string>
     <string name="sin_configuracion">(설정 없음)</string>
     <string name="desconocido">—</string>
+
+    <!-- Actualizaciones -->
+    <string name="nueva_version">새 버전 %1$s · 눌러서 다운로드</string>
+    <string name="descargando">업데이트 다운로드 중…</string>
 </resources>
