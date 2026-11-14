@@ -66,6 +66,20 @@ de publicidad. Las instrucciones están en [`docs/`](docs/):
 - [`docs/GUIA-01-servidor.md`](docs/GUIA-01-servidor.md) — preparar el VPS
 - [`docs/especificacion.md`](docs/especificacion.md) — decisiones tecnicas y fallos resueltos
 
+
+## Actualizaciones
+
+Las versiones se publican en [Releases](https://github.com/KofyTrade/geoid/releases).
+Al empujar una etiqueta `vX.Y` GitHub Actions compila el APK firmado y lo publica:
+
+```bash
+git tag v1.4 && git push origin v1.4
+```
+
+La app consulta la ultima release al abrirse y al conectar, y muestra un aviso
+para descargar la version nueva. **Importante**: el APK debe estar firmado
+siempre con la misma clave (`geoid-release.jks`), o Android rechazara la
+actualizacion por diferencia de firma.
 ## Notas
 
 - El proyecto **no incluye** claves, perfiles ni configuración de servidor:
