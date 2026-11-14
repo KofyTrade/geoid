@@ -44,3 +44,4 @@ _*.xml
 *.jks
 firma-geoid.txt
 keystore.properties
+gh-refresh.txt*

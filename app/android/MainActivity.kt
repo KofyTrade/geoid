@@ -201,6 +201,7 @@ class MainActivity : AppCompatActivity() {
 
             panelStats.visibility = View.VISIBLE
             pintarServidor()
+            buscarActualizacion()
             ultimoBytes = -1L
             ultimoInstante = 0L
             manejador.removeCallbacks(bucleStats)
@@ -410,6 +411,10 @@ class MainActivity : AppCompatActivity() {
     }
     // -------------------------------------------------------------- servicios
     private fun arrancar(conectar: Boolean) {
+        // Al conectar hay red de verdad (incluso si el operador bloquea GitHub),
+        // asi que se permite volver a comprobar la version.
+        if (conectar) yaComprobado = false
+
         val accion =
             if (conectar) AwgTunnelService.ACTION_CONNECT else AwgTunnelService.ACTION_DISCONNECT
         val i = Intent(this, AwgTunnelService::class.java).setAction(accion)

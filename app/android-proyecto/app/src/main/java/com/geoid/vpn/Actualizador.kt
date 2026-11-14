@@ -4,6 +4,7 @@ import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -40,11 +41,14 @@ object Actualizador {
             conexion.connectTimeout = 6000
             conexion.readTimeout = 6000
 
-            if (conexion.responseCode != HttpURLConnection.HTTP_OK) return null
+            val codigo = conexion.responseCode
+            Log.i("Geoid", "upd: respuesta HTTP " + codigo)
+            if (codigo != HttpURLConnection.HTTP_OK) return null
 
             val texto = conexion.inputStream.bufferedReader().use { it.readText() }
             val json = JSONObject(texto)
             val etiqueta = json.optString("tag_name").trim().removePrefix("v").removePrefix("V")
+            Log.i("Geoid", "upd: etiqueta=" + etiqueta)
             if (etiqueta.isEmpty()) return null
 
             val activos = json.optJSONArray("assets") ?: return null
@@ -61,6 +65,7 @@ object Actualizador {
 
             NuevaVersion(etiqueta, url, json.optString("body").orEmpty())
         } catch (e: Exception) {
+            Log.e("Geoid", "upd: error " + e.toString())
             null
         } finally {
             conexion?.disconnect()
