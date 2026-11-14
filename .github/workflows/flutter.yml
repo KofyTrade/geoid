@@ -36,8 +36,16 @@ jobs:
           flutter config --no-analytics
           flutter pub get
 
+      - name: Recuperar la clave de firma
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > geoid-release.jks
+
       - name: Compilar APK
         working-directory: flutter_app
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/geoid-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: flutter build apk --debug
 
       - name: Guardar el APK
