@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'services/nativo.dart';
+import '../services/nativo.dart';
 
 /// Un perfil: nombre visible + contenido del .conf.
 class Perfil {
