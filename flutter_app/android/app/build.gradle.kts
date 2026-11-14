@@ -23,7 +23,7 @@ val rutaKeystore = valor("storeFile", "KEYSTORE_PATH")
 val hayFirma = rutaKeystore != null && file(rutaKeystore).exists()
 
 android {
-    namespace = "com.geoid.geoid_vpn"
+    namespace = "com.geoid.vpn"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

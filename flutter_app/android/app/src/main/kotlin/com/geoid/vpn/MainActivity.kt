@@ -9,7 +9,6 @@ import android.net.Uri
 import android.net.VpnService
 import android.os.Build
 import android.os.Environment
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.geoid.awg.Awg
 import io.flutter.embedding.android.FlutterActivity
@@ -34,13 +33,20 @@ class MainActivity : FlutterActivity() {
     private var resultadoArchivo: MethodChannel.Result? = null
     private var receptor: BroadcastReceiver? = null
 
-    // Selector de ficheros (Activity Result API).
-    private val selector = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private fun abrirSelectorDeArchivos(resultado: MethodChannel.Result) {
+        resultadoArchivo = resultado
+        val intencion = Intent(Intent.ACTION_GET_CONTENT)
+            .setType("*/*")
+            .addCategory(Intent.CATEGORY_OPENABLE)
+        startActivityForResult(intencion, 1002)
+    }
+
+    private fun leerArchivo(uri: android.net.Uri?) {
         val destino = resultadoArchivo
         resultadoArchivo = null
         if (uri == null) {
             destino?.success(null)
-            return@registerForActivityResult
+            return
         }
         try {
             val texto = contentResolver.openInputStream(uri)
@@ -79,10 +85,7 @@ class MainActivity : FlutterActivity() {
 
                     "listarApps" -> resultado.success(listarApps())
 
-                    "elegirArchivo" -> {
-                        resultadoArchivo = resultado
-                        selector.launch("*/*")
-                    }
+                    "elegirArchivo" -> abrirSelectorDeArchivos(resultado)
 
                     "prepararVpn" -> resultado.success(prepararVpn())
 
@@ -198,6 +201,10 @@ class MainActivity : FlutterActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 1001) {
             canalMetodos.invokeMethod("vpnConcedida", resultCode == RESULT_OK)
+            return
+        }
+        if (requestCode == 1002) {
+            leerArchivo(if (resultCode == RESULT_OK) data?.data else null)
             return
         }
         super.onActivityResult(requestCode, resultCode, data)
