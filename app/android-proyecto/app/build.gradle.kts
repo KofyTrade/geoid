@@ -29,8 +29,8 @@ android {
         applicationId = "com.geoid.vpn"
         minSdk = 24
         targetSdk = 37
-        versionCode = 4
-        versionName = "1.3"
+        versionCode = 5
+        versionName = "1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -48,10 +48,9 @@ android {
 
     buildTypes {
         release {
-            optimization {
-                enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
-            }
+            // OJO: no activar "optimization" (R8). Con esta version de AGP rompe
+            // el arranque con IllegalAccessError en kotlin.collections.
+            // El APK pesa algo mas, pero funciona.
             if (rutaKeystore != null && file(rutaKeystore).exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }
