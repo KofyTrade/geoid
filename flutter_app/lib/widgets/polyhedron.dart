@@ -155,24 +155,26 @@ class _PintorPoliedro extends CustomPainter {
     final rotados = _vertices.map(rotar).toList();
     final proyectados = rotados.map(proyectar).toList();
 
-    // Aristas (halo + linea)
+    // Aristas (halo + linea). Cada capa: [fraccion de escala, alfa base].
     final pincel = Paint()
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    for (final anchos in [
-      [escala * 0.030, 26],
-      [escala * 0.018, 64],
-      [escala * 0.009, 235],
-    ]) {
-      final grosor = anchos[0];
-      final alfaBase = anchos[1] as int;
+    const capas = <List<double>>[
+      [0.030, 26],
+      [0.018, 64],
+      [0.009, 235],
+    ];
+
+    for (final capa in capas) {
+      final grosor = escala * capa[0];
+      final alfaBase = capa[1];
       for (final a in _aristas) {
         final p = rotados[a[0]];
         final q = rotados[a[1]];
         final prof = (p[2] + q[2]) / 2;
         final cerca = ((1.7 - prof) / 3.4).clamp(0.0, 1.0);
-        final alfa = (alfaBase * (0.45 + 0.55 * cerca)).toInt();
+        final alfa = alfaBase * (0.45 + 0.55 * cerca);
         pincel.color = conectado
             ? GeoidColors.acento.withValues(alpha: alfa / 255)
             : const Color(0xFF3C8C8C).withValues(alpha: alfa / 255 * 0.55);
