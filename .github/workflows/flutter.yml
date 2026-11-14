@@ -1,0 +1,48 @@
+name: Flutter (Android)
+
+# Compila la app Flutter en Android. Se lanza al tocar flutter_app/ o a mano.
+on:
+  push:
+    paths:
+      - 'flutter_app/**'
+      - '.github/workflows/flutter.yml'
+  workflow_dispatch:
+
+jobs:
+  apk:
+    name: APK de depuracion
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
+      - name: Preparar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Preparar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.50.0'
+          channel: stable
+          cache: true
+
+      - name: Dependencias
+        working-directory: flutter_app
+        run: |
+          flutter config --no-analytics
+          flutter pub get
+
+      - name: Compilar APK
+        working-directory: flutter_app
+        run: flutter build apk --debug
+
+      - name: Guardar el APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: geoid-flutter-debug
+          path: flutter_app/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
