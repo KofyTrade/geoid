@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Geoid</string>
-    <string name="marca">GEOID</string>
+    <string name="app_name">GeoiD-vpn</string>
+    <string name="marca">GEOID-VPN</string>
 
     <string name="estado_conectado">CONECTADO</string>
     <string name="estado_desconectado">DESCONECTADO</string>

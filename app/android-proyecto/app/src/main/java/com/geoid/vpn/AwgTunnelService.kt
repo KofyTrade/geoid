@@ -83,7 +83,7 @@ class AwgTunnelService : VpnService() {
             val mtu = cfg.mtu
 
             val builder = Builder()
-                .setSession("Geoid")
+                .setSession(getString(R.string.app_name))
                 .setMtu(mtu)
 
             for (d in cfg.direcciones) {
@@ -204,7 +204,7 @@ class AwgTunnelService : VpnService() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         return NotificationCompat.Builder(this, CANAL)
-            .setContentTitle("Geoid")
+            .setContentTitle(getString(R.string.app_name))
             .setContentText(getString(R.string.notificacion_texto))
             .setSmallIcon(android.R.drawable.ic_lock_lock)
             .setOngoing(true)
