@@ -23,6 +23,7 @@ keys/
 *.apk
 *.aab
 *.aar
+!app/android-proyecto/app/libs/awg.aar
 build/
 .gradle/
 .idea/
