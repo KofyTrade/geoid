@@ -59,6 +59,14 @@ class _HomeScreenState extends State<HomeScreen> {
     _escucharEstado();
     _buscarActualizacion();
 
+    Nativo.alRecibirArchivo(() {
+      _revisarArchivoEntrante();
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _revisarArchivoEntrante();
+    });
+
     Nativo.alConcederVpn((concedido) {
       if (concedido) {
         _conectarAhora();
@@ -372,6 +380,25 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+
+  /// Si la app se ha abierto con un .conf, se va directo a crear el perfil.
+  Future<void> _revisarArchivoEntrante() async {
+    final conf = await Nativo.archivoEntrante();
+    if (conf == null || conf.trim().isEmpty || !mounted) return;
+
+    final texto = conf.toLowerCase();
+    if (!texto.contains('[interface]') || !texto.contains('[peer]')) {
+      _error(t('error_config'));
+      return;
+    }
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ProfilesScreen(confInicial: conf)),
+    );
+    final perfil = await Almacen.activoPerfil();
+    if (mounted) setState(() => _perfil = perfil);
+    await _actualizarResumenApps();
+  }
   Future<void> _abrirAplicaciones() async {
     if (!esAndroid) {
       _dialogoSoloAndroid();

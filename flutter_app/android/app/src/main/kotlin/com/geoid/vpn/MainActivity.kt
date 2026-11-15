@@ -35,6 +35,9 @@ class MainActivity : FlutterActivity() {
     private var eventos: EventChannel.EventSink? = null
     private var resultadoVpn: MethodChannel.Result? = null
     private var resultadoArchivo: MethodChannel.Result? = null
+
+    // Contenido del .conf que llega al abrir un archivo (ACTION_VIEW o SEND).
+    private var archivoEntrante: String? = null
     private var receptor: BroadcastReceiver? = null
 
     private fun abrirSelectorDeArchivos(resultado: MethodChannel.Result) {
@@ -63,6 +66,8 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+
+        leerIntent(intent)
 
         canalMetodos = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CANAL)
         canalMetodos.setMethodCallHandler { llamada, resultado ->
@@ -104,6 +109,13 @@ class MainActivity : FlutterActivity() {
                     )
 
                     "elegirArchivo" -> abrirSelectorDeArchivos(resultado)
+
+                    // Archivo .conf con el que han abierto la app
+                    "archivoEntrante" -> {
+                        val texto = archivoEntrante
+                        archivoEntrante = null
+                        resultado.success(texto)
+                    }
 
                     "prepararVpn" -> resultado.success(prepararVpn())
 
@@ -214,6 +226,33 @@ class MainActivity : FlutterActivity() {
         resultadoVpn = null
         startActivityForResult(intencion, 1001)
         return false
+    }
+
+    override fun onNewIntent(intencion: Intent) {
+        super.onNewIntent(intencion)
+        setIntent(intencion)
+        leerIntent(intencion)
+        if (archivoEntrante != null) {
+            runOnUiThread { canalMetodos.invokeMethod("nuevoArchivo", null) }
+        }
+    }
+
+    /** Guarda el texto de un .conf recibido por VIEW o SEND. */
+    private fun leerIntent(intencion: Intent?) {
+        if (intencion == null) return
+        val uri: android.net.Uri? = when (intencion.action) {
+            Intent.ACTION_VIEW -> intencion.data
+            Intent.ACTION_SEND -> intencion.getParcelableExtra(Intent.EXTRA_STREAM)
+            else -> null
+        } ?: return
+
+        try {
+            val texto = contentResolver.openInputStream(uri)
+                ?.bufferedReader()?.use { it.readText() }
+            if (!texto.isNullOrBlank()) archivoEntrante = texto
+        } catch (e: Exception) {
+            android.util.Log.w("Geoid", "no se pudo leer el archivo entrante", e)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

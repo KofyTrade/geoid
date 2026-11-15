@@ -123,6 +123,49 @@ class Nativo {
   }
 
   /// Arquitectura del telefono (arm64-v8a, armeabi-v7a, x86_64...).
+  static void Function(bool)? _callbackVpn;
+  static void Function()? _callbackArchivo;
+  static bool _escuchando = false;
+
+  /// Un unico receptor para todos los avisos nativos.
+  static void _escuchar() {
+    if (_escuchando || !esAndroid) return;
+    _escuchando = true;
+    _canal.setMethodCallHandler((llamada) async {
+      switch (llamada.method) {
+        case 'vpnConcedida':
+          _callbackVpn?.call(llamada.arguments as bool? ?? false);
+          break;
+        case 'nuevoArchivo':
+          _callbackArchivo?.call();
+          break;
+      }
+      return null;
+    });
+  }
+
+  /// Escucha la respuesta del dialogo de permiso de VPN.
+  static void alConcederVpn(void Function(bool concedido) callback) {
+    _callbackVpn = callback;
+    _escuchar();
+  }
+
+  /// Avisa cuando llega un archivo mientras la app ya esta abierta.
+  static void alRecibirArchivo(void Function() callback) {
+    _callbackArchivo = callback;
+    _escuchar();
+  }
+
+  /// Texto del .conf con el que han abierto la app (o null).
+  static Future<String?> archivoEntrante() async {
+    if (!esAndroid) return null;
+    try {
+      return await _canal.invokeMethod<String>('archivoEntrante');
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<String> abi() async {
     if (!esAndroid) return '';
     try {
@@ -228,16 +271,7 @@ if ($d.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { Write-Output 
     await _canal.invokeMethod('descargar', {'url': url, 'nombre': nombre});
   }
 
-  /// Escucha la respuesta del dialogo de permiso de VPN.
-  static void alConcederVpn(void Function(bool concedido) callback) {
-    if (!esAndroid) return;
-    _canal.setMethodCallHandler((llamada) async {
-      if (llamada.method == 'vpnConcedida') {
-        callback(llamada.arguments as bool? ?? false);
-      }
-      return null;
-    });
-  }
+
 
   /// Avisos de estado del tunel: {activo: bool, error: String?}
   static Stream<Map<String, dynamic>> estado() {

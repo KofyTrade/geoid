@@ -7,7 +7,10 @@ import '../services/registro.dart';
 import '../theme.dart';
 
 class ProfilesScreen extends StatefulWidget {
-  const ProfilesScreen({super.key});
+  /// Si viene de abrir un .conf desde fuera, el contenido ya listo.
+  final String? confInicial;
+
+  const ProfilesScreen({super.key, this.confInicial});
 
   @override
   State<ProfilesScreen> createState() => _ProfilesScreenState();
@@ -33,15 +36,22 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
       _activo = activo ?? (lista.isEmpty ? null : lista.first.nombre);
       _cargando = false;
     });
+
+    // Si venimos de abrir un .conf, se abre el dialogo ya relleno.
+    final inicial = widget.confInicial;
+    if (inicial != null && inicial.trim().isNotEmpty) {
+      _nuevoOEditar(contenidoInicial: inicial);
+    }
   }
 
   /// Dialogo unico: nombre editable, texto y boton de importar archivo.
-  Future<void> _nuevoOEditar({Perfil? existente}) async {
+  Future<void> _nuevoOEditar({Perfil? existente, String? contenidoInicial}) async {
     final resultado = await showDialog<({String nombre, String conf})>(
       context: context,
       barrierDismissible: false,
       builder: (_) => DialogoPerfil(
         perfil: existente,
+        contenidoInicial: contenidoInicial,
         sugerido: existente?.nombre ?? 'Perfil ${_perfiles.length + 1}',
       ),
     );
@@ -261,9 +271,15 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
 /// Dialogo de perfil: nombre, contenido y boton de importar desde archivo.
 class DialogoPerfil extends StatefulWidget {
   final Perfil? perfil;
+  final String? contenidoInicial;
   final String sugerido;
 
-  const DialogoPerfil({super.key, this.perfil, required this.sugerido});
+  const DialogoPerfil({
+    super.key,
+    this.perfil,
+    this.contenidoInicial,
+    required this.sugerido,
+  });
 
   @override
   State<DialogoPerfil> createState() => _DialogoPerfilState();
@@ -273,7 +289,7 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
   late final TextEditingController _nombre =
       TextEditingController(text: widget.sugerido);
   late final TextEditingController _conf =
-      TextEditingController(text: widget.perfil?.conf ?? '');
+      TextEditingController(\n        text: widget.perfil?.conf ?? widget.contenidoInicial ?? '',\n      );
   String? _error;
   bool _importando = false;
 
