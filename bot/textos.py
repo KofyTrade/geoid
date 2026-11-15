@@ -116,10 +116,9 @@ TEXTOS = {
         "manual_boton": "✅ Ya he pagado",
         "manual_aviso": "✅ Aviso enviado. En cuanto confirmemos el pago recibirás tu configuración aquí mismo.",
         "manual_admin": (
-            "💳 <b>Pago pendiente</b>\n\n"
-            "Usuario: {usuario} (ID <code>{id}</code>)\n"
-            "Plan: <b>{meses} mes(es)</b> · {importe} ₽\n\n"
-            "Pulsa el botón cuando veas el ingreso:"
+            "💰 <b>PAGO {importe} ₽ · {meses} mes(es)</b>\n\n"
+            "Usuario: {usuario} (ID <code>{id}</code>)\n\n"
+            "Pulsa el botón cuando veas el ingreso en el banco:"
         ),
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
@@ -235,9 +234,8 @@ TEXTOS = {
         "manual_boton": "✅ Я оплатил",
         "manual_aviso": "✅ Заявка отправлена. Как только подтвердим оплату, конфигурация придёт сюда.",
         "manual_admin": (
-            "💳 <b>Ожидает оплаты</b>\n\n"
-            "Пользователь: {usuario} (ID <code>{id}</code>)\n"
-            "Тариф: <b>{meses} мес.</b> · {importe} ₽\n\n"
+            "💰 <b>ОПЛАТА {importe} ₽ · {meses} мес.</b>\n\n"
+            "Пользователь: {usuario} (ID <code>{id}</code>)\n\n"
             "Нажмите кнопку, когда увидите поступление:"
         ),
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
@@ -345,9 +343,8 @@ TEXTOS = {
         "manual_boton": "✅ I have paid",
         "manual_aviso": "✅ Sent. As soon as we confirm the payment your configuration arrives here.",
         "manual_admin": (
-            "💳 <b>Payment pending</b>\n\n"
-            "User: {usuario} (ID <code>{id}</code>)\n"
-            "Plan: <b>{meses} month(s)</b> · {importe} ₽\n\n"
+            "💰 <b>PAYMENT {importe} ₽ · {meses} month(s)</b>\n\n"
+            "User: {usuario} (ID <code>{id}</code>)\n\n"
             "Press the button once you see the transfer:"
         ),
         "activar_ok": "Activated {id} until {fecha}.",        "pais": "Finland",
