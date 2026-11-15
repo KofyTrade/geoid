@@ -27,8 +27,8 @@ class _PolyhedronState extends State<Polyhedron>
   Duration _ultimo = Duration.zero;
 
   /// Limita los fotogramas: 60 cuando gira deprisa, 30 cuando esta quieto.
-  static const double _paso60 = 1.0 / 60.0;
-  static const double _paso30 = 1.0 / 30.0;
+  static const double _paso60 = 1.0 / 70.0;
+  static const double _paso30 = 1.0 / 35.0;
 
   @override
   void initState() {
@@ -37,10 +37,13 @@ class _PolyhedronState extends State<Polyhedron>
   }
 
   void _alLatir(Duration tiempo) {
-    final dt = _ultimo == Duration.zero
-        ? 0.0
-        : (tiempo - _ultimo).inMicroseconds / 1000000.0;
+    // Primer latido: solo se toma la referencia de tiempo.
+    if (_ultimo == Duration.zero) {
+      _ultimo = tiempo;
+      return;
+    }
 
+    final dt = (tiempo - _ultimo).inMicroseconds / 1000000.0;
     final minimo = widget.conectado ? _paso60 : _paso30;
     if (dt < minimo) return;
     _ultimo = tiempo;
