@@ -96,7 +96,7 @@ TEXTOS = {
         "metodo_titulo": "¿Cómo quieres pagar?",
         "metodo_stars": "⭐ Estrellas de Telegram",
         "metodo_crypto": "🪙 Cripto (USDT / TON)",
-        "metodo_manual": "💳 Transferencia o tarjeta",
+        "metodo_manual": "💳 СБП / Tarjeta rusa",
         "cripto_texto": (
             "🪙 <b>Factura creada</b>\n\n"
             "Importe: <b>{monto} USDT</b>\n"
@@ -216,7 +216,7 @@ TEXTOS = {
         "metodo_titulo": "Как оплатить?",
         "metodo_stars": "⭐ Звёзды Telegram",
         "metodo_crypto": "🪙 Криптовалюта (USDT / TON)",
-        "metodo_manual": "💳 Перевод или карта",
+        "metodo_manual": "💳 СБП / Карта РФ",
         "cripto_texto": (
             "🪙 <b>Счёт создан</b>\n\n"
             "Сумма: <b>{monto} USDT</b>\n"
@@ -327,7 +327,7 @@ TEXTOS = {
         "metodo_titulo": "How do you want to pay?",
         "metodo_stars": "⭐ Telegram stars",
         "metodo_crypto": "🪙 Crypto (USDT / TON)",
-        "metodo_manual": "💳 Bank transfer or card",
+        "metodo_manual": "💳 SBP / Russian card",
         "cripto_texto": (
             "🪙 <b>Invoice created</b>\n\n"
             "Amount: <b>{monto} USDT</b>\n"
