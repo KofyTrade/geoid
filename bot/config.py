@@ -43,5 +43,25 @@ URL_WINDOWS = (
     "https://github.com/KofyTrade/geoid/releases/latest/download/GeoiD-vpn-Windows.zip"
 )
 
+
+# --- Cripto (Crypto Pay de @CryptoBot) ---
+# Token de la app: @CryptoBot -> Crypto Pay -> Create App
+CRYPTO_TOKEN = os.environ.get("GEOID_CRYPTO_TOKEN", "")
+CRYPTO_MONEDA = os.environ.get("GEOID_CRYPTO_MONEDA", "USDT")
+
+# Precios en dolares para cripto (los de estrellas son aparte).
+PRECIOS_USD = {
+    1: float(os.environ.get("GEOID_USD_1M", "3.5")),
+    3: float(os.environ.get("GEOID_USD_3M", "9")),
+    12: float(os.environ.get("GEOID_USD_12M", "30")),
+}
+
+# --- Pago manual (transferencia rusa / tarjeta) ---
+# Texto que se muestra al cliente. Pon tus datos reales.
+PAGO_MANUAL = os.environ.get(
+    "GEOID_PAGO_MANUAL",
+    "Transferencia a la tarjeta 0000 0000 0000 0000 (nombre) o por SBP al "
+    "telefono +7 000 000 00 00. En el comentario escribe tu ID de Telegram.",
+)
 # Nombre comercial
 MARCA = os.environ.get("GEOID_MARCA", "GeoiD VPN")

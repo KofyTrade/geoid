@@ -140,3 +140,61 @@ Al empezar a vender:
 - No prometas "imposible de bloquear": AmneziaWG ofusca, pero ningún protocolo
   es inmune para siempre.
 - Revisa las condiciones de Telegram para bots de pago en tu país.
+
+## Pagos: tres métodos
+
+Al elegir un plan, el bot pregunta cómo pagar:
+
+| Método | Cómo funciona | Qué necesitas |
+|---|---|---|
+| ⭐ **Estrellas** | Telegram cobra al instante | nada (ya funciona) |
+| 🪙 **Cripto** | Factura de Crypto Pay; el bot la vigila y activa solo | token de @CryptoBot → Crypto Pay → Create App |
+| 💳 **Transferencia / tarjeta rusa** | El cliente paga y tú activas con `/activar ID MESES` | tus datos de cobro |
+
+### Activar cripto
+
+1. Abre **@CryptoBot** → **Crypto Pay** → **Create App**
+2. Copia el token y pégalo en `/etc/geoid-bot.env`:
+
+```bash
+cat >> /etc/geoid-bot.env <<'EOF'
+GEOID_CRYPTO_TOKEN=PEGA_EL_TOKEN
+GEOID_CRYPTO_MONEDA=USDT
+GEOID_USD_1M=3.5
+GEOID_USD_3M=9
+GEOID_USD_12M=30
+EOF
+systemctl restart geoid-bot
+```
+
+El bot consulta las facturas pagadas cada 45 segundos y activa el acceso sin
+intervención. Acepta USDT, TON, BTC, TRX… según lo que configures.
+
+### Activar pago por transferencia
+
+Pon tus datos reales (tarjeta o SBP). Puedes cambiarlos cuando quieras:
+
+```bash
+sed -i "s|^GEOID_PAGO_MANUAL=.*|GEOID_PAGO_MANUAL=Tarjeta 2200 0000 0000 0000 (Ivan I.) o SBP al +7 900 000 00 00. Comentario: tu ID de Telegram.|" /etc/geoid-bot.env
+systemctl restart geoid-bot
+```
+
+Cuando alguien pulse **“Ya he pagado”**, te llegará un aviso con su ID. Lo
+activas con:
+
+```
+/activar 123456789 1
+```
+
+Y el cliente recibe su `.conf` al instante.
+
+### Tarjeta internacional
+
+Ya está cubierta: las **estrellas** se compran con tarjeta internacional desde
+cualquier Telegram. No hace falta pasarela propia.
+
+### Si algún día quieres cobro automático con tarjeta rusa
+
+Eso exige cuenta de autónomo/IP, contrato de adquirencia con un banco
+(YooKassa, CloudPayments, Tinkoff) y, normalmente, cheques fiscales. Es un paso
+administrativo, no técnico.

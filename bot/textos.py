@@ -93,7 +93,31 @@ TEXTOS = {
             "Los pagos con estrellas aún no están activados en este bot.\n"
             "Pide acceso manual al administrador."
         ),
-        "pais": "Finlandia",
+        "metodo_titulo": "¿Cómo quieres pagar?",
+        "metodo_stars": "⭐ Estrellas de Telegram",
+        "metodo_crypto": "🪙 Cripto (USDT / TON)",
+        "metodo_manual": "💳 Transferencia o tarjeta",
+        "cripto_texto": (
+            "🪙 <b>Factura creada</b>\n\n"
+            "Importe: <b>{monto} USDT</b>\n"
+            "Paga aquí: {url}\n\n"
+            "Se activa sola en cuanto se confirme el pago (1-2 minutos)."
+        ),
+        "cripto_no": "El pago con cripto no está disponible ahora mismo. Usa estrellas o transferencia.",
+        "manual_texto": (
+            "💳 <b>Pago por transferencia</b>\n\n{datos}\n\n"
+            "Cuando lo hayas hecho, pulsa el botón de abajo y te activamos a mano "
+            "(normalmente en minutos)."
+        ),
+        "manual_boton": "✅ Ya he pagado",
+        "manual_aviso": "Aviso enviado. En cuanto lo comprobemos, tu acceso se activa.",
+        "manual_admin": (
+            "💳 <b>Pago manual pendiente</b>\n\n"
+            "Usuario: {usuario} (ID <code>{id}</code>)\n"
+            "Plan: {meses} mes(es)\n\n"
+            "Activa con:\n<code>/activar {id} {meses}</code>"
+        ),
+        "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
         "bienvenida": (
@@ -184,7 +208,31 @@ TEXTOS = {
             "Оплата звёздами ещё не включена в этом боте.\n"
             "Напишите администратору."
         ),
-        "pais": "Финляндия",
+        "metodo_titulo": "Как оплатить?",
+        "metodo_stars": "⭐ Звёзды Telegram",
+        "metodo_crypto": "🪙 Криптовалюта (USDT / TON)",
+        "metodo_manual": "💳 Перевод или карта",
+        "cripto_texto": (
+            "🪙 <b>Счёт создан</b>\n\n"
+            "Сумма: <b>{monto} USDT</b>\n"
+            "Оплатить: {url}\n\n"
+            "Доступ включится автоматически после подтверждения (1-2 минуты)."
+        ),
+        "cripto_no": "Оплата криптой сейчас недоступна. Используйте звёзды или перевод.",
+        "manual_texto": (
+            "💳 <b>Оплата переводом</b>\n\n{datos}\n\n"
+            "После оплаты нажмите кнопку ниже — активируем вручную "
+            "(обычно в течение нескольких минут)."
+        ),
+        "manual_boton": "✅ Я оплатил",
+        "manual_aviso": "Заявка отправлена. Как только проверим — доступ включится.",
+        "manual_admin": (
+            "💳 <b>Ожидает оплаты</b>\n\n"
+            "Пользователь: {usuario} (ID <code>{id}</code>)\n"
+            "Тариф: {meses} мес.\n\n"
+            "Активировать:\n<code>/activar {id} {meses}</code>"
+        ),
+        "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
         "bienvenida": (
@@ -266,7 +314,31 @@ TEXTOS = {
         ),
         "error_generico": "Something went wrong. Try again in a minute.",
         "sin_pagos": "Star payments are not enabled in this bot yet.",
-        "pais": "Finland",
+        "metodo_titulo": "How do you want to pay?",
+        "metodo_stars": "⭐ Telegram stars",
+        "metodo_crypto": "🪙 Crypto (USDT / TON)",
+        "metodo_manual": "💳 Bank transfer or card",
+        "cripto_texto": (
+            "🪙 <b>Invoice created</b>\n\n"
+            "Amount: <b>{monto} USDT</b>\n"
+            "Pay here: {url}\n\n"
+            "It activates by itself once the payment confirms (1-2 minutes)."
+        ),
+        "cripto_no": "Crypto payment is unavailable right now. Use stars or a transfer.",
+        "manual_texto": (
+            "💳 <b>Bank transfer</b>\n\n{datos}\n\n"
+            "After paying, press the button below and we activate it manually "
+            "(usually within minutes)."
+        ),
+        "manual_boton": "✅ I have paid",
+        "manual_aviso": "Sent. As soon as we check it, your access activates.",
+        "manual_admin": (
+            "💳 <b>Manual payment pending</b>\n\n"
+            "User: {usuario} (ID <code>{id}</code>)\n"
+            "Plan: {meses} month(s)\n\n"
+            "Activate with:\n<code>/activar {id} {meses}</code>"
+        ),
+        "activar_ok": "Activated {id} until {fecha}.",        "pais": "Finland",
     },
 }
 

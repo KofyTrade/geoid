@@ -150,3 +150,19 @@ def crear_promo(codigo: str, dias: int, usos: int):
             "VALUES (?, ?, ?, 0)",
             (codigo.strip().upper(), dias, usos),
         )
+
+def pago_existe(cargo: str) -> bool:
+    with conectar() as con:
+        fila = con.execute(
+            "SELECT 1 FROM pagos WHERE cargo = ? LIMIT 1", (cargo,)
+        ).fetchone()
+        return fila is not None
+
+
+def pago_mas_reciente(tg_id: int) -> dict | None:
+    with conectar() as con:
+        fila = con.execute(
+            "SELECT * FROM pagos WHERE tg_id = ? ORDER BY cuando DESC LIMIT 1",
+            (tg_id,),
+        ).fetchone()
+        return dict(fila) if fila else None

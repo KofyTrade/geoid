@@ -28,6 +28,7 @@ from aiogram.types import (
 
 import config
 import db
+import pagos
 import provision
 from textos import IDIOMAS, t
 
@@ -211,6 +212,35 @@ async def comando_regalar(mensaje: Message, command: CommandObject):
     await mensaje.answer(f"Activado para {tg_id} hasta {fecha(usuario['expira'])}.")
 
 
+@router.message(Command("activar"))
+async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
+    """Administrador: activa a mano un pago por transferencia."""
+    if mensaje.from_user.id != ADMIN:
+        return
+    partes = (command.args or "").split()
+    if len(partes) != 2:
+        await mensaje.answer("Uso: /activar ID MESES")
+        return
+    tg_id, meses = int(partes[0]), int(partes[1])
+    db.crear_si_falta(tg_id, None)
+    usuario = activar(tg_id, 30 * meses)
+    db.registrar_pago(tg_id, meses, 0, f"manual:{int(time.time())}")
+    await mensaje.answer(
+        t(idioma(mensaje.from_user.id), "activar_ok",
+          id=tg_id, fecha=fecha(usuario["expira"])),
+        parse_mode=ParseMode.HTML,
+    )
+    try:
+        await bot.send_message(
+            tg_id,
+            t(idioma(tg_id), "pago_ok", fecha=fecha(usuario["expira"])),
+            parse_mode=ParseMode.HTML,
+        )
+        await enviar_conf(bot, tg_id, usuario, "GeoiD · transferencia")
+    except Exception:  # noqa: BLE001
+        log.warning("no se pudo avisar al cliente %s", tg_id)
+
+
 @router.message(Command("estado"))
 async def comando_estado(mensaje: Message):
     if mensaje.from_user.id != ADMIN:
@@ -298,8 +328,30 @@ async def boton_comprar(llamada: CallbackQuery):
 
 
 @router.callback_query(F.data.startswith("plan:"))
-async def boton_plan(llamada: CallbackQuery, bot: Bot):
+async def boton_plan(llamada: CallbackQuery):
+    """Elige el plan: ahora toca elegir cómo pagar."""
     meses = int(llamada.data.split(":")[1])
+    idi = idioma(llamada.from_user.id)
+
+    filas = [
+        [InlineKeyboardButton(
+            text=t(idi, "metodo_stars"), callback_data=f"metodo:stars:{meses}")],
+        [InlineKeyboardButton(
+            text=t(idi, "metodo_crypto"), callback_data=f"metodo:crypto:{meses}")],
+        [InlineKeyboardButton(
+            text=t(idi, "metodo_manual"), callback_data=f"metodo:manual:{meses}")],
+        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
+    ]
+    await llamada.message.edit_text(
+        t(idi, "metodo_titulo"),
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("metodo:stars:"))
+async def pago_estrellas(llamada: CallbackQuery, bot: Bot):
+    meses = int(llamada.data.split(":")[2])
     estrellas = config.PRECIOS[meses]
     idi = idioma(llamada.from_user.id)
 
@@ -311,6 +363,72 @@ async def boton_plan(llamada: CallbackQuery, bot: Bot):
         provider_token="",
         currency="XTR",
         prices=[LabeledPrice(label=f"{meses} m", amount=estrellas)],
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("metodo:crypto:"))
+async def pago_cripto(llamada: CallbackQuery):
+    meses = int(llamada.data.split(":")[2])
+    idi = idioma(llamada.from_user.id)
+
+    factura = await pagos.crear_factura(meses, llamada.from_user.id)
+    if not factura or not factura.get("url"):
+        await llamada.answer(t(idi, "cripto_no"), show_alert=True)
+        return
+
+    teclado = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🪙 " + f"{factura['monto']} USDT", url=factura["url"])],
+        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
+    ])
+    await llamada.message.edit_text(
+        t(idi, "cripto_texto", monto=factura["monto"], url=factura["url"]),
+        reply_markup=teclado,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("metodo:manual:"))
+async def pago_manual(llamada: CallbackQuery):
+    meses = int(llamada.data.split(":")[2])
+    idi = idioma(llamada.from_user.id)
+
+    teclado = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text=t(idi, "manual_boton"), callback_data=f"paguei:{meses}")],
+        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
+    ])
+    await llamada.message.edit_text(
+        t(idi, "manual_texto", datos=config.PAGO_MANUAL),
+        reply_markup=teclado,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("paguei:"))
+async def avisar_pago_manual(llamada: CallbackQuery, bot: Bot):
+    meses = int(llamada.data.split(":")[1])
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+    usuario = db.obtener(tg_id) or {}
+
+    if ADMIN:
+        try:
+            await bot.send_message(
+                ADMIN,
+                t("es", "manual_admin", usuario=usuario.get("usuario") or "—",
+                  id=tg_id, meses=meses),
+                parse_mode=ParseMode.HTML,
+            )
+        except Exception:  # noqa: BLE001
+            log.warning("no se pudo avisar al administrador")
+
+    await llamada.message.edit_text(
+        t(idi, "manual_aviso"), reply_markup=teclado_volver(tg_id)
     )
     await llamada.answer()
 
@@ -525,6 +643,43 @@ async def vigilar_caducidades(bot: Bot):
             log.exception("error revisando caducidades")
 
 
+
+async def vigilar_cripto(bot: Bot):
+    """Cada 45 segundos mira si alguien pagó con cripto y lo activa."""
+    if not pagos.disponible():
+        log.info("cripto desactivado (falta GEOID_CRYPTO_TOKEN)")
+        return
+
+    while True:
+        await asyncio.sleep(45)
+        try:
+            for factura in await pagos.facturas_pagadas():
+                datos = pagos.leer_payload(factura.get("payload") or "")
+                if not datos:
+                    continue
+                tg_id, meses = datos
+                cargo = f"crypto:{factura.get('invoice_id')}"
+                if db.pago_existe(cargo):
+                    continue
+
+                db.crear_si_falta(tg_id, None)
+                usuario = activar(tg_id, 30 * meses)
+                db.registrar_pago(
+                    tg_id, meses,
+                    int(float(factura.get("amount") or 0)), cargo,
+                )
+                try:
+                    await bot.send_message(
+                        tg_id,
+                        t(idioma(tg_id), "pago_ok", fecha=fecha(usuario["expira"])),
+                        parse_mode=ParseMode.HTML,
+                    )
+                    await enviar_conf(bot, tg_id, usuario, "GeoiD · cripto")
+                except Exception:  # noqa: BLE001
+                    log.warning("no se pudo avisar a %s", tg_id)
+                log.info("cripto pagado: %s -> %s meses", tg_id, meses)
+        except Exception:  # noqa: BLE001
+            log.exception("error revisando pagos con cripto")
 async def main():
     if not config.TOKEN:
         raise SystemExit("Falta GEOID_TOKEN (token del bot de BotFather)")
@@ -537,6 +692,7 @@ async def main():
     dp.include_router(router)
 
     asyncio.create_task(vigilar_caducidades(bot))
+    asyncio.create_task(vigilar_cripto(bot))
     log.info("bot en marcha · servidor %s", config.ENDPOINT)
     await dp.start_polling(bot)
 
