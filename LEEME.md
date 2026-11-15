@@ -20,6 +20,7 @@ flutter_app/      LA APP (Flutter). Aquí está todo el código que importa.
   windows/        runner de Windows
   windows_tun/    main.go: motor del túnel para Windows (Wintun + AmneziaWG)
 app/              versión 1.x en Kotlin, solo como referencia histórica
+bot/              bot de Telegram que vende y aprovisiona accesos (ver bot/LEEME.md)
 docs/             guías: servidor, app, diseño, rendimiento
 servidor/         script de instalación de Xray en el VPS
 .github/          flujos de compilación y publicación automática
