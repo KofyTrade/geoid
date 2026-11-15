@@ -109,6 +109,18 @@ class _AppsScreenState extends State<AppsScreen> {
                     ),
                   ),
                   TextButton(
+                    onPressed: () => setState(() => _verSistema = !_verSistema),
+                    child: Text(
+                      t('ver_sistema'),
+                      style: TextStyle(
+                        color: _verSistema
+                            ? GeoidColors.acento
+                            : GeoidColors.textoTenue,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  TextButton(
                     onPressed: () {
                       setState(() {
                         if (_marcadas.isEmpty) {
@@ -138,7 +150,17 @@ class _AppsScreenState extends State<AppsScreen> {
                   ? const Center(
                       child: CircularProgressIndicator(color: GeoidColors.acento),
                     )
-                  : ListView.builder(
+                  : _visibles.isEmpty
+                      ? Center(
+                          child: Text(
+                            t('sin_apps'),
+                            style: const TextStyle(
+                              color: GeoidColors.textoSuave,
+                              fontSize: 13,
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
                       itemCount: _visibles.length,
                       itemBuilder: (contexto, i) {
                         final app = _visibles[i];
