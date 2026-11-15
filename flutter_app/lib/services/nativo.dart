@@ -125,8 +125,33 @@ class Nativo {
   }
 
   static Future<String?> elegirArchivo() async {
+    if (Platform.isWindows) return _abrirDialogoWindows();
     if (!esAndroid) return _leerConfDelPortapapeles();
     return _canal.invokeMethod<String>('elegirArchivo');
+  }
+
+  /// Selector de archivos nativo en Windows (dialogo clasico de Windows).
+  static Future<String?> _abrirDialogoWindows() async {
+    const guion = r'''
+Add-Type -AssemblyName System.Windows.Forms
+$d = New-Object System.Windows.Forms.OpenFileDialog
+$d.Title = 'Elegir configuracion'
+$d.Filter = 'Configuracion (*.conf)|*.conf|Todos los archivos (*.*)|*.*'
+if ($d.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { Write-Output $d.FileName }
+''';
+    try {
+      final resultado = await Process.run(
+        'powershell',
+        ['-NoProfile', '-STA', '-Command', guion],
+      );
+      final ruta = (resultado.stdout as String).trim();
+      if (ruta.isEmpty) return null;
+      final archivo = File(ruta);
+      if (!await archivo.exists()) return null;
+      return await archivo.readAsString();
+    } catch (_) {
+      return null;
+    }
   }
 
   static Future<bool> prepararVpn() async {

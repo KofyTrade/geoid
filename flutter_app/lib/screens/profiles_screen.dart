@@ -35,147 +35,41 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
     });
   }
 
-  Future<void> _importar() async {
-    final texto = await Nativo.elegirArchivo();
-    if (texto == null || texto.trim().isEmpty) return;
-    if (!_valido(texto)) {
-      _avisar(t('error_config'));
-      return;
-    }
-    await _pedirNombreYGuardar(texto);
-  }
-
-  bool _valido(String texto) {
-    final minusculas = texto.toLowerCase();
-    return minusculas.contains('[interface]') &&
-        minusculas.contains('[peer]') &&
-        minusculas.contains('privatekey') &&
-        minusculas.contains('endpoint');
-  }
-
-  Future<void> _pegarTexto() async {
-    final controlador = TextEditingController();
-    final texto = await showDialog<String>(
+  /// Dialogo unico: nombre editable, texto y boton de importar archivo.
+  Future<void> _nuevoOEditar({Perfil? existente}) async {
+    final resultado = await showDialog<({String nombre, String conf})>(
       context: context,
-      builder: (contexto) => AlertDialog(
-        title: Text(t('pegar_texto')),
-        content: SizedBox(
-          width: double.maxFinite,
-          height: 260,
-          child: TextField(
-            controller: controlador,
-            maxLines: null,
-            expands: true,
-            style: const TextStyle(
-              color: GeoidColors.texto,
-              fontSize: 12,
-              fontFamily: 'monospace',
-            ),
-            decoration: const InputDecoration(
-              hintText: '[Interface]\nPrivateKey = ...\n[Peer]\nEndpoint = ...',
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(contexto),
-            child: Text(t('cancelar'),
-                style: const TextStyle(color: GeoidColors.textoSuave)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(contexto, controlador.text),
-            child: Text(t('guardar'),
-                style: const TextStyle(color: GeoidColors.acento)),
-          ),
-        ],
+      barrierDismissible: false,
+      builder: (_) => DialogoPerfil(
+        perfil: existente,
+        sugerido: existente?.nombre ?? 'Perfil ${_perfiles.length + 1}',
       ),
     );
+    if (resultado == null) return;
 
-    if (texto == null || texto.trim().isEmpty) return;
-    if (!_valido(texto)) {
-      _avisar(t('error_config'));
-      return;
-    }
-    await _pedirNombreYGuardar(texto);
-  }
+    final nombre = resultado.nombre.trim();
+    final conf = resultado.conf;
 
-  Future<void> _pedirNombreYGuardar(String conf) async {
-    final sugerido = 'Perfil ${_perfiles.length + 1}';
-    final controlador = TextEditingController(text: sugerido);
-    final nombre = await showDialog<String>(
-      context: context,
-      builder: (contexto) => AlertDialog(
-        title: Text(t('nuevo_perfil')),
-        content: TextField(
-          controller: controlador,
-          autofocus: true,
-          style: const TextStyle(color: GeoidColors.texto),
-          decoration: InputDecoration(labelText: t('nombre')),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(contexto),
-            child: Text(t('cancelar'),
-                style: const TextStyle(color: GeoidColors.textoSuave)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(contexto, controlador.text.trim()),
-            child: Text(t('guardar'),
-                style: const TextStyle(color: GeoidColors.acento)),
-          ),
-        ],
-      ),
-    );
-
-    if (nombre == null || nombre.isEmpty) return;
-
-    final nuevo = Perfil(nombre, conf);
-    final lista = List<Perfil>.from(_perfiles)..add(nuevo);
-    await Almacen.guardarLista(lista);
-    await Almacen.marcarActivo(nombre);
-    Registro.anadir('${t('nuevo_perfil')}: $nombre');
-    if (!mounted) return;
-    setState(() {
+    if (existente != null) {
+      final anterior = existente.nombre;
+      existente.nombre = nombre;
+      existente.conf = conf;
+      await Almacen.guardarLista(_perfiles);
+      if (_activo == anterior) {
+        await Almacen.marcarActivo(nombre);
+        _activo = nombre;
+      }
+      Registro.anadir('${t('editar')}: $nombre');
+    } else {
+      final nuevo = Perfil(nombre, conf);
+      final lista = List<Perfil>.from(_perfiles)..add(nuevo);
+      await Almacen.guardarLista(lista);
+      await Almacen.marcarActivo(nombre);
       _perfiles = lista;
       _activo = nombre;
-    });
-  }
-
-  Future<void> _renombrar(Perfil perfil) async {
-    final controlador = TextEditingController(text: perfil.nombre);
-    final nombre = await showDialog<String>(
-      context: context,
-      builder: (contexto) => AlertDialog(
-        title: Text(t('renombrar')),
-        content: TextField(
-          controller: controlador,
-          autofocus: true,
-          style: const TextStyle(color: GeoidColors.texto),
-          decoration: InputDecoration(labelText: t('nombre')),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(contexto),
-            child: Text(t('cancelar'),
-                style: const TextStyle(color: GeoidColors.textoSuave)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(contexto, controlador.text.trim()),
-            child: Text(t('guardar'),
-                style: const TextStyle(color: GeoidColors.acento)),
-          ),
-        ],
-      ),
-    );
-    if (nombre == null || nombre.isEmpty) return;
-
-    final anterior = perfil.nombre;
-    perfil.nombre = nombre;
-    await Almacen.guardarLista(_perfiles);
-    if (_activo == anterior) {
-      await Almacen.marcarActivo(nombre);
-      _activo = nombre;
+      Registro.anadir('${t('nuevo_perfil')}: $nombre');
     }
+
     if (mounted) setState(() {});
   }
 
@@ -216,12 +110,6 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
     if (mounted) setState(() => _activo = perfil.nombre);
   }
 
-  void _avisar(String texto) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(texto), behavior: SnackBarBehavior.floating),
-    );
-  }
-
   void _verConf(Perfil perfil) {
     showDialog<void>(
       context: context,
@@ -231,7 +119,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
           width: double.maxFinite,
           height: 300,
           child: SingleChildScrollView(
-            child: Text(
+            child: SelectableText(
               perfil.conf,
               style: const TextStyle(
                 fontSize: 10,
@@ -264,19 +152,11 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
           t('perfiles'),
           style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
         ),
-        actions: [
-          IconButton(
-            tooltip: t('pegar_texto'),
-            onPressed: _pegarTexto,
-            icon: const Icon(Icons.content_paste, size: 20),
-          ),
-          const SizedBox(width: 6),
-        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: GeoidColors.acento,
         foregroundColor: GeoidColors.fondo,
-        onPressed: esAndroid ? _importar : _pegarTexto,
+        onPressed: () => _nuevoOEditar(),
         icon: const Icon(Icons.add),
         label: Text(t('nuevo_perfil')),
       ),
@@ -284,106 +164,251 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
         child: _cargando
             ? const Center(
                 child: CircularProgressIndicator(color: GeoidColors.acento))
-            : Column(
-                children: [
-                  if (_perfiles.isEmpty)
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          t('sin_perfiles'),
-                          style: const TextStyle(
-                            color: GeoidColors.textoSuave,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    )
-                  else
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 90),
-                        itemCount: _perfiles.length,
-                        itemBuilder: (contexto, i) {
-                          final perfil = _perfiles[i];
-                          final esActivo = perfil.nombre == _activo;
-                          return Card(
-                            color: esActivo
-                                ? GeoidColors.panel
-                                : GeoidColors.botonApagado,
-                            margin: const EdgeInsets.only(bottom: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                              side: BorderSide(
-                                color: esActivo
-                                    ? GeoidColors.acento
-                                    : GeoidColors.borde,
-                              ),
-                            ),
-                            child: ListTile(
-                              onTap: () => _usar(perfil),
-                              title: Text(
-                                perfil.nombre,
-                                style: TextStyle(
-                                  color: esActivo
-                                      ? GeoidColors.acento
-                                      : GeoidColors.texto,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              subtitle: Text(
-                                perfil.resumen,
-                                style: const TextStyle(
-                                  color: GeoidColors.textoTenue,
-                                  fontSize: 11,
-                                ),
-                              ),
-                              trailing: PopupMenuButton<String>(
-                                color: GeoidColors.panel,
-                                icon: const Icon(Icons.more_vert,
-                                    size: 18, color: GeoidColors.textoSuave),
-                                onSelected: (accion) {
-                                  switch (accion) {
-                                    case 'usar':
-                                      _usar(perfil);
-                                      break;
-                                    case 'renombrar':
-                                      _renombrar(perfil);
-                                      break;
-                                    case 'ver':
-                                      _verConf(perfil);
-                                      break;
-                                    case 'eliminar':
-                                      _eliminar(perfil);
-                                      break;
-                                  }
-                                },
-                                itemBuilder: (_) => [
-                                  PopupMenuItem(
-                                    value: 'usar',
-                                    child: Text(t('activar')),
-                                  ),
-                                  PopupMenuItem(
-                                    value: 'renombrar',
-                                    child: Text(t('renombrar')),
-                                  ),
-                                  PopupMenuItem(
-                                    value: 'ver',
-                                    child: Text(t('ver_conf')),
-                                  ),
-                                  PopupMenuItem(
-                                    value: 'eliminar',
-                                    child: Text(t('eliminar')),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+            : _perfiles.isEmpty
+                ? Center(
+                    child: Text(
+                      t('sin_perfiles'),
+                      style: const TextStyle(
+                        color: GeoidColors.textoSuave,
+                        fontSize: 13,
                       ),
                     ),
-                ],
-              ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 90),
+                    itemCount: _perfiles.length,
+                    itemBuilder: (contexto, i) {
+                      final perfil = _perfiles[i];
+                      final esActivo = perfil.nombre == _activo;
+                      return Card(
+                        color:
+                            esActivo ? GeoidColors.panel : GeoidColors.botonApagado,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          side: BorderSide(
+                            color: esActivo
+                                ? GeoidColors.acento
+                                : GeoidColors.borde,
+                          ),
+                        ),
+                        child: ListTile(
+                          onTap: () => _usar(perfil),
+                          title: Text(
+                            perfil.nombre,
+                            style: TextStyle(
+                              color: esActivo
+                                  ? GeoidColors.acento
+                                  : GeoidColors.texto,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: Text(
+                            perfil.resumen,
+                            style: const TextStyle(
+                              color: GeoidColors.textoTenue,
+                              fontSize: 11,
+                            ),
+                          ),
+                          trailing: PopupMenuButton<String>(
+                            color: GeoidColors.panel,
+                            icon: const Icon(Icons.more_vert,
+                                size: 18, color: GeoidColors.textoSuave),
+                            onSelected: (accion) {
+                              switch (accion) {
+                                case 'usar':
+                                  _usar(perfil);
+                                  break;
+                                case 'editar':
+                                  _nuevoOEditar(existente: perfil);
+                                  break;
+                                case 'ver':
+                                  _verConf(perfil);
+                                  break;
+                                case 'eliminar':
+                                  _eliminar(perfil);
+                                  break;
+                              }
+                            },
+                            itemBuilder: (_) => [
+                              PopupMenuItem(
+                                value: 'usar',
+                                child: Text(t('activar')),
+                              ),
+                              PopupMenuItem(
+                                value: 'editar',
+                                child: Text(t('editar')),
+                              ),
+                              PopupMenuItem(
+                                value: 'ver',
+                                child: Text(t('ver_conf')),
+                              ),
+                              PopupMenuItem(
+                                value: 'eliminar',
+                                child: Text(t('eliminar')),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
       ),
+    );
+  }
+}
+
+/// Dialogo de perfil: nombre, contenido y boton de importar desde archivo.
+class DialogoPerfil extends StatefulWidget {
+  final Perfil? perfil;
+  final String sugerido;
+
+  const DialogoPerfil({super.key, this.perfil, required this.sugerido});
+
+  @override
+  State<DialogoPerfil> createState() => _DialogoPerfilState();
+}
+
+class _DialogoPerfilState extends State<DialogoPerfil> {
+  late final TextEditingController _nombre =
+      TextEditingController(text: widget.sugerido);
+  late final TextEditingController _conf =
+      TextEditingController(text: widget.perfil?.conf ?? '');
+  String? _error;
+  bool _importando = false;
+
+  @override
+  void dispose() {
+    _nombre.dispose();
+    _conf.dispose();
+    super.dispose();
+  }
+
+  bool _valido(String texto) {
+    final m = texto.toLowerCase();
+    return m.contains('[interface]') &&
+        m.contains('[peer]') &&
+        m.contains('privatekey') &&
+        m.contains('endpoint');
+  }
+
+  Future<void> _importar() async {
+    setState(() => _importando = true);
+    final texto = await Nativo.elegirArchivo();
+    if (!mounted) return;
+    setState(() => _importando = false);
+    if (texto == null || texto.trim().isEmpty) return;
+    setState(() {
+      _conf.text = texto;
+      _error = _valido(texto) ? null : t('error_config');
+    });
+  }
+
+  void _guardar() {
+    final nombre = _nombre.text.trim();
+    final conf = _conf.text.trim();
+    if (nombre.isEmpty) {
+      setState(() => _error = t('nombre'));
+      return;
+    }
+    if (!_valido(conf)) {
+      setState(() => _error = t('error_config'));
+      return;
+    }
+    Navigator.pop(context, (nombre: nombre, conf: conf));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final editando = widget.perfil != null;
+    return AlertDialog(
+      title: Text(editando ? t('editar') : t('nuevo_perfil')),
+      content: SizedBox(
+        width: 460,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _nombre,
+                autofocus: !editando,
+                textCapitalization: TextCapitalization.sentences,
+                style: const TextStyle(color: GeoidColors.texto),
+                decoration: InputDecoration(labelText: t('nombre')),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                height: 200,
+                child: TextField(
+                  controller: _conf,
+                  maxLines: null,
+                  expands: true,
+                  textAlignVertical: TextAlignVertical.top,
+                  style: const TextStyle(
+                    color: GeoidColors.textoSuave,
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                  ),
+                  decoration: const InputDecoration(
+                    hintText:
+                        '[Interface]\nPrivateKey = ...\n[Peer]\nEndpoint = ...',
+                  ),
+                  onChanged: (valor) {
+                    if (_error != null) setState(() => _error = null);
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: _importando ? null : _importar,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF9BE8DC),
+                  side: const BorderSide(color: GeoidColors.borde),
+                  minimumSize: const Size.fromHeight(44),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                ),
+                icon: _importando
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: GeoidColors.acento,
+                        ),
+                      )
+                    : const Icon(Icons.folder_open, size: 16),
+                label: Text(t('importar_conf'),
+                    style: const TextStyle(fontSize: 12)),
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  _error!,
+                  style: const TextStyle(
+                    color: Color(0xFFFF8A80),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(t('cancelar'),
+              style: const TextStyle(color: GeoidColors.textoSuave)),
+        ),
+        TextButton(
+          onPressed: _guardar,
+          child: Text(t('guardar'),
+              style: const TextStyle(color: GeoidColors.acento)),
+        ),
+      ],
     );
   }
 }
