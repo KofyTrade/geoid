@@ -1,7 +1,7 @@
 """Bot de Telegram de GeoiD VPN.
 
-Vende y aprovisiona accesos AmneziaWG: genera el peer en el servidor y entrega
-al cliente su fichero .conf.
+Menú fijo en la parte inferior (teclado persistente): al pulsar una opción el
+teclado sigue ahí, así siempre se puede volver.
 
 Arranque:  python3 bot.py
 """
@@ -21,9 +21,11 @@ from aiogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    KeyboardButton,
     LabeledPrice,
     Message,
     PreCheckoutQuery,
+    ReplyKeyboardMarkup,
 )
 
 import config
@@ -39,6 +41,10 @@ logging.basicConfig(
 log = logging.getLogger("geoid")
 
 router = Router()
+DIA = 86400
+ADMIN = 0
+
+
 def _admin() -> int:
     """El id de administrador es opcional: si falta o no es un número, se ignora."""
     try:
@@ -48,7 +54,6 @@ def _admin() -> int:
 
 
 ADMIN = _admin()
-DIA = 86400
 
 
 # --------------------------------------------------------------------------- #
@@ -67,39 +72,31 @@ def dias_restantes(instante: int) -> int:
     return max(0, (instante - int(time.time()) + DIA - 1) // DIA)
 
 
-def menu_principal(tg_id: int) -> InlineKeyboardMarkup:
+def teclado_fijo(tg_id: int) -> ReplyKeyboardMarkup:
+    """Menú de abajo: se queda siempre visible."""
     idi = idioma(tg_id)
     filas = [
-        [
-            InlineKeyboardButton(text=t(idi, "menu_prueba"), callback_data="prueba"),
-            InlineKeyboardButton(text=t(idi, "menu_comprar"), callback_data="comprar"),
-        ],
-        [
-            InlineKeyboardButton(text=t(idi, "menu_mi_vpn"), callback_data="mi_vpn"),
-            InlineKeyboardButton(text=t(idi, "menu_pais"), callback_data="pais"),
-        ],
-        [
-            InlineKeyboardButton(text=t(idi, "menu_invitar"), callback_data="invitar"),
-            InlineKeyboardButton(text=t(idi, "menu_promo"), callback_data="promo"),
-        ],
-        [
-            InlineKeyboardButton(text=t(idi, "menu_ayuda"), callback_data="ayuda"),
-            InlineKeyboardButton(text=t(idi, "menu_idioma"), callback_data="idioma"),
-        ],
+        [t(idi, "menu_prueba"), t(idi, "menu_comprar")],
+        [t(idi, "menu_mi_vpn"), t(idi, "menu_pais")],
+        [t(idi, "menu_invitar"), t(idi, "menu_promo")],
+        [t(idi, "menu_ayuda"), t(idi, "menu_idioma")],
     ]
-    return InlineKeyboardMarkup(inline_keyboard=filas)
+    return ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text=x) for x in fila] for fila in filas],
+        resize_keyboard=True,
+        is_persistent=True,
+    )
 
 
 def teclado_planes(tg_id: int) -> InlineKeyboardMarkup:
     idi = idioma(tg_id)
-    filas = []
-    for meses, estrellas in config.PRECIOS.items():
-        filas.append([
-            InlineKeyboardButton(
-                text=t(idi, "plan_boton", meses=meses, estrellas=estrellas),
-                callback_data=f"plan:{meses}",
-            )
-        ])
+    filas = [
+        [InlineKeyboardButton(
+            text=t(idi, "plan_boton", meses=meses, estrellas=estrellas),
+            callback_data=f"plan:{meses}",
+        )]
+        for meses, estrellas in config.PRECIOS.items()
+    ]
     return InlineKeyboardMarkup(inline_keyboard=filas)
 
 
@@ -109,8 +106,12 @@ def teclado_volver(tg_id: int) -> InlineKeyboardMarkup:
     ]])
 
 
+def _destino(evento: Message | CallbackQuery) -> int:
+    return evento.message.chat.id if isinstance(evento, CallbackQuery) else evento.chat.id
+
+
 # --------------------------------------------------------------------------- #
-# Alta de accesos
+# Accesos
 # --------------------------------------------------------------------------- #
 def activar(tg_id: int, dias: int) -> dict:
     """Crea el peer si hace falta y extiende la caducidad."""
@@ -151,10 +152,154 @@ async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
 
 
 # --------------------------------------------------------------------------- #
+# Acciones (las usan tanto el teclado fijo como los botones internos)
+# --------------------------------------------------------------------------- #
+async def accion_prueba(bot: Bot, tg_id: int) -> None:
+    usuario = db.obtener(tg_id) or {}
+    idi = usuario.get("idioma") or "es"
+    ahora = int(time.time())
+
+    if usuario.get("expira", 0) > ahora:
+        await bot.send_message(
+            tg_id, t(idi, "prueba_cabecera", fecha=fecha(usuario["expira"]))
+        )
+        return
+
+    if usuario.get("prueba_usada"):
+        await bot.send_message(tg_id, t(idi, "prueba_ya_usada"))
+        return
+
+    try:
+        actualizado = activar(tg_id, config.DIAS_PRUEBA)
+        db.guardar(tg_id, prueba_usada=1)
+    except Exception:  # noqa: BLE001
+        log.exception("fallo creando la prueba")
+        await bot.send_message(tg_id, t(idi, "error_generico"))
+        return
+
+    await bot.send_message(
+        tg_id,
+        t(idi, "prueba_lista",
+          dias=config.DIAS_PRUEBA,
+          pais=t(idi, "pais"),
+          ip=actualizado["ip"],
+          fecha=fecha(actualizado["expira"])),
+        parse_mode=ParseMode.HTML,
+    )
+    await enviar_conf(bot, tg_id, actualizado, t(idi, "pais"))
+
+
+async def accion_comprar(bot: Bot, tg_id: int) -> None:
+    idi = idioma(tg_id)
+    await bot.send_message(
+        tg_id, t(idi, "comprar_titulo"),
+        reply_markup=teclado_planes(tg_id),
+        parse_mode=ParseMode.HTML,
+    )
+
+
+async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
+    usuario = db.obtener(tg_id) or {}
+    idi = usuario.get("idioma") or "es"
+    ahora = int(time.time())
+
+    if not usuario.get("ip") or usuario.get("expira", 0) <= ahora:
+        texto = t(idi, "mi_vpn_sin") if not usuario.get("ip") else t(idi, "caducado")
+        await bot.send_message(tg_id, texto)
+        return
+
+    teclado = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text=t(idi, "boton_reenviar"), callback_data="reenviar")
+    ]])
+    await bot.send_message(
+        tg_id,
+        t(idi, "mi_vpn_activo",
+          pais=t(idi, "pais"),
+          ip=usuario["ip"],
+          fecha=fecha(usuario["expira"]),
+          dias=dias_restantes(usuario["expira"]),
+          enlace=""),
+        reply_markup=teclado,
+        parse_mode=ParseMode.HTML,
+    )
+
+
+async def accion_pais(bot: Bot, tg_id: int) -> None:
+    await bot.send_message(tg_id, t(idioma(tg_id), "pais_unico"))
+
+
+async def accion_invitar(bot: Bot, tg_id: int) -> None:
+    usuario = db.obtener(tg_id) or {}
+    idi = usuario.get("idioma") or "es"
+    me = await bot.get_me()
+    enlace = f"https://t.me/{me.username}?start={usuario.get('codigo_ref') or 'r'}"
+    with db.conectar() as con:
+        cuantos = con.execute(
+            "SELECT COUNT(*) c FROM usuarios WHERE referido = ?", (tg_id,)
+        ).fetchone()["c"]
+    await bot.send_message(
+        tg_id,
+        t(idi, "invitar_texto", dias=config.DIAS_INVITADO, enlace=enlace, cuantos=cuantos),
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+
+
+async def accion_promo(bot: Bot, tg_id: int) -> None:
+    await bot.send_message(tg_id, t(idioma(tg_id), "promo_pedir"))
+
+
+async def accion_ayuda(bot: Bot, tg_id: int) -> None:
+    idi = idioma(tg_id)
+    await bot.send_message(
+        tg_id,
+        t(idi, "ayuda", android=config.URL_ANDROID, windows=config.URL_WINDOWS),
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+
+
+async def accion_idioma(bot: Bot, tg_id: int) -> None:
+    filas = [
+        [InlineKeyboardButton(text=n, callback_data=f"idi:{c}")]
+        for c, n in IDIOMAS.items()
+    ]
+    await bot.send_message(
+        tg_id,
+        t(idioma(tg_id), "idioma_pedir"),
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
+    )
+
+
+# Etiquetas del teclado fijo en los tres idiomas -> acción
+ACCIONES: dict[str, str] = {}
+for _idi in ("es", "ru", "en"):
+    ACCIONES[t(_idi, "menu_prueba")] = "prueba"
+    ACCIONES[t(_idi, "menu_comprar")] = "comprar"
+    ACCIONES[t(_idi, "menu_mi_vpn")] = "mi_vpn"
+    ACCIONES[t(_idi, "menu_pais")] = "pais"
+    ACCIONES[t(_idi, "menu_invitar")] = "invitar"
+    ACCIONES[t(_idi, "menu_promo")] = "promo"
+    ACCIONES[t(_idi, "menu_ayuda")] = "ayuda"
+    ACCIONES[t(_idi, "menu_idioma")] = "idioma"
+
+REPARTIDOR = {
+    "prueba": accion_prueba,
+    "comprar": accion_comprar,
+    "mi_vpn": accion_mi_vpn,
+    "pais": accion_pais,
+    "invitar": accion_invitar,
+    "promo": accion_promo,
+    "ayuda": accion_ayuda,
+    "idioma": accion_idioma,
+}
+
+
+# --------------------------------------------------------------------------- #
 # Comandos
 # --------------------------------------------------------------------------- #
 @router.message(CommandStart())
-async def start(mensaje: Message, command: CommandObject):
+async def start(mensaje: Message, bot: Bot, command: CommandObject):
     referido = None
     if command.args and command.args.startswith("r"):
         padrino = db.por_codigo(command.args)
@@ -166,7 +311,7 @@ async def start(mensaje: Message, command: CommandObject):
 
     await mensaje.answer(
         t(idi, "bienvenida", marca=config.MARCA, dias=config.DIAS_PRUEBA),
-        reply_markup=menu_principal(mensaje.from_user.id),
+        reply_markup=teclado_fijo(mensaje.from_user.id),
         parse_mode=ParseMode.HTML,
     )
 
@@ -175,18 +320,267 @@ async def start(mensaje: Message, command: CommandObject):
 
 
 @router.message(Command("menu"))
-async def comando_menu(mensaje: Message):
+async def comando_menu(mensaje: Message, bot: Bot):
     idi = idioma(mensaje.from_user.id)
     await mensaje.answer(
         t(idi, "bienvenida", marca=config.MARCA, dias=config.DIAS_PRUEBA),
-        reply_markup=menu_principal(mensaje.from_user.id),
+        reply_markup=teclado_fijo(mensaje.from_user.id),
         parse_mode=ParseMode.HTML,
     )
 
 
+# --------------------------------------------------------------------------- #
+# Teclado fijo (texto)
+# --------------------------------------------------------------------------- #
+@router.message(F.text, ~F.text.startswith("/"))
+async def texto_libre(mensaje: Message, bot: Bot):
+    tg_id = mensaje.from_user.id
+    idi = idioma(tg_id)
+    texto = (mensaje.text or "").strip()
+
+    accion = ACCIONES.get(texto)
+    if accion:
+        try:
+            await REPARTIDOR[accion](bot, tg_id)
+        except Exception:  # noqa: BLE001
+            log.exception("fallo en la accion %s", accion)
+            await mensaje.answer(t(idi, "error_generico"))
+        return
+
+    # Un texto suelto puede ser un código promocional.
+    dias = db.usar_promo(texto)
+    if dias is None:
+        await mensaje.answer(t(idi, "promo_mal"))
+        return
+
+    try:
+        actualizado = activar(tg_id, dias)
+    except Exception:  # noqa: BLE001
+        log.exception("fallo canjeando promo")
+        await mensaje.answer(t(idi, "error_generico"))
+        return
+
+    await mensaje.answer(t(idi, "promo_ok", dias=dias), parse_mode=ParseMode.HTML)
+    await enviar_conf(bot, tg_id, actualizado, t(idi, "pais"))
+
+
+# --------------------------------------------------------------------------- #
+# Botones internos (submenús)
+# --------------------------------------------------------------------------- #
+@router.callback_query(F.data == "menu")
+async def volver_menu(llamada: CallbackQuery, bot: Bot):
+    idi = idioma(llamada.from_user.id)
+    await llamada.message.edit_text(
+        t(idi, "bienvenida", marca=config.MARCA, dias=config.DIAS_PRUEBA),
+        parse_mode=ParseMode.HTML,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(text=t(idi, "menu_comprar"), callback_data="comprar"),
+            InlineKeyboardButton(text=t(idi, "menu_mi_vpn"), callback_data="mi_vpn"),
+        ]]),
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data == "comprar")
+async def cb_comprar(llamada: CallbackQuery, bot: Bot):
+    idi = idioma(llamada.from_user.id)
+    await llamada.message.edit_text(
+        t(idi, "comprar_titulo"),
+        reply_markup=teclado_planes(llamada.from_user.id),
+        parse_mode=ParseMode.HTML,
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("plan:"))
+async def cb_plan(llamada: CallbackQuery):
+    meses = int(llamada.data.split(":")[1])
+    idi = idioma(llamada.from_user.id)
+
+    filas = [
+        [InlineKeyboardButton(
+            text=t(idi, "metodo_stars"), callback_data=f"metodo:stars:{meses}")],
+        [InlineKeyboardButton(
+            text=t(idi, "metodo_crypto"), callback_data=f"metodo:crypto:{meses}")],
+        [InlineKeyboardButton(
+            text=t(idi, "metodo_manual"), callback_data=f"metodo:manual:{meses}")],
+        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
+    ]
+    await llamada.message.edit_text(
+        t(idi, "metodo_titulo"),
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("metodo:stars:"))
+async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
+    meses = int(llamada.data.split(":")[2])
+    estrellas = config.PRECIOS[meses]
+    idi = idioma(llamada.from_user.id)
+
+    await bot.send_invoice(
+        chat_id=llamada.from_user.id,
+        title=f"{config.MARCA} · {meses} {'mes' if meses == 1 else 'meses'}",
+        description=t(idi, f"plan_{'mes' if meses == 1 else ('3meses' if meses == 3 else 'anio')}"),
+        payload=f"plan:{meses}",
+        provider_token="",
+        currency="XTR",
+        prices=[LabeledPrice(label=f"{meses} m", amount=estrellas)],
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("metodo:crypto:"))
+async def cb_cripto(llamada: CallbackQuery):
+    meses = int(llamada.data.split(":")[2])
+    idi = idioma(llamada.from_user.id)
+
+    factura = await pagos.crear_factura(meses, llamada.from_user.id)
+    if not factura or not factura.get("url"):
+        await llamada.answer(t(idi, "cripto_no"), show_alert=True)
+        return
+
+    teclado = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=f"🪙 {factura['monto']} USDT", url=factura["url"])],
+        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
+    ])
+    await llamada.message.edit_text(
+        t(idi, "cripto_texto", monto=factura["monto"], url=factura["url"]),
+        reply_markup=teclado,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("metodo:manual:"))
+async def cb_manual(llamada: CallbackQuery):
+    meses = int(llamada.data.split(":")[2])
+    idi = idioma(llamada.from_user.id)
+
+    teclado = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text=t(idi, "manual_boton"), callback_data=f"paguei:{meses}")],
+        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
+    ])
+    await llamada.message.edit_text(
+        t(idi, "manual_texto", datos=config.PAGO_MANUAL),
+        reply_markup=teclado,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("paguei:"))
+async def cb_paguei(llamada: CallbackQuery, bot: Bot):
+    meses = int(llamada.data.split(":")[1])
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+    usuario = db.obtener(tg_id) or {}
+
+    if ADMIN:
+        try:
+            await bot.send_message(
+                ADMIN,
+                t("es", "manual_admin",
+                  usuario=usuario.get("usuario") or "—",
+                  id=tg_id, meses=meses),
+                parse_mode=ParseMode.HTML,
+            )
+        except Exception:  # noqa: BLE001
+            log.warning("no se pudo avisar al administrador")
+
+    await llamada.message.edit_text(
+        t(idi, "manual_aviso"), reply_markup=teclado_volver(tg_id)
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data == "mi_vpn")
+async def cb_mi_vpn(llamada: CallbackQuery, bot: Bot):
+    await llamada.answer()
+    await accion_mi_vpn(bot, llamada.from_user.id)
+
+
+@router.callback_query(F.data == "reenviar")
+async def cb_reenviar(llamada: CallbackQuery, bot: Bot):
+    tg_id = llamada.from_user.id
+    usuario = db.obtener(tg_id) or {}
+    idi = usuario.get("idioma") or "es"
+    if not usuario.get("ip"):
+        await llamada.answer(t(idi, "mi_vpn_sin"), show_alert=True)
+        return
+    await enviar_conf(bot, tg_id, usuario, t(idi, "reenvio"))
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("idi:"))
+async def elegir_idioma(llamada: CallbackQuery, bot: Bot):
+    idi = llamada.data.split(":")[1]
+    tg_id = llamada.from_user.id
+    db.guardar(tg_id, idioma=idi)
+    await llamada.message.edit_text(t(idi, "idioma_ok"))
+    # Se reenvía el menú fijo ya traducido.
+    await bot.send_message(
+        tg_id,
+        t(idi, "bienvenida", marca=config.MARCA, dias=config.DIAS_PRUEBA),
+        reply_markup=teclado_fijo(tg_id),
+        parse_mode=ParseMode.HTML,
+    )
+    await llamada.answer()
+
+
+# --------------------------------------------------------------------------- #
+# Pagos con estrellas
+# --------------------------------------------------------------------------- #
+@router.pre_checkout_query()
+async def preparar_pago(consulta: PreCheckoutQuery, bot: Bot):
+    await bot.answer_pre_checkout_query(consulta.id, ok=True)
+
+
+@router.message(F.successful_payment)
+async def pago_recibido(mensaje: Message, bot: Bot):
+    pago = mensaje.successful_payment
+    if not pago or not pago.invoice_payload.startswith("plan:"):
+        return
+
+    meses = int(pago.invoice_payload.split(":")[1])
+    tg_id = mensaje.from_user.id
+    idi = idioma(tg_id)
+
+    try:
+        actualizado = activar(tg_id, 30 * meses)
+    except Exception:  # noqa: BLE001
+        log.exception("fallo activando tras el pago")
+        await mensaje.answer(t(idi, "error_generico"))
+        return
+
+    db.registrar_pago(tg_id, meses, pago.total_amount,
+                      pago.telegram_payment_charge_id or "")
+
+    usuario = db.obtener(tg_id) or {}
+    padrino = usuario.get("referido")
+    if padrino:
+        try:
+            activar(padrino, config.DIAS_INVITADO)
+            await bot.send_message(padrino, t(idioma(padrino), "invitar_bienvenida"))
+        except Exception:  # noqa: BLE001
+            log.warning("no se pudo premiar al padrino %s", padrino)
+
+    await mensaje.answer(
+        t(idi, "pago_ok", fecha=fecha(actualizado["expira"])),
+        parse_mode=ParseMode.HTML,
+    )
+    await enviar_conf(bot, tg_id, actualizado, f"{config.MARCA} · {meses} m")
+
+
+# --------------------------------------------------------------------------- #
+# Administración
+# --------------------------------------------------------------------------- #
 @router.message(Command("promo"))
 async def comando_promo(mensaje: Message, command: CommandObject):
-    """Solo administrador: /promo CODIGO DIAS USOS"""
     if mensaje.from_user.id != ADMIN:
         return
     partes = (command.args or "").split()
@@ -252,371 +646,16 @@ async def comando_estado(mensaje: Message):
         f"Activos: {len(activos)}",
         f"Servidor: {config.ENDPOINT}",
         f"Interfaz: {config.AWG_INTERFAZ}",
-        f"Precios: {config.PRECIOS}",
+        f"Estrellas: {config.PRECIOS}",
+        f"Dólares: {config.PRECIOS_USD}",
+        f"Cripto: {'activado' if pagos.disponible() else 'sin token'}",
         f"Avisos: {', '.join(avisos) if avisos else 'ninguno'}",
     ]
     await mensaje.answer("\n".join(texto))
 
 
 # --------------------------------------------------------------------------- #
-# Botones
-# --------------------------------------------------------------------------- #
-@router.callback_query(F.data == "menu")
-async def volver_menu(llamada: CallbackQuery):
-    idi = idioma(llamada.from_user.id)
-    await llamada.message.edit_text(
-        t(idi, "bienvenida", marca=config.MARCA, dias=config.DIAS_PRUEBA),
-        reply_markup=menu_principal(llamada.from_user.id),
-        parse_mode=ParseMode.HTML,
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data == "prueba")
-async def boton_prueba(llamada: CallbackQuery, bot: Bot):
-    tg_id = llamada.from_user.id
-    usuario = db.obtener(tg_id) or {}
-    idi = usuario.get("idioma") or "es"
-    ahora = int(time.time())
-
-    if usuario.get("expira", 0) > ahora:
-        await llamada.message.edit_text(
-            t(idi, "prueba_cabecera", fecha=fecha(usuario["expira"])),
-            reply_markup=teclado_volver(tg_id),
-        )
-        await llamada.answer()
-        return
-
-    if usuario.get("prueba_usada"):
-        await llamada.message.edit_text(
-            t(idi, "prueba_ya_usada"),
-            reply_markup=teclado_volver(tg_id),
-        )
-        await llamada.answer()
-        return
-
-    try:
-        actualizado = activar(tg_id, config.DIAS_PRUEBA)
-        db.guardar(tg_id, prueba_usada=1)
-    except Exception as e:  # noqa: BLE001
-        log.exception("fallo creando la prueba")
-        await llamada.answer(t(idi, "error_generico"), show_alert=True)
-        return
-
-    texto = t(
-        idi, "prueba_lista",
-        dias=config.DIAS_PRUEBA,
-        pais=t(idi, "pais"),
-        ip=actualizado["ip"],
-        fecha=fecha(actualizado["expira"]),
-    )
-    await llamada.message.edit_text(texto, reply_markup=teclado_volver(tg_id),
-                                    parse_mode=ParseMode.HTML)
-    await enviar_conf(bot, tg_id, actualizado, t(idi, "pais"))
-    await llamada.answer()
-
-
-@router.callback_query(F.data == "comprar")
-async def boton_comprar(llamada: CallbackQuery):
-    idi = idioma(llamada.from_user.id)
-    await llamada.message.edit_text(
-        t(idi, "comprar_titulo"),
-        reply_markup=teclado_planes(llamada.from_user.id),
-        parse_mode=ParseMode.HTML,
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data.startswith("plan:"))
-async def boton_plan(llamada: CallbackQuery):
-    """Elige el plan: ahora toca elegir cómo pagar."""
-    meses = int(llamada.data.split(":")[1])
-    idi = idioma(llamada.from_user.id)
-
-    filas = [
-        [InlineKeyboardButton(
-            text=t(idi, "metodo_stars"), callback_data=f"metodo:stars:{meses}")],
-        [InlineKeyboardButton(
-            text=t(idi, "metodo_crypto"), callback_data=f"metodo:crypto:{meses}")],
-        [InlineKeyboardButton(
-            text=t(idi, "metodo_manual"), callback_data=f"metodo:manual:{meses}")],
-        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
-    ]
-    await llamada.message.edit_text(
-        t(idi, "metodo_titulo"),
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data.startswith("metodo:stars:"))
-async def pago_estrellas(llamada: CallbackQuery, bot: Bot):
-    meses = int(llamada.data.split(":")[2])
-    estrellas = config.PRECIOS[meses]
-    idi = idioma(llamada.from_user.id)
-
-    await bot.send_invoice(
-        chat_id=llamada.from_user.id,
-        title=f"{config.MARCA} · {meses} {'mes' if meses == 1 else 'meses'}",
-        description=t(idi, f"plan_{'mes' if meses == 1 else ('3meses' if meses == 3 else 'anio')}"),
-        payload=f"plan:{meses}",
-        provider_token="",
-        currency="XTR",
-        prices=[LabeledPrice(label=f"{meses} m", amount=estrellas)],
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data.startswith("metodo:crypto:"))
-async def pago_cripto(llamada: CallbackQuery):
-    meses = int(llamada.data.split(":")[2])
-    idi = idioma(llamada.from_user.id)
-
-    factura = await pagos.crear_factura(meses, llamada.from_user.id)
-    if not factura or not factura.get("url"):
-        await llamada.answer(t(idi, "cripto_no"), show_alert=True)
-        return
-
-    teclado = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🪙 " + f"{factura['monto']} USDT", url=factura["url"])],
-        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
-    ])
-    await llamada.message.edit_text(
-        t(idi, "cripto_texto", monto=factura["monto"], url=factura["url"]),
-        reply_markup=teclado,
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data.startswith("metodo:manual:"))
-async def pago_manual(llamada: CallbackQuery):
-    meses = int(llamada.data.split(":")[2])
-    idi = idioma(llamada.from_user.id)
-
-    teclado = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(
-            text=t(idi, "manual_boton"), callback_data=f"paguei:{meses}")],
-        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
-    ])
-    await llamada.message.edit_text(
-        t(idi, "manual_texto", datos=config.PAGO_MANUAL),
-        reply_markup=teclado,
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data.startswith("paguei:"))
-async def avisar_pago_manual(llamada: CallbackQuery, bot: Bot):
-    meses = int(llamada.data.split(":")[1])
-    tg_id = llamada.from_user.id
-    idi = idioma(tg_id)
-    usuario = db.obtener(tg_id) or {}
-
-    if ADMIN:
-        try:
-            await bot.send_message(
-                ADMIN,
-                t("es", "manual_admin", usuario=usuario.get("usuario") or "—",
-                  id=tg_id, meses=meses),
-                parse_mode=ParseMode.HTML,
-            )
-        except Exception:  # noqa: BLE001
-            log.warning("no se pudo avisar al administrador")
-
-    await llamada.message.edit_text(
-        t(idi, "manual_aviso"), reply_markup=teclado_volver(tg_id)
-    )
-    await llamada.answer()
-
-
-@router.pre_checkout_query()
-async def preparar_pago(consulta: PreCheckoutQuery, bot: Bot):
-    await bot.answer_pre_checkout_query(consulta.id, ok=True)
-
-
-@router.message(F.successful_payment)
-async def pago_recibido(mensaje: Message, bot: Bot):
-    pago = mensaje.successful_payment
-    if not pago or not pago.invoice_payload.startswith("plan:"):
-        return
-
-    meses = int(pago.invoice_payload.split(":")[1])
-    tg_id = mensaje.from_user.id
-    idi = idioma(tg_id)
-
-    try:
-        actualizado = activar(tg_id, 30 * meses)
-    except Exception:  # noqa: BLE001
-        log.exception("fallo activando tras el pago")
-        await mensaje.answer(t(idi, "error_generico"))
-        return
-
-    db.registrar_pago(
-        tg_id, meses, pago.total_amount, pago.telegram_payment_charge_id or ""
-    )
-
-    # Bonus por invitar: el padrino gana días.
-    usuario = db.obtener(tg_id) or {}
-    padrino = usuario.get("referido")
-    if padrino:
-        try:
-            activar(padrino, config.DIAS_INVITADO)
-            await bot.send_message(
-                padrino,
-                t(idioma(padrino), "invitar_bienvenida"),
-            )
-        except Exception:  # noqa: BLE001
-            log.warning("no se pudo premiar al padrino %s", padrino)
-
-    await mensaje.answer(
-        t(idi, "pago_ok", fecha=fecha(actualizado["expira"])),
-        parse_mode=ParseMode.HTML,
-    )
-    await enviar_conf(bot, tg_id, actualizado, f"{config.MARCA} · {meses} m")
-
-
-@router.callback_query(F.data == "mi_vpn")
-async def boton_mi_vpn(llamada: CallbackQuery):
-    tg_id = llamada.from_user.id
-    usuario = db.obtener(tg_id) or {}
-    idi = usuario.get("idioma") or "es"
-    ahora = int(time.time())
-
-    if not usuario.get("ip") or usuario.get("expira", 0) <= ahora:
-        texto = t(idi, "mi_vpn_sin") if not usuario.get("ip") else t(idi, "caducado")
-        await llamada.message.edit_text(texto, reply_markup=teclado_volver(tg_id))
-        await llamada.answer()
-        return
-
-    texto = t(
-        idi, "mi_vpn_activo",
-        pais=t(idi, "pais"),
-        ip=usuario["ip"],
-        fecha=fecha(usuario["expira"]),
-        dias=dias_restantes(usuario["expira"]),
-        enlace="",
-    )
-    teclado = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=t(idi, "boton_reenviar"), callback_data="reenviar")],
-        [InlineKeyboardButton(text="◀️", callback_data="menu")],
-    ])
-    await llamada.message.edit_text(texto, reply_markup=teclado,
-                                    parse_mode=ParseMode.HTML)
-    await llamada.answer()
-
-
-@router.callback_query(F.data == "reenviar")
-async def boton_reenviar(llamada: CallbackQuery, bot: Bot):
-    tg_id = llamada.from_user.id
-    usuario = db.obtener(tg_id) or {}
-    idi = usuario.get("idioma") or "es"
-    if not usuario.get("ip"):
-        await llamada.answer(t(idi, "mi_vpn_sin"), show_alert=True)
-        return
-    await enviar_conf(bot, tg_id, usuario, t(idi, "reenvio"))
-    await llamada.answer()
-
-
-@router.callback_query(F.data == "pais")
-async def boton_pais(llamada: CallbackQuery):
-    idi = idioma(llamada.from_user.id)
-    await llamada.message.edit_text(
-        t(idi, "pais_unico"), reply_markup=teclado_volver(llamada.from_user.id)
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data == "invitar")
-async def boton_invitar(llamada: CallbackQuery, bot: Bot):
-    tg_id = llamada.from_user.id
-    usuario = db.obtener(tg_id) or {}
-    idi = usuario.get("idioma") or "es"
-    me = await bot.get_me()
-    enlace = f"https://t.me/{me.username}?start={usuario.get('codigo_ref') or 'r'}"
-    with db.conectar() as con:
-        cuantos = con.execute(
-            "SELECT COUNT(*) c FROM usuarios WHERE referido = ?", (tg_id,)
-        ).fetchone()["c"]
-    await llamada.message.edit_text(
-        t(idi, "invitar_texto", dias=config.DIAS_INVITADO, enlace=enlace, cuantos=cuantos),
-        reply_markup=teclado_volver(tg_id),
-        parse_mode=ParseMode.HTML,
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data == "promo")
-async def boton_promo(llamada: CallbackQuery):
-    idi = idioma(llamada.from_user.id)
-    await llamada.message.edit_text(
-        t(idi, "promo_pedir"), reply_markup=teclado_volver(llamada.from_user.id)
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data == "ayuda")
-async def boton_ayuda(llamada: CallbackQuery):
-    idi = idioma(llamada.from_user.id)
-    await llamada.message.edit_text(
-        t(idi, "ayuda", android=config.URL_ANDROID, windows=config.URL_WINDOWS),
-        reply_markup=teclado_volver(llamada.from_user.id),
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data == "idioma")
-async def boton_idioma(llamada: CallbackQuery):
-    filas = [
-        [InlineKeyboardButton(text=n, callback_data=f"idi:{c}")]
-        for c, n in IDIOMAS.items()
-    ]
-    filas.append([InlineKeyboardButton(text="◀️", callback_data="menu")])
-    await llamada.message.edit_text(
-        t(idioma(llamada.from_user.id), "idioma_pedir"),
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
-    )
-    await llamada.answer()
-
-
-@router.callback_query(F.data.startswith("idi:"))
-async def elegir_idioma(llamada: CallbackQuery):
-    idi = llamada.data.split(":")[1]
-    db.guardar(llamada.from_user.id, idioma=idi)
-    await llamada.message.edit_text(
-        t(idi, "idioma_ok"), reply_markup=teclado_volver(llamada.from_user.id)
-    )
-    await llamada.answer()
-
-
-@router.message(F.text)
-async def texto_libre(mensaje: Message, bot: Bot):
-    """Un texto suelto puede ser un código promocional."""
-    tg_id = mensaje.from_user.id
-    idi = idioma(tg_id)
-    dias = db.usar_promo(mensaje.text or "")
-    if dias is None:
-        await mensaje.answer(t(idi, "promo_mal"))
-        return
-    try:
-        actualizado = activar(tg_id, dias)
-    except Exception:  # noqa: BLE001
-        log.exception("fallo canjeando promo")
-        await mensaje.answer(t(idi, "error_generico"))
-        return
-    await mensaje.answer(
-        t(idi, "promo_ok", dias=dias), parse_mode=ParseMode.HTML
-    )
-    await enviar_conf(bot, tg_id, actualizado, t(idi, "pais"))
-
-
-# --------------------------------------------------------------------------- #
-# Caducidad
+# Tareas de fondo
 # --------------------------------------------------------------------------- #
 async def vigilar_caducidades(bot: Bot):
     """Cada 10 minutos quita del servidor a quien haya caducado."""
@@ -641,7 +680,6 @@ async def vigilar_caducidades(bot: Bot):
                 log.info("caducado %s (%s)", usuario["tg_id"], usuario.get("ip"))
         except Exception:  # noqa: BLE001
             log.exception("error revisando caducidades")
-
 
 
 async def vigilar_cripto(bot: Bot):
@@ -680,6 +718,8 @@ async def vigilar_cripto(bot: Bot):
                 log.info("cripto pagado: %s -> %s meses", tg_id, meses)
         except Exception:  # noqa: BLE001
             log.exception("error revisando pagos con cripto")
+
+
 async def main():
     if not config.TOKEN:
         raise SystemExit("Falta GEOID_TOKEN (token del bot de BotFather)")
