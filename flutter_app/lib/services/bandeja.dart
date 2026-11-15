@@ -22,9 +22,8 @@ class Bandeja with TrayListener, WindowListener {
   Future<void> _preparar() async {
     if (_listo) return;
     try {
+      // Primero la bandeja: si fallara, cerrar la ventana debe seguir cerrando.
       await windowManager.ensureInitialized();
-      await windowManager.setPreventClose(true);
-      windowManager.addListener(this);
 
       await trayManager.setIcon(await _copiarIcono());
       await trayManager.setToolTip('GeoiD-vpn');
@@ -38,6 +37,9 @@ class Bandeja with TrayListener, WindowListener {
         ),
       );
       trayManager.addListener(this);
+
+      await windowManager.setPreventClose(true);
+      windowManager.addListener(this);
       _listo = true;
     } catch (e) {
       debugPrint('bandeja: $e');
