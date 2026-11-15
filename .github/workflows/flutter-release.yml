@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
       - name: Comprobar que la etiqueta coincide con la version
         if: startsWith(github.ref, 'refs/tags/v')
         shell: pwsh
@@ -24,8 +27,6 @@ jobs:
           $tag = "${{ github.ref_name }}".TrimStart('v')
           if ($v -ne $tag) { throw "la etiqueta $tag no coincide con pubspec ($v)" }
           Write-Host "version correcta: $v"
-      - name: Descargar el codigo
-        uses: actions/checkout@v4
 
       - name: Preparar Java 21
         uses: actions/setup-java@v4
