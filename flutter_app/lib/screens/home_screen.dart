@@ -37,6 +37,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _bucleStats;
 
   int _ultimoTotal = -1;
+  int _ciclos = 0;
+  bool _midiendo = false;
+  RawDatagramSocket? _socketPing;
+  Completer<int?>? _esperaPing;
+  DateTime _inicioPing = DateTime.now();
+
+  /// Consulta DNS fija (example.com A): solo interesa el tiempo de ida y vuelta.
+  static const List<int> _consultaDns = [
+    0x12, 0x34, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x07, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x03, 0x63, 0x6f, 0x6d,
+    0x00, 0x00, 0x01, 0x00, 0x01,
+  ];
   int _ultimoInstante = 0;
 
   @override
@@ -182,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       await Nativo.conectar(
         conf: perfil.conf,
-        mtu: 1280,
+        mtu: perfil.mtu,
         dns: null,
         apps: apps,
         filtrar: _bloquearAnuncios,
@@ -197,18 +209,52 @@ class _HomeScreenState extends State<HomeScreen> {
     _pararStats();
     _ultimoTotal = -1;
     _ultimoInstante = 0;
-    _bucleStats = Timer.periodic(const Duration(seconds: 2), (_) => _medir());
+    _crearSocketPing();
+    _bucleStats = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (_midiendo) return; // evita solaparse si una medida tarda
+      _midiendo = true;
+      _medir().whenComplete(() => _midiendo = false);
+    });
   }
 
   void _pararStats() {
     _bucleStats?.cancel();
     _bucleStats = null;
+    _cerrarSocketPing();
     if (mounted) {
       setState(() {
         _velocidad = '0 KB/s';
         _ping = '-- ms';
       });
     }
+  }
+
+  /// Un solo socket para todas las medidas de latencia (antes se abria uno
+  /// nuevo cada 2 segundos).
+  Future<void> _crearSocketPing() async {
+    if (_socketPing != null) return;
+    try {
+      final socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
+      socket.listen((evento) {
+        if (evento != RawSocketEvent.read) return;
+        final datagrama = socket.receive();
+        final espera = _esperaPing;
+        if (datagrama != null && espera != null && !espera.isCompleted) {
+          espera.complete(
+            DateTime.now().difference(_inicioPing).inMilliseconds,
+          );
+        }
+      });
+      _socketPing = socket;
+    } catch (_) {
+      _socketPing = null;
+    }
+  }
+
+  void _cerrarSocketPing() {
+    _socketPing?.close();
+    _socketPing = null;
+    _esperaPing = null;
   }
 
   Future<void> _medir() async {
@@ -236,7 +282,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _ultimoTotal = total;
     _ultimoInstante = ahora;
 
-    final ping = await _medirPing();
+    // La latencia se mide cada 6 segundos: menos red, mismo resultado util.
+    _ciclos++;
+    int? ping;
+    if (_ciclos % 3 == 0) ping = await _medirPing();
+
     if (!mounted) return;
     setState(() {
       _velocidad = texto;
@@ -252,46 +302,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Latencia real: consulta DNS al servidor del tunel y mide la respuesta.
   Future<int?> _medirPing() async {
+    final socket = _socketPing;
     final puerta = _puertaTunel();
-    if (puerta == null) return null;
+    if (socket == null || puerta == null) return null;
 
-    RawDatagramSocket? socket;
+    final espera = Completer<int?>();
+    _esperaPing = espera;
+    _inicioPing = DateTime.now();
+
     try {
-      socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
-      final consulta = <int>[
-        0x12, 0x34, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x07, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x03, 0x63, 0x6f, 0x6d,
-        0x00, 0x00, 0x01, 0x00, 0x01,
-      ];
-
-      final inicio = DateTime.now();
-      final completado = Completer<int?>();
-
-      socket.listen((evento) {
-        if (evento == RawSocketEvent.read && !completado.isCompleted) {
-          final datagrama = socket!.receive();
-          if (datagrama != null) {
-            completado.complete(
-              DateTime.now().difference(inicio).inMilliseconds,
-            );
-          }
-        }
-      }, onError: (_) {
-        if (!completado.isCompleted) completado.complete(null);
-      });
-
-      socket.send(consulta, puerta, 53);
-
-      final resultado = await completado.future
-          .timeout(const Duration(seconds: 2), onTimeout: () => null);
-      return resultado;
+      socket.send(_consultaDns, puerta, 53);
+      return await espera.future
+          .timeout(const Duration(milliseconds: 1500), onTimeout: () => null);
     } catch (_) {
       return null;
     } finally {
-      socket?.close();
+      if (identical(_esperaPing, espera)) _esperaPing = null;
     }
   }
-
   InternetAddress? _puertaTunel() {
     final conf = _perfil?.conf ?? '';
     for (final bruta in conf.split('\n')) {

@@ -16,6 +16,20 @@ class Perfil {
         json['conf'] as String? ?? '',
       );
 
+  /// MTU del perfil, con limites sensatos.
+  ///
+  /// AmneziaWG añade relleno por paquete, asi que por encima de ~1400 el
+  /// tunel se atasca en enlaces de 1500. Por debajo de 1280 se pierde velocidad.
+  int get mtu {
+    for (final bruta in conf.split('\n')) {
+      final linea = bruta.trim().toLowerCase();
+      if (!linea.startsWith('mtu')) continue;
+      final valor = int.tryParse(linea.split('=').last.trim());
+      if (valor != null && valor >= 1280 && valor <= 1400) return valor;
+    }
+    return 1280;
+  }
+
   /// IP y puerto del servidor, para mostrarlos en la lista.
   String get resumen {
     for (final bruta in conf.split('\n')) {

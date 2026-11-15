@@ -20,8 +20,14 @@ class Polyhedron extends StatefulWidget {
 class _PolyhedronState extends State<Polyhedron>
     with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
-  double _angulo = 0;
+
+  /// Se repinta solo el lienzo, sin reconstruir el arbol de widgets.
+  final ValueNotifier<double> _angulo = ValueNotifier<double>(0);
   Duration _ultimo = Duration.zero;
+
+  /// Limita los fotogramas: 60 cuando gira deprisa, 30 cuando esta quieto.
+  static const double _paso60 = 1.0 / 60.0;
+  static const double _paso30 = 1.0 / 30.0;
 
   @override
   void initState() {
@@ -33,37 +39,42 @@ class _PolyhedronState extends State<Polyhedron>
     final dt = _ultimo == Duration.zero
         ? 0.0
         : (tiempo - _ultimo).inMicroseconds / 1000000.0;
+
+    final minimo = widget.conectado ? _paso60 : _paso30;
+    if (dt < minimo) return;
     _ultimo = tiempo;
 
     final velocidad = widget.conectado ? 360.0 / 7.0 : 6.0;
-    setState(() {
-      _angulo = (_angulo + velocidad * dt) % 360.0;
-    });
+    _angulo.value = (_angulo.value + velocidad * dt) % 360.0;
   }
 
   @override
   void dispose() {
     _ticker.dispose();
+    _angulo.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _PintorPoliedro(
-        angulo: _angulo,
-        conectado: widget.conectado,
+    return RepaintBoundary(
+      child: CustomPaint(
+        painter: _PintorPoliedro(
+          angulo: _angulo,
+          conectado: widget.conectado,
+        ),
+        child: const SizedBox.expand(),
       ),
-      child: const SizedBox.expand(),
     );
   }
 }
 
 class _PintorPoliedro extends CustomPainter {
-  final double angulo;
+  final ValueListenable<double> angulo;
   final bool conectado;
 
-  _PintorPoliedro({required this.angulo, required this.conectado});
+  _PintorPoliedro({required this.angulo, required this.conectado})
+      : super(repaint: angulo);
 
   static final double _phi = (1 + math.sqrt(5)) / 2;
 
@@ -132,7 +143,7 @@ class _PintorPoliedro extends CustomPainter {
       );
     }
 
-    final rad = angulo * math.pi / 180.0;
+    final rad = angulo.value * math.pi / 180.0;
     final seno = math.sin(rad);
     final coseno = math.cos(rad);
 
