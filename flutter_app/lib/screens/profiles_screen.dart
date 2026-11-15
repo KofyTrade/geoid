@@ -288,8 +288,9 @@ class DialogoPerfil extends StatefulWidget {
 class _DialogoPerfilState extends State<DialogoPerfil> {
   late final TextEditingController _nombre =
       TextEditingController(text: widget.sugerido);
-  late final TextEditingController _conf =
-      TextEditingController(\n        text: widget.perfil?.conf ?? widget.contenidoInicial ?? '',\n      );
+  late final TextEditingController _conf = TextEditingController(
+    text: widget.perfil?.conf ?? widget.contenidoInicial ?? '',
+  );
   String? _error;
   bool _importando = false;
 
