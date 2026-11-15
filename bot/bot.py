@@ -717,6 +717,19 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
         log.warning("no se pudo avisar al cliente %s", tg_id)
 
 
+@router.message(Command("chatid"))
+async def comando_chatid(mensaje: Message):
+    """Dice el ID del chat actual. Sirve para configurar el grupo de avisos."""
+    if ADMIN and mensaje.from_user.id != ADMIN:
+        return
+    await mensaje.answer(
+        f"ID de este chat: <code>{mensaje.chat.id}</code>\n\n"
+        "Para usarlo como destino de avisos, en el servidor:\n"
+        f"<code>echo 'GEOID_AVISOS_ID={mensaje.chat.id}' >> /etc/geoid-bot.env "
+        "&& systemctl restart geoid-bot</code>",
+        parse_mode=ParseMode.HTML,
+    )
+
 @router.message(Command("qr"))
 async def comando_qr(mensaje: Message):
     """Administrador: envia una foto con /qr para usarla como QR de pago."""
