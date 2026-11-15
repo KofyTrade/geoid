@@ -615,7 +615,9 @@ class _HomeScreenState extends State<HomeScreen> {
       } else if (cuantas == 0) {
         _appsResumen = t('todas_apps');
       } else {
-        _appsResumen = t('apps_n').replaceFirst('%s', '$cuantas');
+        _appsResumen = cuantas == 1
+            ? t('apps_1')
+            : t('apps_n').replaceFirst('%s', '$cuantas');
       }
     });
   }

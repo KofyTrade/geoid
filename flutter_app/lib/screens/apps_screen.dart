@@ -100,7 +100,10 @@ class _AppsScreenState extends State<AppsScreen> {
                     child: Text(
                       _marcadas.isEmpty
                           ? t('sin_seleccion')
-                          : t('apps_n').replaceFirst('%s', '${_marcadas.length}'),
+                          : (_marcadas.length == 1
+                              ? t('apps_1')
+                              : t('apps_n')
+                                  .replaceFirst('%s', '${_marcadas.length}')),
                       style: const TextStyle(
                         color: GeoidColors.textoSuave,
                         fontSize: 12,
