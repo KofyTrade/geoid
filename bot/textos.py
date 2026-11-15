@@ -105,17 +105,22 @@ TEXTOS = {
         ),
         "cripto_no": "El pago con cripto no está disponible ahora mismo. Usa estrellas o transferencia.",
         "manual_texto": (
-            "💳 <b>Pago por transferencia</b>\n\n{datos}\n\n"
-            "Cuando lo hayas hecho, pulsa el botón de abajo y te activamos a mano "
-            "(normalmente en minutos)."
+            "💳 <b>Pago con SBP o tarjeta rusa</b>\n\n"
+            "Importe: <b>{importe} ₽</b>\n"
+            "Teléfono: <code>{telefono}</code>{titular}\n\n"
+            "1. Abre tu banco y elige transferir por <b>SBP</b>.\n"
+            "2. Envía <b>{importe} ₽</b> al número de arriba.\n"
+            "3. Vuelve aquí y pulsa <b>«Ya he pagado»</b>.\n\n"
+            "Tu acceso se activa en minutos (lo revisamos a mano).\n\n"
+            "Tu ID de Telegram: <code>{id}</code>"
         ),
         "manual_boton": "✅ Ya he pagado",
-        "manual_aviso": "Aviso enviado. En cuanto lo comprobemos, tu acceso se activa.",
+        "manual_aviso": "✅ Aviso enviado. En cuanto confirmemos el pago recibirás tu configuración aquí mismo.",
         "manual_admin": (
-            "💳 <b>Pago manual pendiente</b>\n\n"
+            "💳 <b>Pago pendiente</b>\n\n"
             "Usuario: {usuario} (ID <code>{id}</code>)\n"
-            "Plan: {meses} mes(es)\n\n"
-            "Activa con:\n<code>/activar {id} {meses}</code>"
+            "Plan: <b>{meses} mes(es)</b> · {importe} ₽\n\n"
+            "Pulsa el botón cuando veas el ingreso:"
         ),
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
@@ -220,17 +225,22 @@ TEXTOS = {
         ),
         "cripto_no": "Оплата криптой сейчас недоступна. Используйте звёзды или перевод.",
         "manual_texto": (
-            "💳 <b>Оплата переводом</b>\n\n{datos}\n\n"
-            "После оплаты нажмите кнопку ниже — активируем вручную "
-            "(обычно в течение нескольких минут)."
+            "💳 <b>Оплата СБП или картой</b>\n\n"
+            "Сумма: <b>{importe} ₽</b>\n"
+            "Телефон: <code>{telefono}</code>{titular}\n\n"
+            "1. Откройте банк и выберите перевод по <b>СБП</b>.\n"
+            "2. Отправьте <b>{importe} ₽</b> на номер выше.\n"
+            "3. Вернитесь сюда и нажмите <b>«Я оплатил»</b>.\n\n"
+            "Доступ включим в течение нескольких минут.\n\n"
+            "Ваш ID в Telegram: <code>{id}</code>"
         ),
         "manual_boton": "✅ Я оплатил",
-        "manual_aviso": "Заявка отправлена. Как только проверим — доступ включится.",
+        "manual_aviso": "✅ Заявка отправлена. Как только подтвердим оплату, конфигурация придёт сюда.",
         "manual_admin": (
             "💳 <b>Ожидает оплаты</b>\n\n"
             "Пользователь: {usuario} (ID <code>{id}</code>)\n"
-            "Тариф: {meses} мес.\n\n"
-            "Активировать:\n<code>/activar {id} {meses}</code>"
+            "Тариф: <b>{meses} мес.</b> · {importe} ₽\n\n"
+            "Нажмите кнопку, когда увидите поступление:"
         ),
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
@@ -326,17 +336,22 @@ TEXTOS = {
         ),
         "cripto_no": "Crypto payment is unavailable right now. Use stars or a transfer.",
         "manual_texto": (
-            "💳 <b>Bank transfer</b>\n\n{datos}\n\n"
-            "After paying, press the button below and we activate it manually "
-            "(usually within minutes)."
+            "💳 <b>Pay by SBP or Russian card</b>\n\n"
+            "Amount: <b>{importe} ₽</b>\n"
+            "Phone: <code>{telefono}</code>{titular}\n\n"
+            "1. Open your bank and choose an <b>SBP</b> transfer.\n"
+            "2. Send <b>{importe} ₽</b> to the number above.\n"
+            "3. Come back and press <b>\"I have paid\"</b>.\n\n"
+            "Your access activates within minutes (checked by hand).\n\n"
+            "Your Telegram ID: <code>{id}</code>"
         ),
         "manual_boton": "✅ I have paid",
-        "manual_aviso": "Sent. As soon as we check it, your access activates.",
+        "manual_aviso": "✅ Sent. As soon as we confirm the payment your configuration arrives here.",
         "manual_admin": (
-            "💳 <b>Manual payment pending</b>\n\n"
+            "💳 <b>Payment pending</b>\n\n"
             "User: {usuario} (ID <code>{id}</code>)\n"
-            "Plan: {meses} month(s)\n\n"
-            "Activate with:\n<code>/activar {id} {meses}</code>"
+            "Plan: <b>{meses} month(s)</b> · {importe} ₽\n\n"
+            "Press the button once you see the transfer:"
         ),
         "activar_ok": "Activated {id} until {fecha}.",        "pais": "Finland",
     },

@@ -457,21 +457,45 @@ async def cb_cripto(llamada: CallbackQuery):
 
 
 @router.callback_query(F.data.startswith("metodo:manual:"))
-async def cb_manual(llamada: CallbackQuery):
+async def cb_manual(llamada: CallbackQuery, bot: Bot):
+    """SBP / tarjeta rusa: importe, telefono (y QR si esta configurado)."""
     meses = int(llamada.data.split(":")[2])
-    idi = idioma(llamada.from_user.id)
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+    importe = config.PRECIOS_RUB.get(meses, 0)
+    titular = f" ({config.SBP_TITULAR})" if config.SBP_TITULAR else ""
+
+    texto = t(idi, "manual_texto",
+              importe=importe,
+              telefono=config.SBP_TELEFONO or "—",
+              titular=titular,
+              id=tg_id)
 
     teclado = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text=t(idi, "manual_boton"), callback_data=f"paguei:{meses}")],
         [InlineKeyboardButton(text="◀️", callback_data="comprar")],
     ])
-    await llamada.message.edit_text(
-        t(idi, "manual_texto", datos=config.PAGO_MANUAL),
-        reply_markup=teclado,
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
+
+    if config.SBP_QR_URL:
+        await bot.send_photo(
+            chat_id=tg_id,
+            photo=config.SBP_QR_URL,
+            caption=texto,
+            parse_mode=ParseMode.HTML,
+            reply_markup=teclado,
+        )
+        try:
+            await llamada.message.delete()
+        except Exception:  # noqa: BLE001
+            pass
+    else:
+        await llamada.message.edit_text(
+            texto,
+            reply_markup=teclado,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
+        )
     await llamada.answer()
 
 
@@ -486,10 +510,17 @@ async def cb_paguei(llamada: CallbackQuery, bot: Bot):
         try:
             await bot.send_message(
                 ADMIN,
-                t("es", "manual_admin",
+                t(idioma(ADMIN), "manual_admin",
                   usuario=usuario.get("usuario") or "—",
-                  id=tg_id, meses=meses),
+                  id=tg_id, meses=meses,
+                  importe=config.PRECIOS_RUB.get(meses, 0)),
                 parse_mode=ParseMode.HTML,
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
+                    InlineKeyboardButton(
+                        text=f"✅ Activar {meses} mes(es)",
+                        callback_data=f"act:{tg_id}:{meses}",
+                    )
+                ]]),
             )
         except Exception:  # noqa: BLE001
             log.warning("no se pudo avisar al administrador")
@@ -500,6 +531,38 @@ async def cb_paguei(llamada: CallbackQuery, bot: Bot):
     await llamada.answer()
 
 
+
+@router.callback_query(F.data.startswith("act:"))
+async def admin_activar(llamada: CallbackQuery, bot: Bot):
+    """El administrador activa con un solo toque desde el aviso de pago."""
+    if llamada.from_user.id != ADMIN:
+        await llamada.answer("Solo para el administrador", show_alert=True)
+        return
+
+    _, sid, smeses = llamada.data.split(":")
+    tg_id, meses = int(sid), int(smeses)
+    db.crear_si_falta(tg_id, None)
+    usuario = activar(tg_id, 30 * meses)
+    db.registrar_pago(
+        tg_id, meses, config.PRECIOS_RUB.get(meses, 0),
+        f"sbp:{int(time.time())}",
+    )
+
+    await llamada.message.edit_text(
+        f"✅ Activado <code>{tg_id}</code> hasta {fecha(usuario['expira'])}",
+        parse_mode=ParseMode.HTML,
+    )
+    try:
+        await bot.send_message(
+            tg_id,
+            t(idioma(tg_id), "pago_ok", fecha=fecha(usuario["expira"])),
+            parse_mode=ParseMode.HTML,
+            reply_markup=teclado_fijo(tg_id),
+        )
+        await enviar_conf(bot, tg_id, usuario, "GeoiD · SBP")
+    except Exception:  # noqa: BLE001
+        log.warning("no se pudo avisar al cliente %s", tg_id)
+    await llamada.answer("Activado")
 @router.callback_query(F.data == "mi_vpn")
 async def cb_mi_vpn(llamada: CallbackQuery, bot: Bot):
     await llamada.answer()

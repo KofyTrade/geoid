@@ -56,13 +56,25 @@ PRECIOS_USD = {
     12: float(os.environ.get("GEOID_USD_12M", "21")),
 }
 
-# --- Pago manual (transferencia rusa / tarjeta) ---
-# Vacio = desactivado: el bot solo enseña Estrellas y Cripto.
-# Si algun dia quieres activarlo, pon aqui tus datos y reinicia el bot.
+# --- Pago con SBP / tarjeta rusa (manual) ---
+# Se activa solo con poner tu telefono. Es la via mas facil para el cliente
+# ruso: abre su banco, escanea el QR y paga.
+SBP_TELEFONO = os.environ.get("GEOID_SBP_TELEFONO", "").strip()
+SBP_TITULAR = os.environ.get("GEOID_SBP_TITULAR", "").strip()
+SBP_QR_URL = os.environ.get("GEOID_SBP_QR_URL", "").strip()   # imagen opcional
+
+# Precios en rublos para este metodo.
+PRECIOS_RUB = {
+    1: int(os.environ.get("GEOID_RUB_1M", "199")),
+    3: int(os.environ.get("GEOID_RUB_3M", "539")),
+    12: int(os.environ.get("GEOID_RUB_12M", "1690")),
+}
+
+# Texto libre por si algun dia quieres otro metodo (vacio = no se muestra).
 PAGO_MANUAL = os.environ.get("GEOID_PAGO_MANUAL", "").strip()
 
 
 def pago_manual_activo() -> bool:
-    return bool(PAGO_MANUAL)
+    return bool(SBP_TELEFONO or PAGO_MANUAL)
 # Nombre comercial
 MARCA = os.environ.get("GEOID_MARCA", "GeoiD VPN")

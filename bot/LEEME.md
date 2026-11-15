@@ -198,3 +198,44 @@ cualquier Telegram. No hace falta pasarela propia.
 Eso exige cuenta de autónomo/IP, contrato de adquirencia con un banco
 (YooKassa, CloudPayments, Tinkoff) y, normalmente, cheques fiscales. Es un paso
 administrativo, no técnico.
+
+## SBP / tarjeta rusa (la vía fácil para clientes rusos)
+
+Sin самозанятый no hay cobro automático, pero sí un flujo de **dos toques**:
+
+1. El cliente elige **💳 СБП / Tarjeta rusa** y ve: importe en ₽, tu teléfono
+   (y tu QR si lo configuras), y su ID de Telegram.
+2. Paga desde su banco y pulsa **«Ya he pagado»**.
+3. A ti te llega el aviso con **un botón «✅ Activar 1 mes»**.
+4. Un toque: se activa, se registra el pago y el cliente recibe su `.conf`.
+
+### Configurarlo
+
+```bash
+cat >> /etc/geoid-bot.env <<'EOF'
+GEOID_SBP_TELEFONO=+79001234567
+GEOID_SBP_TITULAR=Ivan Ivanov
+GEOID_RUB_1M=199
+GEOID_RUB_3M=539
+GEOID_RUB_12M=1690
+EOF
+systemctl restart geoid-bot
+```
+
+**QR opcional**: si pones una imagen pública en `GEOID_SBP_QR_URL`, el bot la
+envía como foto junto al importe (el cliente solo escanea).
+
+```bash
+echo 'GEOID_SBP_QR_URL=https://ejemplo.com/mi-qr-sbp.png' >> /etc/geoid-bot.env
+```
+
+El QR estático de tu banco (СБП) se obtiene en la app del banco: «Мой QR» /
+«Получить QR для переводов». Súbelo a cualquier sitio con enlace público
+(por ejemplo, un repo público o un servicio de imágenes) y pega la URL.
+
+### Por qué así y no automático
+
+Cobrar con tarjeta o SBP de forma automática exige **самозанятый o ИП** y un
+agregador (Freekassa, Lava…). El flujo de arriba funciona **hoy**, sin papeleo,
+y añade solo unos minutos de espera. Cuando el volumen lo justifique, se integra
+el agregador y el paso 3 desaparece.
