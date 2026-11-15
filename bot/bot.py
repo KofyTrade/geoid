@@ -717,8 +717,14 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
 
 @router.message(Command("qr"))
 async def comando_qr(mensaje: Message):
-    """Administrador: responde a una foto con /qr para usarla como QR de SBP."""
+    """Administrador: envia una foto con /qr para usarla como QR de pago."""
     if mensaje.from_user.id != ADMIN:
+        await mensaje.answer(
+            "Este comando es solo para el administrador.\n\n"
+            f"Tu ID es {mensaje.from_user.id}. Para activarlo, en el servidor:\n"
+            f"sed -i 's|^GEOID_ADMIN=.*|GEOID_ADMIN={mensaje.from_user.id}|' "
+            "/etc/geoid-bot.env && systemctl restart geoid-bot"
+        )
         return
 
     foto = None
