@@ -34,11 +34,13 @@ class Actualizador {
           .replaceFirst(RegExp('^[vV]'), '');
       if (etiqueta.isEmpty) return null;
 
+      // En Windows el paquete es un ZIP; en Android, un APK.
+      final extension = Platform.isWindows ? '.zip' : '.apk';
       final activos = (json['assets'] as List<dynamic>?) ?? [];
       for (final activo in activos) {
         final mapa = activo as Map<String, dynamic>;
-        final nombre = (mapa['name'] as String? ?? '');
-        if (nombre.toLowerCase().endsWith('.apk')) {
+        final nombre = (mapa['name'] as String? ?? '').toLowerCase();
+        if (nombre.endsWith(extension)) {
           final url = mapa['browser_download_url'] as String? ?? '';
           if (url.isNotEmpty) return NuevaVersion(etiqueta, url);
         }
@@ -71,6 +73,10 @@ class Actualizador {
   }
 
   static Future<void> descargar(NuevaVersion version) {
-    return Nativo.descargar(version.urlApk, 'GeoiD-vpn-${version.numero}.apk');
+    final extension = Platform.isWindows ? '.zip' : '.apk';
+    return Nativo.descargar(
+      version.urlApk,
+      'GeoiD-vpn-${version.numero}$extension',
+    );
   }
 }
