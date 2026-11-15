@@ -29,6 +29,11 @@ CREATE TABLE IF NOT EXISTS promos (
     usados      INTEGER DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS ajustes (
+    clave       TEXT PRIMARY KEY,
+    valor       TEXT
+);
+
 CREATE TABLE IF NOT EXISTS pagos (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     tg_id       INTEGER NOT NULL,
@@ -166,3 +171,22 @@ def pago_mas_reciente(tg_id: int) -> dict | None:
             (tg_id,),
         ).fetchone()
         return dict(fila) if fila else None
+
+def leer_ajuste(clave: str) -> str | None:
+    with conectar() as con:
+        fila = con.execute(
+            "SELECT valor FROM ajustes WHERE clave = ?", (clave,)
+        ).fetchone()
+        return fila["valor"] if fila else None
+
+
+def guardar_ajuste(clave: str, valor: str | None) -> None:
+    with conectar() as con:
+        if valor is None:
+            con.execute("DELETE FROM ajustes WHERE clave = ?", (clave,))
+        else:
+            con.execute(
+                "INSERT INTO ajustes (clave, valor) VALUES (?, ?) "
+                "ON CONFLICT(clave) DO UPDATE SET valor = excluded.valor",
+                (clave, valor),
+            )

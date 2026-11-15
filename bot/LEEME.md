@@ -222,16 +222,13 @@ EOF
 systemctl restart geoid-bot
 ```
 
-**QR opcional**: si pones una imagen pública en `GEOID_SBP_QR_URL`, el bot la
-envía como foto junto al importe (el cliente solo escanea).
+**QR (recomendado, sin enlaces)**: en la app de tu banco busca «Мой QR» /
+«QR для переводов» y guarda la imagen. Luego, en Telegram:
 
-```bash
-echo 'GEOID_SBP_QR_URL=https://ejemplo.com/mi-qr-sbp.png' >> /etc/geoid-bot.env
-```
+1. Envíale esa foto **a tu propio bot** (como si fuera un mensaje)
+2. Responde a la foto escribiendo `/qr`
 
-El QR estático de tu banco (СБП) se obtiene en la app del banco: «Мой QR» /
-«Получить QR для переводов». Súbelo a cualquier sitio con enlace público
-(por ejemplo, un repo público o un servicio de imágenes) y pega la URL.
+El bot la guarda y la enviará en cada pago por SBP. Para quitarla: `/qr borrar`.
 
 ### Por qué así y no automático
 

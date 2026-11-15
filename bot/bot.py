@@ -477,10 +477,11 @@ async def cb_manual(llamada: CallbackQuery, bot: Bot):
         [InlineKeyboardButton(text="◀️", callback_data="comprar")],
     ])
 
-    if config.SBP_QR_URL:
+    qr = db.leer_ajuste("qr_sbp") or config.SBP_QR_URL
+    if qr:
         await bot.send_photo(
             chat_id=tg_id,
-            photo=config.SBP_QR_URL,
+            photo=qr,
             caption=texto,
             parse_mode=ParseMode.HTML,
             reply_markup=teclado,
@@ -699,6 +700,36 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
     except Exception:  # noqa: BLE001
         log.warning("no se pudo avisar al cliente %s", tg_id)
 
+
+@router.message(Command("qr"))
+async def comando_qr(mensaje: Message):
+    """Administrador: responde a una foto con /qr para usarla como QR de SBP."""
+    if mensaje.from_user.id != ADMIN:
+        return
+
+    foto = None
+    if mensaje.reply_to_message and mensaje.reply_to_message.photo:
+        foto = mensaje.reply_to_message.photo[-1].file_id
+    elif mensaje.photo:
+        foto = mensaje.photo[-1].file_id
+
+    if foto:
+        db.guardar_ajuste("qr_sbp", foto)
+        await mensaje.answer(
+            "✅ QR guardado. Se enviará como imagen en los pagos por SBP.\n\n"
+            "Para quitarlo: /qr borrar"
+        )
+        return
+
+    if (mensaje.text or "").endswith("borrar"):
+        db.guardar_ajuste("qr_sbp", None)
+        await mensaje.answer("🗑 QR eliminado.")
+        return
+
+    await mensaje.answer(
+        "Envíame una foto del QR de tu banco (СБП) y respóndele con /qr.\n\n"
+        "También sirve: enviar la foto y luego escribir /qr."
+    )
 
 @router.message(Command("estado"))
 async def comando_estado(mensaje: Message):
