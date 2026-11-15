@@ -478,14 +478,20 @@ async def cb_manual(llamada: CallbackQuery, bot: Bot):
     ])
 
     qr = db.leer_ajuste("qr_sbp") or config.SBP_QR_URL
+    enviado = False
     if qr:
-        await bot.send_photo(
-            chat_id=tg_id,
-            photo=qr,
-            caption=texto,
-            parse_mode=ParseMode.HTML,
-            reply_markup=teclado,
-        )
+        try:
+            await bot.send_photo(
+                chat_id=tg_id,
+                photo=qr,
+                caption=texto,
+                parse_mode=ParseMode.HTML,
+                reply_markup=teclado,
+            )
+            enviado = True
+        except Exception:  # noqa: BLE001
+            log.exception("no se pudo enviar el QR; se manda solo el texto")
+    if enviado:
         try:
             await llamada.message.delete()
         except Exception:  # noqa: BLE001
@@ -497,7 +503,6 @@ async def cb_manual(llamada: CallbackQuery, bot: Bot):
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
         )
-    await llamada.answer()
 
 
 @router.callback_query(F.data.startswith("paguei:"))
