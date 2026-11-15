@@ -102,3 +102,29 @@ la caché de DNS (se intentó y el servicio falló al reiniciar; se dejó como e
 - Mostrar progreso de descarga de la actualización dentro de la app.
 - Selección por aplicación en Windows (requiere un controlador WFP firmado).
 - Prueba de velocidad integrada para comparar antes/después de BBR.
+
+---
+
+## Estado al 16/11/2026 (cierre de sesión)
+
+**App**: 3.0.3 en Android y Windows, con actualización automática desde Releases.
+
+**Bot @geoidvpnbot** (en el VPS, servicio `geoid-bot`):
+- Menú fijo abajo + menú ☰ con `/start` y `/menu`
+- Prueba de 3 días
+- Cobro con ⭐ Estrellas (automático), 🪙 Cripto Crypto Pay (automático) y
+  📱 Pago por QR / SBP (el bot avisa y se activa con un toque)
+- Avisos de pago en un grupo privado aparte (`GEOID_AVISOS_ID`)
+- Comandos de administrador: `/estado`, `/qr`, `/chatid`, `/activar`,
+  `/regalar`, `/promo`
+- Precios: 199 / 539 / 1690 ₽ · 150 / 400 / 1200 ⭐ · 2.5 / 6.5 / 21 USDT
+
+**Servidor**: AmneziaWG (UDP 21766, MTU 1280), dnsmasq con bloqueo de anuncios,
+BBR activo.
+
+### Pendiente para la próxima sesión
+
+1. Sacarte el **самозанятый** → integrar Freekassa/Lava y automatizar el SBP.
+2. Comando `/ventas` con resumen de ingresos y clientes activos.
+3. Añadir más países (otro VPS por país + columna `pais`).
+4. Copia de seguridad de `bot.sqlite` y del keystore fuera del servidor/PC.
