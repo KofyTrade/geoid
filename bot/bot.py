@@ -38,7 +38,15 @@ logging.basicConfig(
 log = logging.getLogger("geoid")
 
 router = Router()
-ADMIN = int(os.environ.get("GEOID_ADMIN", "0") or 0)
+def _admin() -> int:
+    """El id de administrador es opcional: si falta o no es un número, se ignora."""
+    try:
+        return int(os.environ.get("GEOID_ADMIN", "0") or 0)
+    except ValueError:
+        return 0
+
+
+ADMIN = _admin()
 DIA = 86400
 
 
