@@ -51,9 +51,9 @@ CRYPTO_MONEDA = os.environ.get("GEOID_CRYPTO_MONEDA", "USDT")
 
 # Precios en dolares para cripto (los de estrellas son aparte).
 PRECIOS_USD = {
-    1: float(os.environ.get("GEOID_USD_1M", "3.5")),
-    3: float(os.environ.get("GEOID_USD_3M", "9")),
-    12: float(os.environ.get("GEOID_USD_12M", "30")),
+    1: float(os.environ.get("GEOID_USD_1M", "2.5")),
+    3: float(os.environ.get("GEOID_USD_3M", "6.5")),
+    12: float(os.environ.get("GEOID_USD_12M", "21")),
 }
 
 # --- Pago manual (transferencia rusa / tarjeta) ---
