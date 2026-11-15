@@ -153,10 +153,10 @@ async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
 # Comandos
 # --------------------------------------------------------------------------- #
 @router.message(CommandStart())
-async def start(mensaje: Message, comando: CommandObject):
+async def start(mensaje: Message, command: CommandObject):
     referido = None
-    if comando.args and comando.args.startswith("r"):
-        padrino = db.por_codigo(comando.args)
+    if command.args and command.args.startswith("r"):
+        padrino = db.por_codigo(command.args)
         if padrino and padrino["tg_id"] != mensaje.from_user.id:
             referido = padrino["tg_id"]
 
@@ -184,11 +184,11 @@ async def comando_menu(mensaje: Message):
 
 
 @router.message(Command("promo"))
-async def comando_promo(mensaje: Message, comando: CommandObject):
+async def comando_promo(mensaje: Message, command: CommandObject):
     """Solo administrador: /promo CODIGO DIAS USOS"""
     if mensaje.from_user.id != ADMIN:
         return
-    partes = (comando.args or "").split()
+    partes = (command.args or "").split()
     if len(partes) != 3:
         await mensaje.answer("Uso: /promo CODIGO DIAS USOS")
         return
@@ -198,10 +198,10 @@ async def comando_promo(mensaje: Message, comando: CommandObject):
 
 
 @router.message(Command("regalar"))
-async def comando_regalar(mensaje: Message, comando: CommandObject):
+async def comando_regalar(mensaje: Message, command: CommandObject):
     if mensaje.from_user.id != ADMIN:
         return
-    partes = (comando.args or "").split()
+    partes = (command.args or "").split()
     if len(partes) != 2:
         await mensaje.answer("Uso: /regalar ID DÍAS")
         return
