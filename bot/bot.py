@@ -465,6 +465,9 @@ async def cb_manual(llamada: CallbackQuery, bot: Bot):
     importe = config.PRECIOS_RUB.get(meses, 0)
     titular = f" ({config.SBP_TITULAR})" if config.SBP_TITULAR else ""
 
+    # Se responde al toque de inmediato: el boton nunca se queda girando.
+    await llamada.answer()
+
     texto = t(idi, "manual_texto",
               importe=importe,
               telefono=config.SBP_TELEFONO or "—",
