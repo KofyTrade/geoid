@@ -147,6 +147,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
+    /// En escritorio no hay seleccion por aplicacion: el tunel es del sistema.
+    void _dialogoSoloAndroid() {
+      showDialog<void>(
+        context: context,
+        builder: (contexto) => AlertDialog(
+          title: Text(t('apps_titulo')),
+          content: Text(t('apps_texto')),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(contexto),
+              child: Text(t('cancelar'),
+                  style: const TextStyle(color: GeoidColors.acento)),
+            ),
+          ],
+        ),
+      );
+    }
+
     /// Aviso en escritorio: el tunel todavia no esta disponible.
     void _dialogoEscritorio() {
       showDialog<void>(
@@ -355,6 +373,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _abrirAplicaciones() async {
+    if (!esAndroid) {
+      _dialogoSoloAndroid();
+      return;
+    }
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const AppsScreen()),
     );
@@ -587,7 +609,13 @@ class _HomeScreenState extends State<HomeScreen> {
         .length;
     if (!mounted) return;
     setState(() {
-      _appsResumen = cuantas == 0 ? t('todas_apps') : t('apps_n').replaceFirst('%s', '$cuantas');
+      if (!esAndroid) {
+        _appsResumen = t('todo_sistema');
+      } else if (cuantas == 0) {
+        _appsResumen = t('todas_apps');
+      } else {
+        _appsResumen = t('apps_n').replaceFirst('%s', '$cuantas');
+      }
     });
   }
 
