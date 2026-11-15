@@ -96,7 +96,7 @@ TEXTOS = {
         "metodo_titulo": "¿Cómo quieres pagar?",
         "metodo_stars": "⭐ Estrellas de Telegram",
         "metodo_crypto": "🪙 Cripto (USDT / TON)",
-        "metodo_manual": "💳 СБП / Tarjeta rusa",
+        "metodo_manual": "📱 Pago por QR",
         "cripto_texto": (
             "🪙 <b>Factura creada</b>\n\n"
             "Importe: <b>{monto} USDT</b>\n"
@@ -105,7 +105,7 @@ TEXTOS = {
         ),
         "cripto_no": "El pago con cripto no está disponible ahora mismo. Usa estrellas o transferencia.",
         "manual_texto": (
-            "💳 <b>Pago con SBP o tarjeta rusa</b>\n\n"
+            "📱 <b>Pago por QR</b>\n\n"
             "Importe: <b>{importe} ₽</b>\n"
             "Teléfono: <code>{telefono}</code>{titular}\n\n"
             "1. Abre tu banco y elige transferir por <b>SBP</b>.\n"
@@ -216,7 +216,7 @@ TEXTOS = {
         "metodo_titulo": "Как оплатить?",
         "metodo_stars": "⭐ Звёзды Telegram",
         "metodo_crypto": "🪙 Криптовалюта (USDT / TON)",
-        "metodo_manual": "💳 СБП / Карта РФ",
+        "metodo_manual": "📱 Оплата по QR",
         "cripto_texto": (
             "🪙 <b>Счёт создан</b>\n\n"
             "Сумма: <b>{monto} USDT</b>\n"
@@ -225,7 +225,7 @@ TEXTOS = {
         ),
         "cripto_no": "Оплата криптой сейчас недоступна. Используйте звёзды или перевод.",
         "manual_texto": (
-            "💳 <b>Оплата СБП или картой</b>\n\n"
+            "📱 <b>Оплата по QR</b>\n\n"
             "Сумма: <b>{importe} ₽</b>\n"
             "Телефон: <code>{telefono}</code>{titular}\n\n"
             "1. Откройте банк и выберите перевод по <b>СБП</b>.\n"
@@ -327,7 +327,7 @@ TEXTOS = {
         "metodo_titulo": "How do you want to pay?",
         "metodo_stars": "⭐ Telegram stars",
         "metodo_crypto": "🪙 Crypto (USDT / TON)",
-        "metodo_manual": "💳 SBP / Russian card",
+        "metodo_manual": "📱 Pay by QR",
         "cripto_texto": (
             "🪙 <b>Invoice created</b>\n\n"
             "Amount: <b>{monto} USDT</b>\n"
@@ -336,7 +336,7 @@ TEXTOS = {
         ),
         "cripto_no": "Crypto payment is unavailable right now. Use stars or a transfer.",
         "manual_texto": (
-            "💳 <b>Pay by SBP or Russian card</b>\n\n"
+            "📱 <b>Pay by QR</b>\n\n"
             "Amount: <b>{importe} ₽</b>\n"
             "Phone: <code>{telefono}</code>{titular}\n\n"
             "1. Open your bank and choose an <b>SBP</b> transfer.\n"
