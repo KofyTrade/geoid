@@ -57,3 +57,7 @@ flutter_app/android/.gradle/
 flutter_app/android/local.properties
 flutter_app/windows/flutter/ephemeral/
 flutter_app/**/*.iml
+
+# Secretos locales (nunca al repositorio)
+CREDENCIALES.txt
+*.secreto
