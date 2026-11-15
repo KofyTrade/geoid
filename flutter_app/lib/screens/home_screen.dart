@@ -391,14 +391,37 @@ class _HomeScreenState extends State<HomeScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'GEOID-VPN',
-                        style: TextStyle(
-                          color: const Color(0xFF5FD9C8),
-                          fontSize: 12,
-                          letterSpacing: 3.6,
-                          fontWeight: FontWeight.w300,
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          const Text(
+                            'GEOID-VPN',
+                            style: TextStyle(
+                              color: Color(0xFF5FD9C8),
+                              fontSize: 12,
+                              letterSpacing: 3.6,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          FutureBuilder<String>(
+                            future: Nativo.version(),
+                            builder: (contexto, instantanea) {
+                              final v = instantanea.data;
+                              if (v == null || v.isEmpty) {
+                                return const SizedBox.shrink();
+                              }
+                              return Text(
+                                'v$v',
+                                style: const TextStyle(
+                                  color: GeoidColors.textoTenue,
+                                  fontSize: 9,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       Text(
@@ -576,6 +599,8 @@ class _HomeScreenState extends State<HomeScreen> {
         if (version == null) return;
         await Actualizador.descargar(version);
         _error(t('descargando'));
+        // Ya se ha descargado: el aviso no vuelve a molestar.
+        if (mounted) setState(() => _actualizacion = null);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
