@@ -6,7 +6,8 @@ import '../theme.dart';
 
 /// Seleccion de aplicaciones que pasan por el tunel.
 ///
-/// Si no hay ninguna marcada, pasan todas (como en la app original).
+/// Si no hay ninguna marcada, pasan todas. Se muestran todas las aplicaciones,
+/// incluidas las del sistema.
 class AppsScreen extends StatefulWidget {
   const AppsScreen({super.key});
 
@@ -18,7 +19,6 @@ class _AppsScreenState extends State<AppsScreen> {
   List<AppInstalada> _todas = [];
   Set<String> _marcadas = {};
   bool _cargando = true;
-  bool _verSistema = false;
   String _filtro = '';
 
   @override
@@ -49,7 +49,6 @@ class _AppsScreenState extends State<AppsScreen> {
   List<AppInstalada> get _visibles {
     final texto = _filtro.toLowerCase();
     final lista = _todas.where((a) {
-      if (!_verSistema && a.sistema) return false;
       if (texto.isEmpty) return true;
       return a.nombre.toLowerCase().contains(texto) ||
           a.paquete.toLowerCase().contains(texto);
@@ -87,8 +86,8 @@ class _AppsScreenState extends State<AppsScreen> {
                 style: const TextStyle(color: GeoidColors.texto, fontSize: 14),
                 decoration: InputDecoration(
                   hintText: t('buscar_apps'),
-                  prefixIcon: const Icon(Icons.search, size: 18,
-                      color: GeoidColors.textoTenue),
+                  prefixIcon: const Icon(Icons.search,
+                      size: 18, color: GeoidColors.textoTenue),
                 ),
                 onChanged: (v) => setState(() => _filtro = v),
               ),
@@ -109,25 +108,10 @@ class _AppsScreenState extends State<AppsScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () => setState(() => _verSistema = !_verSistema),
-                    child: Text(
-                      t('ver_sistema'),
-                      style: TextStyle(
-                        color: _verSistema
-                            ? GeoidColors.acento
-                            : GeoidColors.textoTenue,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  TextButton(
                     onPressed: () {
                       setState(() {
                         if (_marcadas.isEmpty) {
-                          _marcadas = _todas
-                              .where((a) => !a.sistema)
-                              .map((a) => a.paquete)
-                              .toSet();
+                          _marcadas = _todas.map((a) => a.paquete).toSet();
                         } else {
                           _marcadas = {};
                         }
@@ -148,7 +132,20 @@ class _AppsScreenState extends State<AppsScreen> {
             Expanded(
               child: _cargando
                   ? const Center(
-                      child: CircularProgressIndicator(color: GeoidColors.acento),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(color: GeoidColors.acento),
+                          SizedBox(height: 14),
+                          Text(
+                            'Cargando aplicaciones…',
+                            style: TextStyle(
+                              color: GeoidColors.textoSuave,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
                     )
                   : _visibles.isEmpty
                       ? Center(
@@ -161,73 +158,75 @@ class _AppsScreenState extends State<AppsScreen> {
                           ),
                         )
                       : ListView.builder(
-                      itemCount: _visibles.length,
-                      itemBuilder: (contexto, i) {
-                        final app = _visibles[i];
-                        final marcada = _marcadas.contains(app.paquete);
-                        return ListTile(
-                          dense: true,
-                          leading: CircleAvatar(
-                            radius: 15,
-                            backgroundColor: marcada
-                                ? GeoidColors.borde
-                                : GeoidColors.panel,
-                            child: Text(
-                              app.inicial,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: marcada
-                                    ? GeoidColors.acento
-                                    : GeoidColors.textoSuave,
-                              ),
-                            ),
-                          ),
-                          title: Text(
-                            app.nombre,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: marcada
-                                  ? GeoidColors.texto
-                                  : GeoidColors.textoSuave,
-                            ),
-                          ),
-                          subtitle: Text(
-                            app.paquete,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: GeoidColors.textoTenue,
-                            ),
-                          ),
-                          trailing: SwitchTheme(
-                            data: SwitchThemeData(
-                              thumbColor: WidgetStateProperty.resolveWith(
-                                (estados) => estados.contains(WidgetState.selected)
-                                    ? GeoidColors.acento
-                                    : GeoidColors.textoTenue,
-                              ),
-                              trackColor: WidgetStateProperty.resolveWith(
-                                (estados) => estados.contains(WidgetState.selected)
+                          itemCount: _visibles.length,
+                          itemBuilder: (contexto, i) {
+                            final app = _visibles[i];
+                            final marcada = _marcadas.contains(app.paquete);
+                            return ListTile(
+                              dense: true,
+                              leading: CircleAvatar(
+                                radius: 15,
+                                backgroundColor: marcada
                                     ? GeoidColors.borde
-                                    : GeoidColors.botonApagado,
+                                    : GeoidColors.panel,
+                                child: Text(
+                                  app.inicial,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: marcada
+                                        ? GeoidColors.acento
+                                        : GeoidColors.textoSuave,
+                                  ),
+                                ),
                               ),
-                            ),
-                            child: Switch(
-                              value: marcada,
-                              onChanged: (v) {
-                                setState(() {
-                                  if (v) {
-                                    _marcadas.add(app.paquete);
-                                  } else {
-                                    _marcadas.remove(app.paquete);
-                                  }
-                                });
-                                _guardar();
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                              title: Text(
+                                app.nombre,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: marcada
+                                      ? GeoidColors.texto
+                                      : GeoidColors.textoSuave,
+                                ),
+                              ),
+                              subtitle: Text(
+                                app.paquete,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: GeoidColors.textoTenue,
+                                ),
+                              ),
+                              trailing: SwitchTheme(
+                                data: SwitchThemeData(
+                                  thumbColor: WidgetStateProperty.resolveWith(
+                                    (estados) =>
+                                        estados.contains(WidgetState.selected)
+                                            ? GeoidColors.acento
+                                            : GeoidColors.textoTenue,
+                                  ),
+                                  trackColor: WidgetStateProperty.resolveWith(
+                                    (estados) =>
+                                        estados.contains(WidgetState.selected)
+                                            ? GeoidColors.borde
+                                            : GeoidColors.botonApagado,
+                                  ),
+                                ),
+                                child: Switch(
+                                  value: marcada,
+                                  onChanged: (v) {
+                                    setState(() {
+                                      if (v) {
+                                        _marcadas.add(app.paquete);
+                                      } else {
+                                        _marcadas.remove(app.paquete);
+                                      }
+                                    });
+                                    _guardar();
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),

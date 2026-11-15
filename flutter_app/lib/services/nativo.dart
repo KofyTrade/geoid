@@ -122,6 +122,16 @@ class Nativo {
     });
   }
 
+  /// Arquitectura del telefono (arm64-v8a, armeabi-v7a, x86_64...).
+  static Future<String> abi() async {
+    if (!esAndroid) return '';
+    try {
+      return await _canal.invokeMethod<String>('abi') ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   static Future<List<AppInstalada>> aplicaciones() async {
     if (!esAndroid) return [];
     final lista = await _canal.invokeMethod<List<dynamic>>('listarApps');

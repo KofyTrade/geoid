@@ -36,15 +36,25 @@ class Actualizador {
 
       // En Windows el paquete es un ZIP; en Android, un APK.
       final extension = Platform.isWindows ? '.zip' : '.apk';
+      final abi = Platform.isAndroid ? await Nativo.abi() : '';
+
       final activos = (json['assets'] as List<dynamic>?) ?? [];
+      String? cualquiera;
       for (final activo in activos) {
         final mapa = activo as Map<String, dynamic>;
         final nombre = (mapa['name'] as String? ?? '').toLowerCase();
-        if (nombre.endsWith(extension)) {
-          final url = mapa['browser_download_url'] as String? ?? '';
-          if (url.isNotEmpty) return NuevaVersion(etiqueta, url);
+        if (!nombre.endsWith(extension)) continue;
+
+        final url = mapa['browser_download_url'] as String? ?? '';
+        if (url.isEmpty) continue;
+
+        cualquiera ??= url;
+        // Se prefiere el APK de la arquitectura del telefono: pesa la mitad.
+        if (abi.isNotEmpty && nombre.contains(abi)) {
+          return NuevaVersion(etiqueta, url);
         }
       }
+      if (cualquiera != null) return NuevaVersion(etiqueta, cualquiera);
       return null;
     } catch (_) {
       return null;

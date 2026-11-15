@@ -380,7 +380,8 @@ class _HomeScreenState extends State<HomeScreen> {
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const AppsScreen()),
     );
-    setState(() {});
+    // Al volver, se refresca el contador de la pantalla principal.
+    await _actualizarResumenApps();
   }
 
   Future<void> _abrirPerfiles() async {

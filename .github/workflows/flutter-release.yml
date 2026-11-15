@@ -57,15 +57,18 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: flutter build apk --release
+        run: flutter build apk --release --split-per-abi
 
-      - name: Renombrar el APK
+      - name: Renombrar los APK
         run: |
           mkdir -p salida
           VERSION="${GITHUB_REF_NAME#v}"
           if [ -z "$VERSION" ]; then VERSION="manual"; fi
-          cp flutter_app/build/app/outputs/flutter-apk/app-release.apk \
-             "salida/GeoiD-vpn-Android-${VERSION}.apk"
+          ORIGEN="flutter_app/build/app/outputs/flutter-apk"
+          for ABI in arm64-v8a armeabi-v7a x86_64; do
+            cp "$ORIGEN/app-$ABI-release.apk" \
+               "salida/GeoiD-vpn-Android-${VERSION}-$ABI.apk"
+          done
           ls -lh salida/
 
       - name: Publicar la version

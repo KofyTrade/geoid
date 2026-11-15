@@ -27,6 +27,10 @@ class MainActivity : FlutterActivity() {
         private const val CANAL_ESTADO = "geoid/estado"
     }
 
+    // La lista de aplicaciones tarda: se recorre en un hilo aparte para que la
+    // interfaz no se congele mientras se abre la pantalla.
+    private val trabajador = java.util.concurrent.Executors.newSingleThreadExecutor()
+
     private lateinit var canalMetodos: MethodChannel
     private var eventos: EventChannel.EventSink? = null
     private var resultadoVpn: MethodChannel.Result? = null
@@ -83,7 +87,21 @@ class MainActivity : FlutterActivity() {
                         resultado.success(true)
                     }
 
-                    "listarApps" -> resultado.success(listarApps())
+                    "listarApps" -> {
+                        trabajador.execute {
+                            val lista = try {
+                                listarApps()
+                            } catch (e: Exception) {
+                                emptyList<Map<String, Any?>>()
+                            }
+                            runOnUiThread { resultado.success(lista) }
+                        }
+                    }
+
+                    // ABI del telefono: sirve para bajar el APK del tamano correcto.
+                    "abi" -> resultado.success(
+                        android.os.Build.SUPPORTED_ABIS.firstOrNull() ?: "arm64-v8a"
+                    )
 
                     "elegirArchivo" -> abrirSelectorDeArchivos(resultado)
 
