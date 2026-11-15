@@ -4,9 +4,22 @@ Cliente VPN para Android con **AmneziaWG** (WireGuard ofuscado), pensado para re
 con inspección profunda de paquetes. Interfaz oscura, perfiles múltiples, selección
 de aplicaciones y bloqueo de publicidad por DNS.
 
+> **Versión 2.x: Flutter.** La app actual está en `flutter_app/` (un solo código
+> para Android y, más adelante, escritorio). La versión 1.x en Kotlin sigue en
+> `app/` como referencia y legado.
+
 <p align="center">
   <em>Un poliedro que gira como un planeta cuando el túnel está activo.</em>
 </p>
+
+## Descargar
+
+APK firmado, desde Releases:
+
+<https://github.com/KofyTrade/geoid/releases/latest>
+
+La app comprueba las versiones nuevas al abrirse y al conectar, y ofrece
+descargarlas.
 
 ## Qué hace
 
@@ -23,8 +36,11 @@ de aplicaciones y bloqueo de publicidad por DNS.
 ## Estructura
 
 ```
+flutter_app/                  app 2.x en Flutter (la que se publica)
+  lib/                        interfaz, perfiles, actualizador e idiomas
+  android/                    tunel VpnService + motor AmneziaWG (awg.aar)
 app/
-  android/                    plantillas de codigo + script de instalacion
+  android/                    plantillas de codigo + script de instalacion (1.x)
     instalar-codigo.ps1       copia las plantillas al proyecto de Android Studio
     strings/                  traducciones (values, -es, -fr, -de, -it, -ru, -ja, -ko)
   android-proyecto/           proyecto de Android Studio (Kotlin)
