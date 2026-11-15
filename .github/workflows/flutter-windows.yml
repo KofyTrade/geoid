@@ -96,4 +96,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ github.ref_name }}" "flutter_app\salida\GeoiD-vpn-Windows.zip" --clobber
+          $tag = "${{ github.ref_name }}"
+          $listo = $false
+          for ($i = 0; $i -lt 15; $i++) {
+            gh release view $tag | Out-Null
+            if ($LASTEXITCODE -eq 0) { $listo = $true; break }
+            Start-Sleep -Seconds 20
+          }
+          if (-not $listo) { throw "la version $tag no aparecio" }
+          gh release upload $tag "flutter_app\salida\GeoiD-vpn-Windows.zip" --clobber
