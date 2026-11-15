@@ -80,7 +80,7 @@ jobs:
           Copy-Item "tools\geoid-tun.exe" $origen -Force
           Copy-Item "tools\wintun.dll" $origen -Force
           New-Item -ItemType Directory -Force -Path salida | Out-Null
-          Compress-Archive -Path "$origen\*" -DestinationPath "salida\GeoiD-vpn-windows.zip" -Force
+          Compress-Archive -Path "$origen\*" -DestinationPath "salida\GeoiD-vpn-Windows.zip" -Force
           Get-ChildItem $origen | ForEach-Object { "  $($_.Name)" }
           Get-ChildItem salida | ForEach-Object { "$($_.Name)  $([math]::Round($_.Length/1MB,1)) MB" }
 
@@ -88,5 +88,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: geoid-windows
-          path: flutter_app/salida/GeoiD-vpn-windows.zip
+          path: flutter_app/salida/GeoiD-vpn-Windows.zip
           if-no-files-found: error

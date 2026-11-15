@@ -56,7 +56,7 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           if [ -z "$VERSION" ]; then VERSION="manual"; fi
           cp flutter_app/build/app/outputs/flutter-apk/app-release.apk \
-             "salida/GeoiD-vpn-${VERSION}.apk"
+             "salida/GeoiD-vpn-Android-${VERSION}.apk"
           ls -lh salida/
 
       - name: Publicar la version
