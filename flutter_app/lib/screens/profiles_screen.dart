@@ -264,6 +264,14 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
           t('perfiles'),
           style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
         ),
+        actions: [
+          IconButton(
+            tooltip: t('pegar_texto'),
+            onPressed: _pegarTexto,
+            icon: const Icon(Icons.content_paste, size: 20),
+          ),
+          const SizedBox(width: 6),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: GeoidColors.acento,
@@ -373,23 +381,6 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                         },
                       ),
                     ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                    child: OutlinedButton.icon(
-                      onPressed: _pegarTexto,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF9BE8DC),
-                        side: const BorderSide(color: GeoidColors.borde),
-                        minimumSize: const Size.fromHeight(46),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(23),
-                        ),
-                      ),
-                      icon: const Icon(Icons.content_paste, size: 16),
-                      label: Text(t('pegar_texto'),
-                          style: const TextStyle(fontSize: 12)),
-                    ),
-                  ),
                 ],
               ),
       ),

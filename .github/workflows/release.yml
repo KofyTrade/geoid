@@ -2,9 +2,7 @@ name: Compilar y publicar
 
 # Se lanza al empujar una etiqueta de version (v1.1, v1.2...) o a mano.
 on:
-  push:
-    tags:
-      - 'v*'
+  # Solo manual: la app Kotlin queda sustituida por la de Flutter.
   workflow_dispatch:
 
 permissions:
