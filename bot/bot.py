@@ -17,6 +17,8 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import (
+    BotCommand,
+    BotCommandScopeChat,
     BufferedInputFile,
     CallbackQuery,
     ChatMemberUpdated,
@@ -165,14 +167,17 @@ async def accion_prueba(bot: Bot, tg_id: int) -> None:
     idi = usuario.get("idioma") or "es"
     ahora = int(time.time())
 
+    teclado = teclado_fijo(tg_id)
+
     if usuario.get("expira", 0) > ahora:
         await bot.send_message(
-            tg_id, t(idi, "prueba_cabecera", fecha=fecha(usuario["expira"]))
+            tg_id, t(idi, "prueba_cabecera", fecha=fecha(usuario["expira"])),
+            reply_markup=teclado,
         )
         return
 
     if usuario.get("prueba_usada"):
-        await bot.send_message(tg_id, t(idi, "prueba_ya_usada"))
+        await bot.send_message(tg_id, t(idi, "prueba_ya_usada"), reply_markup=teclado)
         return
 
     try:
@@ -191,6 +196,7 @@ async def accion_prueba(bot: Bot, tg_id: int) -> None:
           ip=actualizado["ip"],
           fecha=fecha(actualizado["expira"])),
         parse_mode=ParseMode.HTML,
+        reply_markup=teclado,
     )
     await enviar_conf(bot, tg_id, actualizado, t(idi, "pais"))
 
@@ -211,7 +217,7 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
 
     if not usuario.get("ip") or usuario.get("expira", 0) <= ahora:
         texto = t(idi, "mi_vpn_sin") if not usuario.get("ip") else t(idi, "caducado")
-        await bot.send_message(tg_id, texto)
+        await bot.send_message(tg_id, texto, reply_markup=teclado_fijo(tg_id))
         return
 
     teclado = InlineKeyboardMarkup(inline_keyboard=[[
@@ -231,7 +237,9 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
 
 
 async def accion_pais(bot: Bot, tg_id: int) -> None:
-    await bot.send_message(tg_id, t(idioma(tg_id), "pais_unico"))
+    await bot.send_message(
+        tg_id, t(idioma(tg_id), "pais_unico"), reply_markup=teclado_fijo(tg_id)
+    )
 
 
 async def accion_invitar(bot: Bot, tg_id: int) -> None:
@@ -356,7 +364,7 @@ async def texto_libre(mensaje: Message, bot: Bot):
     # Un texto suelto puede ser un código promocional.
     dias = db.usar_promo(texto)
     if dias is None:
-        await mensaje.answer(t(idi, "promo_mal"))
+        await mensaje.answer(t(idi, "promo_mal"), reply_markup=teclado_fijo(tg_id))
         return
 
     try:
@@ -870,6 +878,33 @@ async def vigilar_cripto(bot: Bot):
             log.exception("error revisando pagos con cripto")
 
 
+
+async def configurar_comandos(bot: Bot):
+    """Menú ☰ de Telegram: así el usuario siempre puede volver al menú."""
+    publicos = [
+        BotCommand(command="start", description="Menú principal"),
+        BotCommand(command="menu", description="Mostrar el menú"),
+    ]
+    try:
+        await bot.set_my_commands(publicos)
+    except Exception:  # noqa: BLE001
+        log.warning("no se pudieron fijar los comandos")
+
+    if ADMIN:
+        try:
+            await bot.set_my_commands(
+                publicos + [
+                    BotCommand(command="chatid", description="ID de este chat"),
+                    BotCommand(command="qr", description="Guardar el QR de pago"),
+                    BotCommand(command="estado", description="Estado del bot"),
+                    BotCommand(command="activar", description="Activar ID MESES"),
+                    BotCommand(command="regalar", description="Regalar ID DÍAS"),
+                    BotCommand(command="promo", description="Crear código"),
+                ],
+                scope=BotCommandScopeChat(chat_id=ADMIN),
+            )
+        except Exception:  # noqa: BLE001
+            log.warning("no se pudieron fijar los comandos de administrador")
 async def main():
     if not config.TOKEN:
         raise SystemExit("Falta GEOID_TOKEN (token del bot de BotFather)")
@@ -881,6 +916,7 @@ async def main():
     dp = Dispatcher()
     dp.include_router(router)
 
+    await configurar_comandos(bot)
     asyncio.create_task(vigilar_caducidades(bot))
     asyncio.create_task(vigilar_cripto(bot))
     log.info("bot en marcha · servidor %s", config.ENDPOINT)
