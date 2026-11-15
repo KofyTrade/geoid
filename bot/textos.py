@@ -106,12 +106,11 @@ TEXTOS = {
         "cripto_no": "El pago con cripto no está disponible ahora mismo. Usa estrellas o transferencia.",
         "manual_texto": (
             "📱 <b>Pago por QR</b>\n\n"
-            "Importe: <b>{importe} ₽</b>\n"
-            "Teléfono: <code>{telefono}</code>{titular}\n\n"
-            "1. Abre tu banco y elige transferir por <b>SBP</b>.\n"
-            "2. Envía <b>{importe} ₽</b> al número de arriba.\n"
+            "Importe: <b>{importe} ₽</b>\n\n"
+            "1. Abre la app de tu banco y elige <b>«Escanear QR»</b>.\n"
+            "2. Escanea el código y confirma <b>{importe} ₽</b>.\n"
             "3. Vuelve aquí y pulsa <b>«Ya he pagado»</b>.\n\n"
-            "Tu acceso se activa en minutos (lo revisamos a mano).\n\n"
+            "Tu acceso se activa en minutos.\n\n"
             "Tu ID de Telegram: <code>{id}</code>"
         ),
         "manual_boton": "✅ Ya he pagado",
@@ -226,10 +225,9 @@ TEXTOS = {
         "cripto_no": "Оплата криптой сейчас недоступна. Используйте звёзды или перевод.",
         "manual_texto": (
             "📱 <b>Оплата по QR</b>\n\n"
-            "Сумма: <b>{importe} ₽</b>\n"
-            "Телефон: <code>{telefono}</code>{titular}\n\n"
-            "1. Откройте банк и выберите перевод по <b>СБП</b>.\n"
-            "2. Отправьте <b>{importe} ₽</b> на номер выше.\n"
+            "Сумма: <b>{importe} ₽</b>\n\n"
+            "1. Откройте приложение банка и выберите <b>«Сканировать QR»</b>.\n"
+            "2. Отсканируйте код и подтвердите <b>{importe} ₽</b>.\n"
             "3. Вернитесь сюда и нажмите <b>«Я оплатил»</b>.\n\n"
             "Доступ включим в течение нескольких минут.\n\n"
             "Ваш ID в Telegram: <code>{id}</code>"
@@ -337,12 +335,11 @@ TEXTOS = {
         "cripto_no": "Crypto payment is unavailable right now. Use stars or a transfer.",
         "manual_texto": (
             "📱 <b>Pay by QR</b>\n\n"
-            "Amount: <b>{importe} ₽</b>\n"
-            "Phone: <code>{telefono}</code>{titular}\n\n"
-            "1. Open your bank and choose an <b>SBP</b> transfer.\n"
-            "2. Send <b>{importe} ₽</b> to the number above.\n"
+            "Amount: <b>{importe} ₽</b>\n\n"
+            "1. Open your bank app and choose <b>Scan QR</b>.\n"
+            "2. Scan the code and confirm <b>{importe} ₽</b>.\n"
             "3. Come back and press <b>\"I have paid\"</b>.\n\n"
-            "Your access activates within minutes (checked by hand).\n\n"
+            "Your access activates within minutes.\n\n"
             "Your Telegram ID: <code>{id}</code>"
         ),
         "manual_boton": "✅ I have paid",

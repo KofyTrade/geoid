@@ -236,3 +236,16 @@ Cobrar con tarjeta o SBP de forma automática exige **самозанятый o �
 agregador (Freekassa, Lava…). El flujo de arriba funciona **hoy**, sin papeleo,
 y añade solo unos minutos de espera. Cuando el volumen lo justifique, se integra
 el agregador y el paso 3 desaparece.
+
+## Ajuste: solo QR (sin teléfono ni nombre)
+
+El pago por QR muestra únicamente el importe, el QR y los pasos. El nombre y el
+teléfono ya no aparecen en el mensaje.
+
+El botón **📱 Pago por QR** solo se enseña cuando hay un QR guardado:
+
+1. En la app del banco: «Мой QR» / «QR для переводов» → guarda la imagen
+2. Envíale esa foto al bot
+3. Responde a la foto con `/qr`
+
+Para ocultar el método (por ejemplo, mientras lo preparas): `/qr borrar`.

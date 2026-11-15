@@ -106,6 +106,11 @@ def teclado_volver(tg_id: int) -> InlineKeyboardMarkup:
     ]])
 
 
+def hay_qr() -> bool:
+    """El pago por QR solo existe si hay un QR guardado."""
+    return bool(db.leer_ajuste("qr_sbp") or config.SBP_QR_URL)
+
+
 def _destino(evento: Message | CallbackQuery) -> int:
     return evento.message.chat.id if isinstance(evento, CallbackQuery) else evento.chat.id
 
@@ -403,8 +408,8 @@ async def cb_plan(llamada: CallbackQuery):
         [InlineKeyboardButton(
             text=t(idi, "metodo_crypto"), callback_data=f"metodo:crypto:{meses}")],
     ]
-    # El pago por transferencia solo aparece si hay datos configurados.
-    if config.pago_manual_activo():
+    # El pago por QR solo aparece si hay un QR guardado.
+    if hay_qr():
         filas.append([InlineKeyboardButton(
             text=t(idi, "metodo_manual"), callback_data=f"metodo:manual:{meses}")])
     filas.append([InlineKeyboardButton(text="◀️", callback_data="comprar")])
@@ -463,16 +468,11 @@ async def cb_manual(llamada: CallbackQuery, bot: Bot):
     tg_id = llamada.from_user.id
     idi = idioma(tg_id)
     importe = config.PRECIOS_RUB.get(meses, 0)
-    titular = f" ({config.SBP_TITULAR})" if config.SBP_TITULAR else ""
 
     # Se responde al toque de inmediato: el boton nunca se queda girando.
     await llamada.answer()
 
-    texto = t(idi, "manual_texto",
-              importe=importe,
-              telefono=config.SBP_TELEFONO or "—",
-              titular=titular,
-              id=tg_id)
+    texto = t(idi, "manual_texto", importe=importe, id=tg_id)
 
     teclado = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
@@ -481,6 +481,12 @@ async def cb_manual(llamada: CallbackQuery, bot: Bot):
     ])
 
     qr = db.leer_ajuste("qr_sbp") or config.SBP_QR_URL
+    if not qr:
+        await bot.send_message(
+            tg_id,
+            "El pago por QR no está disponible ahora mismo.",
+        )
+        return
     enviado = False
     if qr:
         try:
