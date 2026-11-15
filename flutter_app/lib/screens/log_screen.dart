@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../i18n.dart';
+import '../services/nativo.dart';
 import '../services/registro.dart';
 import '../theme.dart';
 
@@ -21,6 +22,21 @@ class LogScreen extends StatelessWidget {
           style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
         ),
         actions: [
+          Center(
+            child: FutureBuilder<String>(
+              future: Nativo.version(),
+              builder: (contexto, instantanea) => Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: Text(
+                  'v${instantanea.data ?? ''}',
+                  style: const TextStyle(
+                    color: GeoidColors.textoTenue,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ),
+          ),
           IconButton(
             tooltip: t('limpiar'),
             onPressed: Registro.limpiar,
