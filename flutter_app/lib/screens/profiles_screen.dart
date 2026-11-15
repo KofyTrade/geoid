@@ -276,7 +276,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: GeoidColors.acento,
         foregroundColor: GeoidColors.fondo,
-        onPressed: _importar,
+        onPressed: esAndroid ? _importar : _pegarTexto,
         icon: const Icon(Icons.add),
         label: Text(t('nuevo_perfil')),
       ),
