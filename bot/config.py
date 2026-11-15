@@ -33,6 +33,10 @@ PRECIOS = {
 DIR_DATOS = os.environ.get("GEOID_DATOS", "/var/lib/geoid-bot")
 DB = os.path.join(DIR_DATOS, "bot.sqlite")
 
+# Chat donde llegan los avisos de pago: un grupo o canal privado.
+# Vacio = se mandan al privado del administrador.
+AVISOS_ID = os.environ.get("GEOID_AVISOS_ID", "").strip()
+
 # Enlaces de la aplicación (los releases del repositorio).
 URL_APP = "https://github.com/KofyTrade/geoid/releases/latest"
 URL_ANDROID = (

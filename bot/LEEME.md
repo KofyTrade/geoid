@@ -249,3 +249,23 @@ El botón **📱 Pago por QR** solo se enseña cuando hay un QR guardado:
 3. Responde a la foto con `/qr`
 
 Para ocultar el método (por ejemplo, mientras lo preparas): `/qr borrar`.
+
+## Avisos de pago en un grupo aparte
+
+Para que no se mezclen con los clientes y suenen con un tono propio:
+
+1. Crea un **grupo privado** en Telegram (solo tú dentro)
+2. Añade el bot **@geoidvpnbot** como miembro
+3. El bot te escribirá en privado con el **ID del grupo**
+4. Copia ese comando (te lo da el propio bot) o hazlo a mano:
+
+```bash
+echo 'GEOID_AVISOS_ID=-1001234567890' >> /etc/geoid-bot.env
+systemctl restart geoid-bot
+```
+
+Desde ese momento los avisos de pago (con su botón **✅ Activar**) llegan al
+grupo, y en ese chat puedes poner un sonido distinto y fijarlo.
+
+Si quieres volver al privado: borra la línea con
+`sed -i "/^GEOID_AVISOS_ID=/d" /etc/geoid-bot.env` y reinicia.

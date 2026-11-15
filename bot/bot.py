@@ -19,6 +19,7 @@ from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import (
     BufferedInputFile,
     CallbackQuery,
+    ChatMemberUpdated,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     KeyboardButton,
@@ -521,11 +522,12 @@ async def cb_paguei(llamada: CallbackQuery, bot: Bot):
     idi = idioma(tg_id)
     usuario = db.obtener(tg_id) or {}
 
-    if ADMIN:
+    destino = int(config.AVISOS_ID) if config.AVISOS_ID else ADMIN
+    if destino:
         try:
             await bot.send_message(
-                ADMIN,
-                t(idioma(ADMIN), "manual_admin",
+                destino,
+                t("es", "manual_admin",
                   usuario=usuario.get("usuario") or "—",
                   id=tg_id, meses=meses,
                   importe=config.PRECIOS_RUB.get(meses, 0)),
@@ -769,6 +771,25 @@ async def comando_estado(mensaje: Message):
     ]
     await mensaje.answer("\n".join(texto))
 
+
+
+@router.my_chat_member()
+async def al_entrar_en_grupo(evento: ChatMemberUpdated, bot: Bot):
+    """Al añadir el bot a un grupo, se le dice al administrador el id del chat."""
+    if ADMIN == 0:
+        return
+    estado = evento.new_chat_member.status
+    if estado not in ("member", "administrator"):
+        return
+    titulo = getattr(evento.chat, "title", None) or str(evento.chat.id)
+    await bot.send_message(
+        ADMIN,
+        "✅ Me han añadido al chat <b>{}</b>.\n\n"
+        "Si quieres que los avisos de pago lleguen aquí, en el servidor:\n"
+        "<code>echo 'GEOID_AVISOS_ID={}' >> /etc/geoid-bot.env "
+        "&& systemctl restart geoid-bot</code>".format(titulo, evento.chat.id),
+        parse_mode=ParseMode.HTML,
+    )
 
 # --------------------------------------------------------------------------- #
 # Tareas de fondo
