@@ -339,6 +339,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final nueva = await Actualizador.buscar();
     if (nueva == null) return;
     final actual = await Actualizador.versionInstalada();
+    // Si el binario no lleva la version incrustada, no se avisa: mejor no
+    // molestar con un aviso que podria ser falso.
+    if (actual.isEmpty || actual == '0.0.0') return;
     if (!Actualizador.masNueva(nueva.numero, actual)) return;
     if (!mounted) return;
     setState(() => _actualizacion = nueva);

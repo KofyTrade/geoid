@@ -90,7 +90,11 @@ class Nativo {
   static const MethodChannel _canal = MethodChannel('geoid/nativo');
   static const EventChannel _estado = EventChannel('geoid/estado');
 
-  static String _versionEscritorio = '2.0.3';
+  /// Version real del binario: la inyecta el CI al compilar (--dart-define).
+  static const String _versionCompilada =
+      String.fromEnvironment('APP_VERSION', defaultValue: '0.0.0');
+
+  static String _versionEscritorio = _versionCompilada;
 
   static Future<String> version() async {
     if (!esAndroid) return _versionEscritorio;
