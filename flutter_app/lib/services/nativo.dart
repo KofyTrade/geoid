@@ -167,7 +167,7 @@ class Nativo {
 
   static Future<String> stats() async {
     if (Platform.isWindows) {
-      return '\;\';
+      return '${TunWindows.rxBytes};${TunWindows.txBytes}';
     }
     if (!esAndroid) return '';
     final crudo = await _canal.invokeMethod<String>('stats');
