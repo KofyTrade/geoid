@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 
+import 'tun_windows.dart';
+
 /// Aplicacion instalada en el telefono.
 class AppInstalada {
   final String paquete;
@@ -128,6 +130,7 @@ class Nativo {
   }
 
   static Future<bool> prepararVpn() async {
+    if (Platform.isWindows) return TunWindows.disponible;
     if (!esAndroid) return false;
     final listo = await _canal.invokeMethod<bool>('prepararVpn');
     return listo ?? false;
@@ -140,6 +143,10 @@ class Nativo {
     required List<String> apps,
     required bool filtrar,
   }) async {
+    if (Platform.isWindows) {
+      await TunWindows.conectar(conf, mtu);
+      return;
+    }
     if (!esAndroid) {
       throw UnsupportedError('escritorio');
     }
@@ -153,11 +160,15 @@ class Nativo {
   }
 
   static Future<void> desconectar() async {
+    if (Platform.isWindows) return TunWindows.desconectar();
     if (!esAndroid) return;
     await _canal.invokeMethod('desconectar');
   }
 
   static Future<String> stats() async {
+    if (Platform.isWindows) {
+      return '\;\';
+    }
     if (!esAndroid) return '';
     final crudo = await _canal.invokeMethod<String>('stats');
     return crudo ?? '';
@@ -191,6 +202,7 @@ class Nativo {
 
   /// Avisos de estado del tunel: {activo: bool, error: String?}
   static Stream<Map<String, dynamic>> estado() {
+    if (Platform.isWindows) return TunWindows.avisos;
     if (!esAndroid) {
       return Stream<Map<String, dynamic>>.value({'activo': false, 'error': null});
     }

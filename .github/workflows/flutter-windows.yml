@@ -1,6 +1,6 @@
 name: Flutter (Windows)
 
-# Compila la app de escritorio para Windows.
+# Compila la app de escritorio y el motor del tunel para Windows.
 on:
   push:
     paths:
@@ -10,12 +10,18 @@ on:
 
 jobs:
   windows:
-    name: EXE de Windows
+    name: Paquete de Windows
     runs-on: windows-latest
 
     steps:
       - name: Descargar el codigo
         uses: actions/checkout@v4
+
+      - name: Preparar Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: false
 
       - name: Preparar Flutter
         uses: subosito/flutter-action@v2
@@ -24,18 +30,46 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Activar escritorio
+      - name: Compilar el motor (geoid-tun.exe)
+        shell: pwsh
+        run: |
+          git clone --depth 1 https://github.com/amnezia-vpn/amneziawg-go motor
+          New-Item -ItemType Directory -Force -Path motor\cmd\geoid-tun | Out-Null
+          Copy-Item flutter_app\windows_tun\main.go motor\cmd\geoid-tun\main.go
+          Push-Location motor
+          $env:GOOS = "windows"
+          $env:GOARCH = "amd64"
+          $env:CGO_ENABLED = "0"
+          go build -trimpath -ldflags "-s -w" -o ..\flutter_app\tools\geoid-tun.exe .\cmd\geoid-tun
+          Pop-Location
+          Get-Item flutter_app\tools\geoid-tun.exe | ForEach-Object { "$($_.Name)  $([math]::Round($_.Length/1MB,1)) MB" }
+
+      - name: Descargar el controlador Wintun
+        shell: pwsh
+        run: |
+          $destino = "flutter_app\tools"
+          New-Item -ItemType Directory -Force -Path $destino | Out-Null
+          $zip = Join-Path $destino "wintun.zip"
+          for ($i = 0; $i -lt 5; $i++) {
+            curl.exe -sL --retry 3 --max-time 120 -o $zip "https://www.wintun.net/builds/wintun-0.14.1.zip"
+            if ((Get-Item $zip).Length -gt 700000) { break }
+            Start-Sleep -Seconds 3
+          }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::ExtractToDirectory($zip, (Join-Path $destino "wintun"))
+          $dll = Get-ChildItem (Join-Path $destino "wintun") -Recurse -Filter wintun.dll |
+                 Where-Object { $_.FullName -match 'amd64' } | Select-Object -First 1
+          if (-not $dll) { throw "no se encontro wintun.dll" }
+          Copy-Item $dll.FullName (Join-Path $destino "wintun.dll") -Force
+          Get-Item (Join-Path $destino "wintun.dll") | ForEach-Object { "$($_.Name)  $([math]::Round($_.Length/1KB,0)) KB" }
+
+      - name: Compilar la app
+        working-directory: flutter_app
         run: |
           flutter config --no-analytics
           flutter config --enable-windows-desktop
-
-      - name: Dependencias
-        working-directory: flutter_app
-        run: flutter pub get
-
-      - name: Compilar
-        working-directory: flutter_app
-        run: flutter build windows --release
+          flutter pub get
+          flutter build windows --release
 
       - name: Empaquetar
         working-directory: flutter_app
@@ -43,8 +77,11 @@ jobs:
         run: |
           $origen = "build\windows\x64\runner\Release"
           if (-not (Test-Path $origen)) { throw "no se genero la salida" }
+          Copy-Item "tools\geoid-tun.exe" $origen -Force
+          Copy-Item "tools\wintun.dll" $origen -Force
           New-Item -ItemType Directory -Force -Path salida | Out-Null
           Compress-Archive -Path "$origen\*" -DestinationPath "salida\GeoiD-vpn-windows.zip" -Force
+          Get-ChildItem $origen | ForEach-Object { "  $($_.Name)" }
           Get-ChildItem salida | ForEach-Object { "$($_.Name)  $([math]::Round($_.Length/1MB,1)) MB" }
 
       - name: Guardar

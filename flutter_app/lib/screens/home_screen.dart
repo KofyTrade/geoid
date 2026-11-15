@@ -9,6 +9,7 @@ import '../models/perfil.dart';
 import '../services/actualizador.dart';
 import '../services/nativo.dart';
 import '../services/registro.dart';
+import '../services/tun_windows.dart';
 import '../theme.dart';
 import '../widgets/polyhedron.dart';
 import 'apps_screen.dart';
@@ -107,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _pulsarBoton() async {
     if (_conectando) return;
 
-    if (!esAndroid) {
+    if (!esAndroid && !(Platform.isWindows && TunWindows.disponible)) {
       _dialogoEscritorio();
       return;
     }
