@@ -21,6 +21,9 @@ APK firmado, desde Releases:
 La app comprueba las versiones nuevas al abrirse y al conectar, y ofrece
 descargarlas.
 
+Para escritorio hay un paquete de Windows en el mismo release: ver
+[la guía de Windows](docs/GUIA-05-windows.md).
+
 ## Qué hace
 
 - **Túnel real** con AmneziaWG 3.1 sobre `VpnService`: TCP y UDP, sin proxies.
