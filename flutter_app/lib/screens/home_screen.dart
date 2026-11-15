@@ -105,6 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _pulsarBoton() async {
     if (_conectando) return;
+
+    if (!esAndroid) {
+      _dialogoEscritorio();
+      return;
+    }
     if (_conectado) {
       await Nativo.desconectar();
       return;
@@ -127,6 +132,36 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+
+    /// Aviso en escritorio: el tunel todavia no esta disponible.
+    void _dialogoEscritorio() {
+      showDialog<void>(
+        context: context,
+        builder: (contexto) => AlertDialog(
+          title: Text(t('escritorio_titulo')),
+          content: Text(t('escritorio_texto')),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                final perfil = _perfil ?? await Almacen.activoPerfil();
+                if (perfil != null) {
+                  await Clipboard.setData(ClipboardData(text: perfil.conf));
+                }
+                if (contexto.mounted) Navigator.pop(contexto);
+                _error(t('copiado'));
+              },
+              child: Text(t('copiar_conf'),
+                  style: const TextStyle(color: GeoidColors.acento)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(contexto),
+              child: Text(t('cancelar'),
+                  style: const TextStyle(color: GeoidColors.textoSuave)),
+            ),
+          ],
+        ),
+      );
+    }
   Future<void> _conectarAhora() async {
     final perfil = _perfil ?? await Almacen.activoPerfil();
     if (perfil == null) {
