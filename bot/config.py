@@ -57,11 +57,12 @@ PRECIOS_USD = {
 }
 
 # --- Pago manual (transferencia rusa / tarjeta) ---
-# Texto que se muestra al cliente. Pon tus datos reales.
-PAGO_MANUAL = os.environ.get(
-    "GEOID_PAGO_MANUAL",
-    "Transferencia a la tarjeta 0000 0000 0000 0000 (nombre) o por SBP al "
-    "telefono +7 000 000 00 00. En el comentario escribe tu ID de Telegram.",
-)
+# Vacio = desactivado: el bot solo enseña Estrellas y Cripto.
+# Si algun dia quieres activarlo, pon aqui tus datos y reinicia el bot.
+PAGO_MANUAL = os.environ.get("GEOID_PAGO_MANUAL", "").strip()
+
+
+def pago_manual_activo() -> bool:
+    return bool(PAGO_MANUAL)
 # Nombre comercial
 MARCA = os.environ.get("GEOID_MARCA", "GeoiD VPN")

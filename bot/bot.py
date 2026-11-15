@@ -402,10 +402,12 @@ async def cb_plan(llamada: CallbackQuery):
             text=t(idi, "metodo_stars"), callback_data=f"metodo:stars:{meses}")],
         [InlineKeyboardButton(
             text=t(idi, "metodo_crypto"), callback_data=f"metodo:crypto:{meses}")],
-        [InlineKeyboardButton(
-            text=t(idi, "metodo_manual"), callback_data=f"metodo:manual:{meses}")],
-        [InlineKeyboardButton(text="◀️", callback_data="comprar")],
     ]
+    # El pago por transferencia solo aparece si hay datos configurados.
+    if config.pago_manual_activo():
+        filas.append([InlineKeyboardButton(
+            text=t(idi, "metodo_manual"), callback_data=f"metodo:manual:{meses}")])
+    filas.append([InlineKeyboardButton(text="◀️", callback_data="comprar")])
     await llamada.message.edit_text(
         t(idi, "metodo_titulo"),
         reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
