@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'i18n.dart';
 import 'screens/home_screen.dart';
+import 'services/bandeja.dart';
 import 'theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   I18n.iniciar();
+  // En Windows: minimizar y cerrar llevan la app a la bandeja del sistema.
+  Bandeja.iniciar();
   runApp(const GeoidApp());
 }
 
