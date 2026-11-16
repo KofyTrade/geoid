@@ -380,7 +380,7 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
               OutlinedButton.icon(
                 onPressed: _importando ? null : _importar,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Color(0xFF9BE8DC),
+                  foregroundColor: GeoidColors.textoBoton,
                   side: BorderSide(color: GeoidColors.borde),
                   minimumSize: Size.fromHeight(44),
                   shape: RoundedRectangleBorder(

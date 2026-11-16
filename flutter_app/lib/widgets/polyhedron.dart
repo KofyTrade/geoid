@@ -139,7 +139,9 @@ class _PintorPoliedro extends CustomPainter {
     // Estrellas
     final pincelEstrella = Paint()..style = PaintingStyle.fill;
     for (final e in _estrellas) {
-      pincelEstrella.color = Color(0xFFC8FFF8).withValues(alpha: 0.28);
+      pincelEstrella.color = GeoidColors.oscuro
+          ? const Color(0xFFC8FFF8).withValues(alpha: 0.28)
+          : const Color(0xFF2E6B66).withValues(alpha: 0.16);
       canvas.drawCircle(
         Offset(e[0] * size.width, e[1] * size.height),
         e[2],
@@ -192,7 +194,10 @@ class _PintorPoliedro extends CustomPainter {
         final alfa = alfaBase * (0.45 + 0.55 * cerca);
         pincel.color = conectado
             ? GeoidColors.acento.withValues(alpha: alfa / 255)
-            : Color(0xFF3C8C8C).withValues(alpha: alfa / 255 * 0.55);
+            : (GeoidColors.oscuro
+                    ? const Color(0xFF3C8C8C)
+                    : const Color(0xFF4E9A93))
+                .withValues(alpha: alfa / 255 * 0.7);
         pincel.strokeWidth = math.max(1.0, grosor);
         canvas.drawLine(proyectados[a[0]], proyectados[a[1]], pincel);
       }
@@ -204,7 +209,9 @@ class _PintorPoliedro extends CustomPainter {
       final r = rotar(n);
       final punto = proyectar(r);
       final cerca = ((1.7 - r[2]) / 3.4).clamp(0.0, 1.0);
-      pincelNodo.color = Color(0xFFBEFFF6)
+      pincelNodo.color = (GeoidColors.oscuro
+          ? const Color(0xFFBEFFF6)
+          : const Color(0xFF0E8C7F))
           .withValues(alpha: (120 + 110 * cerca) / 255);
       canvas.drawCircle(punto, 1.4 + 1.8 * cerca, pincelNodo);
     }
@@ -213,7 +220,9 @@ class _PintorPoliedro extends CustomPainter {
     for (var i = 0; i < proyectados.length; i++) {
       final z = rotados[i][2];
       final cerca = ((1.7 - z) / 3.4).clamp(0.0, 1.0);
-      pincelNodo.color = Color(0xFFBEFFF6)
+      pincelNodo.color = (GeoidColors.oscuro
+          ? const Color(0xFFBEFFF6)
+          : const Color(0xFF0E8C7F))
           .withValues(alpha: (150 + 105 * cerca) / 255);
       canvas.drawCircle(proyectados[i], 2.2 + 3.0 * cerca, pincelNodo);
     }

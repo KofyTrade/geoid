@@ -462,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             'GEOID-VPN',
                             style: TextStyle(
-                              color: Color(0xFF5FD9C8),
+                              color: GeoidColors.marca,
                               fontSize: 12,
                               letterSpacing: 3.6,
                               fontWeight: FontWeight.w300,
@@ -645,7 +645,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       label: Text(
                         t('activar_vpn'),
                         style: TextStyle(
-                          color: Color(0xFF9BE8DC),
+                          color: GeoidColors.textoBoton,
                           fontSize: 12,
                         ),
                       ),
@@ -749,7 +749,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: OutlinedButton(
         onPressed: alPulsar,
         style: OutlinedButton.styleFrom(
-          foregroundColor: Color(0xFF9BE8DC),
+          foregroundColor: GeoidColors.textoBoton,
           side: BorderSide(color: GeoidColors.borde),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
