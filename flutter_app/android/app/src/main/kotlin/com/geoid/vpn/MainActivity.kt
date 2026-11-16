@@ -240,11 +240,13 @@ class MainActivity : FlutterActivity() {
     /** Guarda el texto de un .conf recibido por VIEW o SEND. */
     private fun leerIntent(intencion: Intent?) {
         if (intencion == null) return
+        @Suppress("DEPRECATION")
         val uri: android.net.Uri? = when (intencion.action) {
             Intent.ACTION_VIEW -> intencion.data
             Intent.ACTION_SEND -> intencion.getParcelableExtra(Intent.EXTRA_STREAM)
             else -> null
-        } ?: return
+        }
+        if (uri == null) return
 
         try {
             val texto = contentResolver.openInputStream(uri)
