@@ -11,6 +11,7 @@
 set -euo pipefail
 
 PUERTO="${1:-8443}"
+MODO="${2:-tls}"   # tls = disfrazado (mejor contra bloqueos) · simple = formato clásico
 BIN="/usr/local/bin/mtg"
 CONF="/etc/mtg.toml"
 SECRETO="/etc/mtg.secret"
@@ -52,7 +53,11 @@ if [ -f "$SECRETO" ]; then
   SECRET=$(cat "$SECRETO")
   echo "   (usando la clave existente)"
 else
-  SECRET=$("$BIN" generate-secret --hex tls)
+  if [ "$MODO" = "simple" ]; then
+    SECRET=$("$BIN" generate-secret --hex)
+  else
+    SECRET=$("$BIN" generate-secret --hex tls)
+  fi
   echo "$SECRET" > "$SECRETO"
   chmod 600 "$SECRETO"
   echo "   clave generada"
@@ -128,6 +133,15 @@ command -v ufw >/dev/null && ufw allow "${PUERTO}/tcp" >/dev/null 2>&1 || true
 IP=$(curl -fsSL https://api.ipify.org || echo "193.29.224.164")
 ENLACE="tg://proxy?server=${IP}&port=${PUERTO}&secret=${SECRET}"
 
+#  El propio mtg sabe cuál es el enlace correcto: se usa su salida si existe.
+ACCESO=$("$BIN" access --format tg "$CONF" 2>/dev/null || true)
+if [ -z "$ACCESO" ]; then
+  ACCESO=$("$BIN" access "$CONF" 2>/dev/null || true)
+fi
+case "$ACCESO" in
+  tg://*) ENLACE="$ACCESO" ;;
+esac
+
 verde ""
 verde "=================================================================="
 verde " PROXY LISTO Y FUNCIONANDO"
@@ -148,6 +162,7 @@ echo ""
 verde "  Estado:            systemctl status mtg"
 verde "  Registro:          journalctl -u mtg -f"
 verde "  Cambiar de puerto: bash $0 443"
+verde "  Modo clásico:      bash $0 8443 simple"
 verde "  Configuración:     $CONF"
 verde "=================================================================="
 echo ""
