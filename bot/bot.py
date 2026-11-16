@@ -110,6 +110,15 @@ def teclado_volver(tg_id: int) -> InlineKeyboardMarkup:
     ]])
 
 
+def _duracion(meses: int, idi: str) -> str:
+    """Como se dice la duracion en cada idioma."""
+    if idi == "ru":
+        return f"{meses} мес."
+    if idi == "en":
+        return f"{meses} month" + ("" if meses == 1 else "s")
+    return f"{meses} mes" + ("" if meses == 1 else "es")
+
+
 def _descripcion_plan(meses: int, idi: str) -> str:
     clave = {
         1: "plan_mes",
@@ -469,9 +478,15 @@ async def cb_plan(llamada: CallbackQuery):
         filas.append([InlineKeyboardButton(
             text=t(idi, "metodo_manual"), callback_data=f"metodo:manual:{meses}")])
     filas.append([InlineKeyboardButton(text="◀️", callback_data="comprar")])
+    texto = (
+        t(idi, "plan_linea", duracion=_duracion(meses, idi))
+        + "\n\n"
+        + t(idi, "metodo_titulo")
+    )
     await llamada.message.edit_text(
-        t(idi, "metodo_titulo"),
+        texto,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
+        parse_mode=ParseMode.HTML,
     )
     await llamada.answer()
 
@@ -484,8 +499,13 @@ async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
 
     await bot.send_invoice(
         chat_id=llamada.from_user.id,
-        title=f"{config.MARCA} · {meses} {'mes' if meses == 1 else 'meses'}",
-        description=_descripcion_plan(meses, idi),
+        title=f"{config.MARCA} · {_duracion(meses, idi)}",
+        description=t(
+            idi, "factura_desc",
+            marca=config.MARCA,
+            duracion=_duracion(meses, idi),
+            fecha=fecha(int(time.time()) + 30 * meses * DIA),
+        ),
         payload=f"plan:{meses}",
         provider_token="",
         currency="XTR",
@@ -528,7 +548,10 @@ async def cb_manual(llamada: CallbackQuery, bot: Bot):
     # Se responde al toque de inmediato: el boton nunca se queda girando.
     await llamada.answer()
 
-    texto = t(idi, "manual_texto", importe=importe, id=tg_id)
+    texto = t(idi, "manual_texto",
+              importe=importe,
+              id=tg_id,
+              duracion=_duracion(meses, idi))
 
     teclado = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(

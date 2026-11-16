@@ -2,6 +2,12 @@
 
 TEXTOS = {
     "es": {
+        "factura_desc": (
+            "Acceso completo a {marca} durante {duracion}.\n"
+            "Se activa al instante y caduca el {fecha}."
+        ),
+        "plan_linea": "💳 Plan: <b>{duracion}</b>",
+        "manual_plan": "Plan: <b>{duracion}</b>",
         "plan_6meses": "Acceso 6 meses + proxy de Telegram de regalo",
         "proxy_boton": "🎁 Mi proxy de Telegram",
         "proxy_sin": "El proxy de regalo es para planes de 6 meses o más.",
@@ -123,7 +129,8 @@ TEXTOS = {
         "cripto_no": "El pago con cripto no está disponible ahora mismo. Usa estrellas o transferencia.",
         "manual_texto": (
             "📱 <b>Pago por QR</b>\n\n"
-            "Importe: <b>{importe} ₽</b>\n\n"
+            "Importe: <b>{importe} ₽</b>\n"
+            "Plan: <b>{duracion}</b>\n\n"
             "1. Abre la app de tu banco y elige <b>«Escanear QR»</b>.\n"
             "2. Escanea el código y confirma <b>{importe} ₽</b>.\n"
             "3. Vuelve aquí y pulsa <b>«Ya he pagado»</b>.\n\n"
@@ -140,6 +147,12 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "factura_desc": (
+            "Полный доступ к {marca} на {duracion}.\n"
+            "Активируется сразу, действует до {fecha}."
+        ),
+        "plan_linea": "💳 Тариф: <b>{duracion}</b>",
+        "manual_plan": "Тариф: <b>{duracion}</b>",
         "plan_6meses": "Доступ на 6 месяцев + прокси Telegram в подарок",
         "proxy_boton": "🎁 Мой прокси Telegram",
         "proxy_sin": "Прокси в подарок — для тарифов от 6 месяцев.",
@@ -258,7 +271,8 @@ TEXTOS = {
         "cripto_no": "Оплата криптой сейчас недоступна. Используйте звёзды или перевод.",
         "manual_texto": (
             "📱 <b>Оплата по QR</b>\n\n"
-            "Сумма: <b>{importe} ₽</b>\n\n"
+            "Сумма: <b>{importe} ₽</b>\n"
+            "Тариф: <b>{duracion}</b>\n\n"
             "1. Откройте приложение банка и выберите <b>«Сканировать QR»</b>.\n"
             "2. Отсканируйте код и подтвердите <b>{importe} ₽</b>.\n"
             "3. Вернитесь сюда и нажмите <b>«Я оплатил»</b>.\n\n"
@@ -275,6 +289,12 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "factura_desc": (
+            "Full access to {marca} for {duracion}.\n"
+            "Activates instantly and expires on {fecha}."
+        ),
+        "plan_linea": "💳 Plan: <b>{duracion}</b>",
+        "manual_plan": "Plan: <b>{duracion}</b>",
         "plan_6meses": "6 months + free Telegram proxy",
         "proxy_boton": "🎁 My Telegram proxy",
         "proxy_sin": "The free proxy is for plans of 6 months or more.",
@@ -384,7 +404,8 @@ TEXTOS = {
         "cripto_no": "Crypto payment is unavailable right now. Use stars or a transfer.",
         "manual_texto": (
             "📱 <b>Pay by QR</b>\n\n"
-            "Amount: <b>{importe} ₽</b>\n\n"
+            "Amount: <b>{importe} ₽</b>\n"
+            "Plan: <b>{duracion}</b>\n\n"
             "1. Open your bank app and choose <b>Scan QR</b>.\n"
             "2. Scan the code and confirm <b>{importe} ₽</b>.\n"
             "3. Come back and press <b>\"I have paid\"</b>.\n\n"
