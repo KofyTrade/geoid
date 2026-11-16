@@ -189,3 +189,34 @@ def revisar_servidor() -> list[str]:
     except RuntimeError as e:
         avisos.append(f"awg no responde: {e}")
     return avisos
+
+def endpoints() -> dict[str, str]:
+    """IP publica de cada peer conectado: {clave_publica: ip}."""
+    try:
+        salida = _ejecutar("awg", "show", config.AWG_INTERFAZ, "dump")
+    except Exception:  # noqa: BLE001
+        return {}
+
+    salida = (salida or "").strip()
+    if not salida:
+        return {}
+
+    ip_por_clave: dict[str, str] = {}
+    for numero, linea in enumerate(salida.splitlines()):
+        if numero == 0:
+            continue  # primera linea = interfaz
+        partes = linea.split("\t")
+        if len(partes) < 3:
+            continue
+        clave, endpoint = partes[0], partes[2]
+        if not endpoint or endpoint == "(none)":
+            continue
+        # endpoint viene como 1.2.3.4:56789 o [2001:db8::1]:56789
+        if endpoint.startswith("["):
+            ip = endpoint[1:endpoint.find("]")]
+        else:
+            ip = endpoint.rsplit(":", 1)[0]
+        if ip:
+            ip_por_clave[clave] = ip
+
+    return ip_por_clave

@@ -915,6 +915,58 @@ async def configurar_comandos(bot: Bot):
             )
         except Exception:  # noqa: BLE001
             log.warning("no se pudieron fijar los comandos de administrador")
+
+async def vigilar_duplicados(bot: Bot):
+    """Avisa si varias cuentas de prueba salen por la misma IP publica."""
+    destino = int(config.AVISOS_ID) if config.AVISOS_ID else ADMIN
+    if not destino:
+        return
+
+    while True:
+        await asyncio.sleep(900)
+        try:
+            ips = provision.endpoints()
+            if not ips:
+                continue
+
+            usuarios = db.con_peer()
+            por_ip: dict[str, list] = {}
+            for usuario in usuarios:
+                ip = ips.get(usuario["publica"] or "")
+                if not ip:
+                    continue
+                if not usuario["prueba_usada"] or db.ha_pagado(usuario["tg_id"]):
+                    continue  # clientes que pagan no cuentan
+                por_ip.setdefault(ip, []).append(usuario)
+
+            for ip, cuentas in por_ip.items():
+                if len(cuentas) < 2:
+                    continue
+                clave = ip + ":" + ",".join(str(c["tg_id"]) for c in cuentas)
+                if db.aviso_visto(clave):
+                    continue
+                db.marcar_aviso(clave)
+
+                detalle = "\n".join(
+                    f"· {c['usuario'] or '—'} (ID <code>{c['tg_id']}</code>)"
+                    for c in cuentas
+                )
+                await bot.send_message(
+                    destino,
+                    "🕵️ <b>Posible granja de pruebas</b>\n\n"
+                    f"IP pública: <code>{ip}</code>\n"
+                    f"Cuentas de prueba conectadas a la vez: {len(cuentas)}\n\n"
+                    f"{detalle}\n\n"
+                    "Si quieres cortarles el acceso:\n"
+                    + "\n".join(
+                        f"<code>awg set awg0 peer {c['publica']} remove</code>"
+                        for c in cuentas
+                    ),
+                    parse_mode=ParseMode.HTML,
+                )
+                log.info("duplicado detectado en %s (%s cuentas)", ip, len(cuentas))
+        except Exception:  # noqa: BLE001
+            log.exception("error revisando duplicados")
 async def main():
     if not config.TOKEN:
         raise SystemExit("Falta GEOID_TOKEN (token del bot de BotFather)")
@@ -929,6 +981,7 @@ async def main():
     await configurar_comandos(bot)
     asyncio.create_task(vigilar_caducidades(bot))
     asyncio.create_task(vigilar_cripto(bot))
+    asyncio.create_task(vigilar_duplicados(bot))
     log.info("bot en marcha · servidor %s", config.ENDPOINT)
     await dp.start_polling(bot)
 

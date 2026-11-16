@@ -29,6 +29,11 @@ CREATE TABLE IF NOT EXISTS promos (
     usados      INTEGER DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS avisos (
+    clave       TEXT PRIMARY KEY,
+    cuando      INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS ajustes (
     clave       TEXT PRIMARY KEY,
     valor       TEXT
@@ -171,6 +176,39 @@ def pago_mas_reciente(tg_id: int) -> dict | None:
             (tg_id,),
         ).fetchone()
         return dict(fila) if fila else None
+
+def con_peer():
+    """Usuarios que tienen peer creado."""
+    with conectar() as con:
+        return con.execute(
+            "SELECT tg_id, usuario, publica, prueba_usada, expira "
+            "FROM usuarios WHERE publica IS NOT NULL"
+        ).fetchall()
+
+
+def ha_pagado(tg_id: int) -> bool:
+    with conectar() as con:
+        fila = con.execute(
+            "SELECT COUNT(*) c FROM pagos WHERE tg_id = ?", (tg_id,)
+        ).fetchone()
+        return fila["c"] > 0
+
+
+def aviso_visto(clave: str) -> bool:
+    with conectar() as con:
+        fila = con.execute(
+            "SELECT 1 FROM avisos WHERE clave = ?", (clave,)
+        ).fetchone()
+        return fila is not None
+
+
+def marcar_aviso(clave: str) -> None:
+    with conectar() as con:
+        con.execute(
+            "INSERT OR IGNORE INTO avisos (clave, cuando) VALUES (?, ?)",
+            (clave, int(time.time())),
+        )
+
 
 def leer_ajuste(clave: str) -> str | None:
     with conectar() as con:

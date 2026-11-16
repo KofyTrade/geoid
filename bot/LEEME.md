@@ -269,3 +269,24 @@ grupo, y en ese chat puedes poner un sonido distinto y fijarlo.
 
 Si quieres volver al privado: borra la línea con
 `sed -i "/^GEOID_AVISOS_ID=/d" /etc/geoid-bot.env` y reinicia.
+
+## Anti-abuso de la prueba gratis
+
+La prueba está atada a la **cuenta de Telegram** en la base de datos del servidor:
+desinstalar la app, borrar sus datos o cambiar de móvil **no** da otra prueba.
+El único hueco es crear otra cuenta de Telegram.
+
+Para detectarlo, el bot revisa cada 15 minutos qué cuentas de prueba están
+conectadas y desde qué IP pública:
+
+- Si **dos o más cuentas de prueba sin ningún pago** salen por la misma IP, avisa
+  al grupo de pagos con los usuarios y el comando exacto para cortarles el peer.
+- Cada aviso se manda una sola vez (tabla `avisos`), no spam.
+- **No bloquea nada solo**: en redes móviles rusas mucha gente comparte IP
+  (CGNAT), así que el aviso es para que decidas tú.
+
+Para verlo funcionando sin esperar:
+
+```bash
+journalctl -u geoid-bot -f | grep -i duplicado
+```
