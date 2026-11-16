@@ -21,7 +21,7 @@
 set -euo pipefail
 
 PUERTO="${1:-8443}"
-MODO="${2:-tls}"
+MODO="tls"   # mtg 2.3 solo admite modo disfrazado
 DOMINIO="${3:-www.cloudflare.com}"
 
 BIN="/usr/local/bin/mtg"
@@ -65,14 +65,9 @@ if [ -f "$SECRETO" ]; then
   SECRET=$(cat "$SECRETO")
   echo "   (usando la clave existente)"
 else
-  if [ "$MODO" = "simple" ]; then
-    SECRET=$("$BIN" generate-secret --hex)
-    echo "   modo clásico (sin disfraz)"
-  else
-    # El segundo argumento es el DOMINIO que se imita: debe ser real.
-    SECRET=$("$BIN" generate-secret --hex "$DOMINIO")
-    echo "   modo disfrazado, imitando $DOMINIO"
-  fi
+  # Esta version de mtg solo genera claves disfrazadas (exige un dominio real).
+  SECRET=$("$BIN" generate-secret --hex "$DOMINIO")
+  echo "   imitando $DOMINIO"
   echo "$SECRET" > "$SECRETO"
   chmod 600 "$SECRETO"
 fi
@@ -176,6 +171,6 @@ echo ""
 verde "  Estado:            systemctl status mtg"
 verde "  Registro:          journalctl -u mtg -f"
 verde "  Cambiar de puerto: bash $0 443"
-verde "  Modo clásico:      rm -f /etc/mtg.secret && bash $0 8443 simple"
+verde "  Otro dominio:      rm -f /etc/mtg.secret && bash $0 8443 tls www.google.com"
 verde "  Configuración:     $CONF"
 verde "=================================================================="
