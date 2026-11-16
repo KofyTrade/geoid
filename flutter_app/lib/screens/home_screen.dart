@@ -28,7 +28,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _conectado = false;
   bool _conectando = false;
-  bool _bloquearAnuncios = true;
 
   Perfil? _perfil;
   NuevaVersion? _actualizacion;
@@ -80,11 +79,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _cargarAjustes() async {
-    final filtrar = await Nativo.leer('ajustes', 'bloquearAnuncios');
+
     final perfil = await Almacen.activoPerfil();
     if (!mounted) return;
     setState(() {
-      _bloquearAnuncios = filtrar == null ? true : filtrar == 'true';
       _perfil = perfil;
     });
   }
@@ -225,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
         mtu: perfil.mtu,
         dns: null,
         apps: apps,
-        filtrar: _bloquearAnuncios,
+        filtrar: Ajustes.bloqueo.value,
       );
     } catch (e) {
       setState(() => _conectando = false);
@@ -632,74 +630,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      t('bloquear_anuncios'),
-                      style: TextStyle(
-                        color: GeoidColors.texto,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                  SwitchTheme(
-                    data: SwitchThemeData(
-                      thumbColor: WidgetStateProperty.resolveWith(
-                        (estados) => estados.contains(WidgetState.selected)
-                            ? GeoidColors.acento
-                            : GeoidColors.textoTenue,
-                      ),
-                      trackColor: WidgetStateProperty.resolveWith(
-                        (estados) => estados.contains(WidgetState.selected)
-                            ? GeoidColors.borde
-                            : GeoidColors.botonApagado,
-                      ),
-                    ),
-                    child: Switch(
-                      value: _bloquearAnuncios,
-                      onChanged: (v) async {
-                        setState(() => _bloquearAnuncios = v);
-                        await Nativo.guardar('ajustes', 'bloquearAnuncios', '$v');
-                        if (_conectado) {
-                          await Nativo.desconectar();
-                          await _conectarAhora();
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: _abrirPerfiles,
-                      child: Text(
-                        '${t('perfiles')}: ${_perfil?.nombre ?? t('sin_perfiles')}',
-                        style: TextStyle(
-                          color: GeoidColors.acento,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextButton.icon(
-                      onPressed: _abrirSuscripcion,
-                      icon: Icon(Icons.workspace_premium, size: 15),
-                      label: Text(
-                        _etiquetaAcceso(),
-                        style: TextStyle(
-                          color: GeoidColors.textoBoton,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),

@@ -69,6 +69,15 @@ class _AjustesScreenState extends State<AjustesScreen> {
             valor: Ajustes.oscuro.value ? t('tema_oscuro') : t('tema_claro'),
             alPulsar: _elegirTema,
           ),
+          _interruptor(
+            icono: Icons.block,
+            titulo: t('bloquear_anuncios'),
+            valor: Ajustes.bloqueo.value,
+            alCambiar: (v) async {
+              await Ajustes.ponerBloqueo(v);
+              if (mounted) setState(() {});
+            },
+          ),
           _fila(
             icono: Icons.info_outline,
             titulo: t('acerca_de'),
@@ -270,6 +279,37 @@ class _AjustesScreenState extends State<AjustesScreen> {
               t('cerrar'),
               style: TextStyle(color: GeoidColors.acento),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _interruptor({
+    required IconData icono,
+    required String titulo,
+    required bool valor,
+    required ValueChanged<bool> alCambiar,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: GeoidColors.linea)),
+      ),
+      child: Row(
+        children: [
+          Icon(icono, size: 20, color: GeoidColors.textoSuave),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              titulo,
+              style: TextStyle(color: GeoidColors.texto, fontSize: 14),
+            ),
+          ),
+          Switch(
+            value: valor,
+            onChanged: alCambiar,
+            activeThumbColor: GeoidColors.acento,
           ),
         ],
       ),
