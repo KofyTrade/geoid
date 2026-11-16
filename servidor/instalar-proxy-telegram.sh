@@ -5,13 +5,25 @@
 #  Para que Telegram funcione en Rusia sin tener la VPN encendida 24 horas.
 #  Solo se enruta Telegram: el resto del móvil va directo y no gasta batería.
 #
-#  Uso:   bash instalar-proxy-telegram.sh [PUERTO]
-#         (por defecto 8443; si lo bloquean, prueba 443 o 2053)
+#  Uso:
+#     bash instalar-proxy-telegram.sh [PUERTO] [MODO] [DOMINIO]
+#
+#     PUERTO   8443 por defecto (si lo bloquean: 443, 2053...)
+#     MODO     tls (disfrazado, recomendado) · simple (clásico)
+#     DOMINIO  dominio que imita el tráfico (por defecto www.cloudflare.com)
+#
+#  Ejemplos:
+#     bash instalar-proxy-telegram.sh
+#     bash instalar-proxy-telegram.sh 443
+#     bash instalar-proxy-telegram.sh 8443 simple
+#     rm -f /etc/mtg.secret && bash instalar-proxy-telegram.sh
 # ---------------------------------------------------------------------------
 set -euo pipefail
 
 PUERTO="${1:-8443}"
-MODO="${2:-tls}"   # tls = disfrazado (mejor contra bloqueos) · simple = formato clásico
+MODO="${2:-tls}"
+DOMINIO="${3:-www.cloudflare.com}"
+
 BIN="/usr/local/bin/mtg"
 CONF="/etc/mtg.toml"
 SECRETO="/etc/mtg.secret"
@@ -55,24 +67,28 @@ if [ -f "$SECRETO" ]; then
 else
   if [ "$MODO" = "simple" ]; then
     SECRET=$("$BIN" generate-secret --hex)
+    echo "   modo clásico (sin disfraz)"
   else
-    SECRET=$("$BIN" generate-secret --hex tls)
+    # El segundo argumento es el DOMINIO que se imita: debe ser real.
+    SECRET=$("$BIN" generate-secret --hex "$DOMINIO")
+    echo "   modo disfrazado, imitando $DOMINIO"
   fi
   echo "$SECRET" > "$SECRETO"
   chmod 600 "$SECRETO"
-  echo "   clave generada"
 fi
 
 azul "4/5 · Configurando y arrancando (puerto $PUERTO)"
 
-# Las versiones nuevas (2.3+) leen un archivo de configuración; las viejas
-# aceptan la clave por parámetro. Se prueba lo uno y lo otro.
 cat > "$CONF" <<EOF
 # Proxy MTProto de GeoiD para Telegram
 secret = "$SECRET"
 bind-to = "0.0.0.0:$PUERTO"
 EOF
 chmod 600 "$CONF"
+
+#  Si ya estaba corriendo, se para para poder probar sin chocar con el puerto.
+systemctl stop mtg 2>/dev/null || true
+sleep 1
 
 probar() {
   timeout 4 bash -c "$1" >/tmp/mtg_prueba.log 2>&1
@@ -131,15 +147,13 @@ fi
 command -v ufw >/dev/null && ufw allow "${PUERTO}/tcp" >/dev/null 2>&1 || true
 
 IP=$(curl -fsSL https://api.ipify.org || echo "193.29.224.164")
-ENLACE="tg://proxy?server=${IP}&port=${PUERTO}&secret=${SECRET}"
 
-#  El propio mtg sabe cuál es el enlace correcto: se usa su salida si existe.
+#  El enlace correcto lo sabe generar el propio mtg.
+ENLACE="tg://proxy?server=${IP}&port=${PUERTO}&secret=${SECRET}"
 ACCESO=$("$BIN" access --format tg "$CONF" 2>/dev/null || true)
-if [ -z "$ACCESO" ]; then
-  ACCESO=$("$BIN" access "$CONF" 2>/dev/null || true)
-fi
+[ -z "$ACCESO" ] && ACCESO=$("$BIN" access "$CONF" 2>/dev/null || true)
 case "$ACCESO" in
-  tg://*) ENLACE="$ACCESO" ;;
+  tg://*) ENLACE="$(printf '%s' "$ACCESO" | head -1)" ;;
 esac
 
 verde ""
@@ -162,9 +176,6 @@ echo ""
 verde "  Estado:            systemctl status mtg"
 verde "  Registro:          journalctl -u mtg -f"
 verde "  Cambiar de puerto: bash $0 443"
-verde "  Modo clásico:      bash $0 8443 simple"
+verde "  Modo clásico:      rm -f /etc/mtg.secret && bash $0 8443 simple"
 verde "  Configuración:     $CONF"
 verde "=================================================================="
-echo ""
-echo "  Guarda este enlace: si algún día lo bloquean, cambia de puerto"
-echo "  y avisa a tus clientes del nuevo."
