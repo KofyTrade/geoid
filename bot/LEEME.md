@@ -379,3 +379,13 @@ GEOID_PROXY_DISPOSITIVOS=2
 > como dos; un móvil y un portátil en la misma wifi cuentan como uno. Es una
 > aproximación razonable: en el peor caso es más permisivo, nunca corta a un
 > cliente legítimo por error.
+
+### Separación importante
+
+- **Tu proxy personal** (para tu Telegram): puerto **443**, servicio `mtg`,
+  configuración `/etc/mtg.toml`. No se comparte con nadie.
+- **Proxy de los clientes**: puertos **20000–40000**, servicios
+  `mtg-user@<ID>`, uno por cliente.
+
+El bot **nunca** entrega a un cliente el proxy del puerto 443. Si falta el
+sistema multiusuario, simplemente no entrega nada y avisa en el registro.

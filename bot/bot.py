@@ -343,7 +343,11 @@ async def entregar_proxy(bot: Bot, tg_id: int, meses: int) -> None:
     """Crea el proxy personal del cliente y le manda su enlace."""
     if meses < config.MIN_MESES_PROXY:
         return
-    if not config.PROXY_SECRETO and not proxy_personal.disponible():
+    # Los clientes NUNCA usan el proxy del dueno (puerto 443): siempre uno propio.
+    if not proxy_personal.disponible():
+        log.warning(
+            "proxy personal no disponible: falta ejecutar proxy-multiusuario.sh"
+        )
         return
 
     usuario = db.obtener(tg_id) or {}
@@ -355,12 +359,10 @@ async def entregar_proxy(bot: Bot, tg_id: int, meses: int) -> None:
         if not proxy_personal.activo(tg_id):
             datos = proxy_personal.crear(tg_id, secreto)
             puerto, secreto = datos["puerto"], datos["secreto"]
-    elif proxy_personal.disponible():
+    else:
         datos = proxy_personal.crear(tg_id)
         puerto, secreto = datos["puerto"], datos["secreto"]
         db.guardar(tg_id, proxy=1, proxy_puerto=puerto, proxy_secreto=secreto)
-    else:
-        return
 
     enlace = (
         f"tg://proxy?server={config.PROXY_SERVIDOR}"
