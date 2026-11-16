@@ -43,6 +43,8 @@ String t(String clave) => I18n.t(clave);
 
 const Map<String, Map<String, String>> _textos = {
   'en': {
+    'apps_externas': 'Installed',
+    'apps_sistema': 'System',
     'ninguna_excluida': 'All apps use the VPN',
     'excluidas_1': '1 app without VPN',
     'excluidas_n': '%s apps without VPN',
@@ -126,6 +128,8 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'View configuration',
   },
   'es': {
+    'apps_externas': 'Externas',
+    'apps_sistema': 'Sistema',
     'ninguna_excluida': 'Todas las apps usan la VPN',
     'excluidas_1': '1 app sin VPN',
     'excluidas_n': '%s apps sin VPN',
@@ -344,6 +348,8 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'Vedi configurazione',
   },
   'ru': {
+    'apps_externas': 'Сторонние',
+    'apps_sistema': 'Системные',
     'ninguna_excluida': 'Все приложения через VPN',
     'excluidas_1': '1 приложение без VPN',
     'excluidas_n': '%s приложений без VPN',

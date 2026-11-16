@@ -21,6 +21,9 @@ class _AppsScreenState extends State<AppsScreen> {
   bool _cargando = true;
   String _filtro = '';
 
+  /// false = aplicaciones instaladas · true = del sistema
+  bool _verSistema = false;
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +52,7 @@ class _AppsScreenState extends State<AppsScreen> {
   List<AppInstalada> get _visibles {
     final texto = _filtro.toLowerCase();
     final lista = _todas.where((a) {
+      if (a.sistema != _verSistema) return false;
       if (texto.isEmpty) return true;
       return a.nombre.toLowerCase().contains(texto) ||
           a.paquete.toLowerCase().contains(texto);
@@ -90,6 +94,32 @@ class _AppsScreenState extends State<AppsScreen> {
                       size: 18, color: GeoidColors.textoTenue),
                 ),
                 onChanged: (v) => setState(() => _filtro = v),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _grupo(
+                      texto: t('apps_externas'),
+                      cuantas: _todas.where((a) => !a.sistema).length,
+                      color: GeoidColors.acento,
+                      activo: !_verSistema,
+                      alPulsar: () => setState(() => _verSistema = false),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _grupo(
+                      texto: t('apps_sistema'),
+                      cuantas: _todas.where((a) => a.sistema).length,
+                      color: const Color(0xFF5BA8FF),
+                      activo: _verSistema,
+                      alPulsar: () => setState(() => _verSistema = true),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
