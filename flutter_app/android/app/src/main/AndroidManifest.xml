@@ -53,10 +53,37 @@
                 <data android:mimeType="application/octet-stream" />
                 <data android:pathPattern=".*\\.conf" />
             </intent-filter>
+            <!-- Cualquier binario: asi Telegram y otros ofrecen la app al abrir
+                 un .conf, porque su direccion interna no lleva el nombre. -->
+            <intent-filter android:label="GeoiD-vpn">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/octet-stream" />
+            </intent-filter>
+            <intent-filter android:label="GeoiD-vpn">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/x-wireguard-profile" />
+            </intent-filter>
+            <!-- Compartir: desde Telegram o el explorador de archivos -->
             <intent-filter android:label="GeoiD-vpn">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter android:label="GeoiD-vpn">
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/octet-stream" />
+            </intent-filter>
+            <intent-filter android:label="GeoiD-vpn">
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/*" />
             </intent-filter>
         </activity>
 
