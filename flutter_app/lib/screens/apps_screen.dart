@@ -277,4 +277,51 @@ class _AppsScreenState extends State<AppsScreen> {
       ),
     );
   }
+
+  /// Casilla de grupo: externas o del sistema.
+  Widget _grupo({
+    required String texto,
+    required int cuantas,
+    required Color color,
+    required bool activo,
+    required VoidCallback alPulsar,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: alPulsar,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        decoration: BoxDecoration(
+          color: activo ? color.withValues(alpha: 0.18) : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: activo ? color : GeoidColors.borde,
+            width: activo ? 1.4 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              activo ? Icons.check_box : Icons.check_box_outline_blank,
+              size: 16,
+              color: activo ? color : GeoidColors.textoTenue,
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                '$texto ($cuantas)',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: activo ? color : GeoidColors.textoSuave,
+                  fontSize: 12,
+                  fontWeight: activo ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
