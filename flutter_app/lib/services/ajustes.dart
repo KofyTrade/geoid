@@ -41,9 +41,9 @@ class Ajustes {
     GeoidColors.oscuro = valor;
     await Nativo.guardar(_zona, 'tema', valor ? 'oscuro' : 'claro');
   }
-}
 
   static Future<void> ponerBloqueo(bool valor) async {
     bloqueo.value = valor;
     await Nativo.guardar(_zona, 'bloquearAnuncios', '$valor');
   }
+}

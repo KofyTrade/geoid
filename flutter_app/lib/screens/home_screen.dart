@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../i18n.dart';
 import '../models/perfil.dart';
 import '../services/actualizador.dart';
+import '../services/ajustes.dart';
 import '../services/nativo.dart';
 import '../services/registro.dart';
 import '../services/tun_windows.dart';
