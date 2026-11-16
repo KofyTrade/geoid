@@ -114,6 +114,15 @@ def teclado_volver(tg_id: int) -> InlineKeyboardMarkup:
     ]])
 
 
+def _dias(cantidad: int, idi: str) -> str:
+    """Como se dicen los dias en cada idioma."""
+    if idi == "ru":
+        return f"{cantidad} дн."
+    if idi == "en":
+        return f"{cantidad} day" + ("" if cantidad == 1 else "s")
+    return f"{cantidad} día" + ("" if cantidad == 1 else "s")
+
+
 def _duracion(meses: int, idi: str) -> str:
     """Como se dice la duracion en cada idioma."""
     if idi == "ru":
@@ -274,15 +283,33 @@ async def accion_invitar(bot: Bot, tg_id: int) -> None:
     idi = usuario.get("idioma") or "es"
     me = await bot.get_me()
     enlace = f"https://t.me/{me.username}?start={usuario.get('codigo_ref') or 'r'}"
-    with db.conectar() as con:
-        cuantos = con.execute(
-            "SELECT COUNT(*) c FROM usuarios WHERE referido = ?", (tg_id,)
-        ).fetchone()["c"]
+    cuantos = db.referidos_pagados(tg_id)
+
+    texto = t(idi, "invitar_texto", enlace=enlace, cuantos=cuantos)
+
+    # progreso hacia el siguiente premio
+    siguiente = None
+    for amigos, premio in config.NIVELES_INVITACION:
+        if cuantos < amigos:
+            siguiente = (amigos, premio)
+            break
+
+    if siguiente:
+        faltan = siguiente[0] - cuantos
+        texto += "\n\n" + t(
+            idi, "invitar_siguiente",
+            faltan=faltan,
+            premio=_dias(siguiente[1], idi),
+        )
+    else:
+        texto += "\n\n" + t(idi, "invitar_maximo")
+
     await bot.send_message(
         tg_id,
-        t(idi, "invitar_texto", dias=config.DIAS_INVITADO, enlace=enlace, cuantos=cuantos),
+        texto,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
+        reply_markup=teclado_fijo(tg_id),
     )
 
 
@@ -339,6 +366,51 @@ REPARTIDOR = {
 # --------------------------------------------------------------------------- #
 # Comandos
 # --------------------------------------------------------------------------- #
+async def recompensar_padrino(bot: Bot, comprador: int) -> None:
+    """Si el amigo ha comprado, mira los niveles del padrino y premia."""
+    usuario = db.obtener(comprador) or {}
+    padrino = usuario.get("referido")
+    if not padrino:
+        return
+
+    datos = db.obtener(padrino) or {}
+    nivel_previo = int(datos.get("nivel_ref") or 0)
+    cuantos = db.referidos_pagados(padrino)
+
+    nivel_nuevo = 0
+    for numero, (amigos, _dias) in enumerate(config.NIVELES_INVITACION, start=1):
+        if cuantos >= amigos:
+            nivel_nuevo = numero
+
+    if nivel_nuevo <= nivel_previo:
+        return
+
+    dias = sum(
+        premio
+        for numero, (_amigos, premio) in enumerate(config.NIVELES_INVITACION, start=1)
+        if nivel_previo < numero <= nivel_nuevo
+    )
+    if dias <= 0:
+        return
+
+    db.crear_si_falta(padrino, None)
+    actualizado = activar(padrino, dias)
+    db.guardar(padrino, nivel_ref=nivel_nuevo)
+
+    try:
+        await bot.send_message(
+            padrino,
+            t(idioma(padrino), "premio_invitacion",
+              cuantos=cuantos, dias=dias, fecha=fecha(actualizado["expira"])),
+            parse_mode=ParseMode.HTML,
+            reply_markup=teclado_fijo(padrino),
+        )
+    except Exception:  # noqa: BLE001
+        log.warning("no se pudo avisar del premio a %s", padrino)
+
+    log.info("premio nivel %s (%s dias) para %s", nivel_nuevo, dias, padrino)
+
+
 async def entregar_proxy(bot: Bot, tg_id: int, meses: int) -> None:
     """Crea el proxy personal del cliente y le manda su enlace."""
     if meses < config.MIN_MESES_PROXY:
@@ -692,6 +764,7 @@ async def admin_activar(llamada: CallbackQuery, bot: Bot):
         await enviar_conf(bot, tg_id, usuario, "GeoiD · SBP")
     except Exception:  # noqa: BLE001
         log.warning("no se pudo avisar al cliente %s", tg_id)
+    await recompensar_padrino(bot, tg_id)
     await entregar_proxy(bot, tg_id, meses)
     await llamada.answer("Activado")
 @router.callback_query(F.data == "proxy")
@@ -791,14 +864,7 @@ async def pago_recibido(mensaje: Message, bot: Bot):
     db.registrar_pago(tg_id, meses, pago.total_amount,
                       pago.telegram_payment_charge_id or "")
 
-    usuario = db.obtener(tg_id) or {}
-    padrino = usuario.get("referido")
-    if padrino:
-        try:
-            activar(padrino, config.DIAS_INVITADO)
-            await bot.send_message(padrino, t(idioma(padrino), "invitar_bienvenida"))
-        except Exception:  # noqa: BLE001
-            log.warning("no se pudo premiar al padrino %s", padrino)
+    await recompensar_padrino(bot, tg_id)
 
     await avisos.avisar(
         f"VENTA {meses} mes(es) por estrellas - {tg_id}",
@@ -871,6 +937,7 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
             parse_mode=ParseMode.HTML,
         )
         await enviar_conf(bot, tg_id, usuario, "GeoiD · transferencia")
+        await recompensar_padrino(bot, tg_id)
         await entregar_proxy(bot, tg_id, meses)
     except Exception:  # noqa: BLE001
         log.warning("no se pudo avisar al cliente %s", tg_id)
@@ -1038,6 +1105,7 @@ async def vigilar_cripto(bot: Bot):
                     f"Importe: {factura.get('amount')} {factura.get('asset')}\n"
                     f"Activo hasta: {fecha(usuario['expira'])}",
                 )
+                await recompensar_padrino(bot, tg_id)
                 await entregar_proxy(bot, tg_id, meses)
                 log.info("cripto pagado: %s -> %s meses", tg_id, meses)
         except Exception:  # noqa: BLE001

@@ -20,7 +20,11 @@ IP_MAX = int(os.environ.get("GEOID_IP_MAX", "250"))
 
 # --- Producto ---
 DIAS_PRUEBA = int(os.environ.get("GEOID_DIAS_PRUEBA", "3"))
-DIAS_INVITADO = int(os.environ.get("GEOID_DIAS_INVITADO", "7"))  # bonus por invitar
+DIAS_INVITADO = int(os.environ.get("GEOID_DIAS_INVITADO", "7"))
+
+# Premios por amigos que COMPRAN (la prueba gratis no cuenta):
+# (amigos necesarios, dias de regalo)
+NIVELES_INVITACION = [(3, 7), (10, 15), (20, 30)]  # bonus por invitar
 
 # Precios en estrellas de Telegram (XTR). 1 estrella ~ 0,013 $.
 PRECIOS = {

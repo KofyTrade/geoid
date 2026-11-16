@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     referido    INTEGER,
     codigo_ref  TEXT UNIQUE,
     proxy       INTEGER DEFAULT 0,
+    nivel_ref   INTEGER DEFAULT 0,
     proxy_puerto INTEGER,
     proxy_secreto TEXT
 );
@@ -87,6 +88,8 @@ def _migrar(con) -> None:
     columnas = {f[1] for f in con.execute("PRAGMA table_info(usuarios)")}
     if "proxy" not in columnas:
         con.execute("ALTER TABLE usuarios ADD COLUMN proxy INTEGER DEFAULT 0")
+    if "nivel_ref" not in columnas:
+        con.execute("ALTER TABLE usuarios ADD COLUMN nivel_ref INTEGER DEFAULT 0")
     if "proxy_puerto" not in columnas:
         con.execute("ALTER TABLE usuarios ADD COLUMN proxy_puerto INTEGER")
     if "proxy_secreto" not in columnas:
@@ -198,6 +201,18 @@ def con_peer():
             "SELECT tg_id, usuario, publica, prueba_usada, expira "
             "FROM usuarios WHERE publica IS NOT NULL"
         ).fetchall()
+
+
+def referidos_pagados(tg_id: int) -> int:
+    """Amigos invitados que han COMPRADO (no cuentan las pruebas)."""
+    with conectar() as con:
+        fila = con.execute(
+            "SELECT COUNT(DISTINCT u.tg_id) c FROM usuarios u "
+            "JOIN pagos p ON p.tg_id = u.tg_id "
+            "WHERE u.referido = ?",
+            (tg_id,),
+        ).fetchone()
+        return fila["c"] if fila else 0
 
 
 def ha_pagado(tg_id: int) -> bool:

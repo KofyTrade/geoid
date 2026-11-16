@@ -88,11 +88,24 @@ TEXTOS = {
             "Es la ruta más rápida hacia Rusia. Cuando añadamos más países "
             "aparecerán aquí."
         ),
-        "invitar_texto": (
+                "invitar_texto": (
             "👥 <b>Invita y gana días</b>\n\n"
-            "Por cada amigo que compre, te regalamos <b>{dias} días</b>.\n\n"
-            "Tu enlace:\n<code>{enlace}</code>\n\n"
-            "Invitados hasta ahora: <b>{cuantos}</b>"
+            "Solo cuentan los amigos que <b>compren</b> (la prueba gratis de 3 "
+            "días no cuenta):\n\n"
+            "· 3 amigos → <b>7 días</b> gratis\n"
+            "· 10 amigos → <b>15 días</b> gratis\n"
+            "· 20 amigos → <b>1 mes</b> gratis\n\n"
+            "Los días se suman a los que ya tengas.\n\n"
+            "Tu enlace:\n{enlace}\n\n"
+            "Amigos que ya han comprado: <b>{cuantos}</b>"
+        ),
+        "invitar_siguiente": "Te faltan <b>{faltan}</b> para el siguiente premio ({premio}).",
+        "invitar_maximo": "¡Ya tienes el premio máximo! 🎉",
+        "premio_invitacion": (
+            "🎉 <b>¡Premio por invitar!</b>\n\n"
+            "Amigos que han comprado: <b>{cuantos}</b>\n"
+            "Has ganado: <b>{dias} días</b>\n\n"
+            "Tu acceso ahora vence el {fecha}."
         ),
         "invitar_bienvenida": "🎉 Has llegado con una invitación. ¡Disfruta!",
         "promo_pedir": "Escribe el código promocional:",
@@ -233,11 +246,24 @@ TEXTOS = {
             "Это самый быстрый маршрут в Россию. Другие страны появятся "
             "здесь же."
         ),
-        "invitar_texto": (
+                "invitar_texto": (
             "👥 <b>Приглашайте и получайте дни</b>\n\n"
-            "За каждого друга, который купит, дарим <b>{dias} дней</b>.\n\n"
-            "Ваша ссылка:\n<code>{enlace}</code>\n\n"
-            "Приглашено: <b>{cuantos}</b>"
+            "Считаются только друзья, которые <b>купили</b> (бесплатные 3 дня "
+            "не считаются):\n\n"
+            "· 3 друга → <b>7 дней</b> бесплатно\n"
+            "· 10 друзей → <b>15 дней</b> бесплатно\n"
+            "· 20 друзей → <b>1 месяц</b> бесплатно\n\n"
+            "Дни прибавляются к вашим текущим.\n\n"
+            "Ваша ссылка:\n{enlace}\n\n"
+            "Друзей уже купили: <b>{cuantos}</b>"
+        ),
+        "invitar_siguiente": "Осталось <b>{faltan}</b> до следующей награды ({premio}).",
+        "invitar_maximo": "Максимальная награда уже ваша! 🎉",
+        "premio_invitacion": (
+            "🎉 <b>Награда за приглашения!</b>\n\n"
+            "Купивших друзей: <b>{cuantos}</b>\n"
+            "Вы получили: <b>{dias} дней</b>\n\n"
+            "Доступ теперь действует до {fecha}."
         ),
         "invitar_bienvenida": "🎉 Вы пришли по приглашению. Пользуйтесь!",
         "promo_pedir": "Введите промокод:",
@@ -373,10 +399,24 @@ TEXTOS = {
             "Only one server for now: <b>Finland</b> (Helsinki).\n\n"
             "It's the fastest route to Russia. More countries will appear here."
         ),
-        "invitar_texto": (
+                "invitar_texto": (
             "👥 <b>Invite and earn days</b>\n\n"
-            "For every friend who buys, you get <b>{dias} days</b>.\n\n"
-            "Your link:\n<code>{enlace}</code>\n\nInvited so far: <b>{cuantos}</b>"
+            "Only friends who <b>buy</b> count (the 3-day free trial does "
+            "not):\n\n"
+            "· 3 friends → <b>7 days</b> free\n"
+            "· 10 friends → <b>15 days</b> free\n"
+            "· 20 friends → <b>1 month</b> free\n\n"
+            "Days are added to the ones you already have.\n\n"
+            "Your link:\n{enlace}\n\n"
+            "Friends who already bought: <b>{cuantos}</b>"
+        ),
+        "invitar_siguiente": "You need <b>{faltan}</b> more for the next reward ({premio}).",
+        "invitar_maximo": "You already have the top reward! 🎉",
+        "premio_invitacion": (
+            "🎉 <b>Referral reward!</b>\n\n"
+            "Friends who bought: <b>{cuantos}</b>\n"
+            "You earned: <b>{dias} days</b>\n\n"
+            "Your access now expires on {fecha}."
         ),
         "invitar_bienvenida": "🎉 You arrived through an invitation. Enjoy!",
         "promo_pedir": "Type the promo code:",
