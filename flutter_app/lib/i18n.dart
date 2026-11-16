@@ -35,6 +35,7 @@ String t(String clave) => I18n.t(clave);
 const Map<String, Map<String, String>> _textos = {
   'en': {
     'activar_vpn': 'Activate VPN',
+    'mi_vpn': 'My VPN',
     'activar_vpn_texto': 'Trial and purchase happen in our Telegram bot. Tap an option and the bot opens with your configuration right away.',
     'periodo_prueba': 'Free trial',
     'tres_dias': '3 days free · no card',
@@ -99,6 +100,7 @@ const Map<String, Map<String, String>> _textos = {
   },
   'es': {
     'activar_vpn': 'Activar VPN',
+    'mi_vpn': 'Mi VPN',
     'activar_vpn_texto': 'La prueba y la compra se hacen en nuestro bot de Telegram. Al tocar una opción se abre el bot y recibes tu configuración al instante.',
     'periodo_prueba': 'Período de prueba',
     'tres_dias': '3 días gratis · sin tarjeta',
@@ -298,6 +300,7 @@ const Map<String, Map<String, String>> _textos = {
   },
   'ru': {
     'activar_vpn': 'Активировать VPN',
+    'mi_vpn': 'Мой VPN',
     'activar_vpn_texto': 'Пробный доступ и оплата — в нашем Telegram-боте. Нажмите вариант, бот откроется и вы сразу получите конфигурацию.',
     'periodo_prueba': 'Пробный период',
     'tres_dias': '3 дня бесплатно · без карты',
