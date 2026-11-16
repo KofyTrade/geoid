@@ -290,3 +290,27 @@ Para verlo funcionando sin esperar:
 ```bash
 journalctl -u geoid-bot -f | grep -i duplicado
 ```
+
+## Avisos por correo (independiente de Telegram)
+
+Si Telegram está bloqueado o el proxy falla, los avisos llegan igual al móvil
+como notificación del correo.
+
+```bash
+cat >> /etc/geoid-bot.env <<'EOF'
+GEOID_SMTP_HOST=smtp.yandex.ru
+GEOID_SMTP_PORT=465
+GEOID_SMTP_USER=tu@yandex.ru
+GEOID_SMTP_PASS=CONTRASEÑA_DE_APLICACION
+GEOID_CORREO_DESTINO=tu@yandex.ru
+EOF
+systemctl restart geoid-bot
+```
+
+- **Yandex**: `smtp.yandex.ru`, puerto `465`, y hay que crear una
+  *contraseña de aplicación* en la configuración de la cuenta.
+- **Gmail**: `smtp.gmail.com`, puerto `465`, también con contraseña de aplicación.
+- **Mail.ru**: `smtp.mail.ru`, puerto `465`.
+
+Se envía un correo en tres momentos: cuando alguien pulsa «Ya he pagado»,
+en cada pago con estrellas y en cada pago con cripto.

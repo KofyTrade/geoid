@@ -31,6 +31,7 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
 )
 
+import avisos
 import config
 import db
 import pagos
@@ -560,6 +561,16 @@ async def cb_paguei(llamada: CallbackQuery, bot: Bot):
         except Exception:  # noqa: BLE001
             log.warning("no se pudo avisar al administrador")
 
+    await avisos.avisar(
+        f"PAGO {config.PRECIOS_RUB.get(meses, 0)} RUB - {usuario.get('usuario') or tg_id}",
+        "Alguien ha pulsado «Ya he pagado».\n\n"
+        f"Usuario: {usuario.get('usuario') or '—'} (ID {tg_id})\n"
+        f"Plan: {meses} mes(es)\n"
+        f"Importe: {config.PRECIOS_RUB.get(meses, 0)} RUB\n\n"
+        "Comprueba tu banco y activa con /activar "
+        f"{tg_id} {meses}",
+    )
+
     await llamada.message.edit_text(
         t(idi, "manual_aviso"), reply_markup=teclado_volver(tg_id)
     )
@@ -668,6 +679,14 @@ async def pago_recibido(mensaje: Message, bot: Bot):
             await bot.send_message(padrino, t(idioma(padrino), "invitar_bienvenida"))
         except Exception:  # noqa: BLE001
             log.warning("no se pudo premiar al padrino %s", padrino)
+
+    await avisos.avisar(
+        f"VENTA {meses} mes(es) por estrellas - {tg_id}",
+        f"Pago con estrellas de {tg_id}.\n"
+        f"Plan: {meses} mes(es)\n"
+        f"Estrellas: {pago.total_amount}\n"
+        f"Activo hasta: {fecha(actualizado['expira'])}",
+    )
 
     await mensaje.answer(
         t(idi, "pago_ok", fecha=fecha(actualizado["expira"])),
@@ -883,6 +902,13 @@ async def vigilar_cripto(bot: Bot):
                     await enviar_conf(bot, tg_id, usuario, "GeoiD · cripto")
                 except Exception:  # noqa: BLE001
                     log.warning("no se pudo avisar a %s", tg_id)
+                await avisos.avisar(
+                    f"VENTA {meses} mes(es) con cripto - {tg_id}",
+                    f"Pago en cripto de {tg_id}.\n"
+                    f"Plan: {meses} mes(es)\n"
+                    f"Importe: {factura.get('amount')} {factura.get('asset')}\n"
+                    f"Activo hasta: {fecha(usuario['expira'])}",
+                )
                 log.info("cripto pagado: %s -> %s meses", tg_id, meses)
         except Exception:  # noqa: BLE001
             log.exception("error revisando pagos con cripto")
