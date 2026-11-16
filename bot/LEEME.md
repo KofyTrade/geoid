@@ -389,3 +389,28 @@ GEOID_PROXY_DISPOSITIVOS=2
 
 El bot **nunca** entrega a un cliente el proxy del puerto 443. Si falta el
 sistema multiusuario, simplemente no entrega nada y avisa en el registro.
+
+## Códigos promocionales
+
+### Crear
+
+```bash
+/promo VERANO 7 20            # 7 días, 20 usos en total
+/promo LANZAMIENTO 3 100 31.12.2026   # además caduca ese día
+```
+
+- **Un uso por persona**: el mismo cliente no puede repetir el código
+- Si un código se recrea con el mismo nombre, los usos por persona se reinician
+- Los días **se suman** a lo que le quedara al cliente
+
+### Gestionar
+
+| Comando | Para qué |
+|---|---|
+| `/promos` | Lista con usos restantes y fecha de caducidad |
+| `/promo borrar VERANO` | Elimina el código |
+
+### Cómo lo usa el cliente
+
+Menú **🎟 Canjear código** → escribe el código (vale en minúsculas) → recibe
+los días y su `.conf` al instante.

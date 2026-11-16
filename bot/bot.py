@@ -541,7 +541,7 @@ async def texto_libre(mensaje: Message, bot: Bot):
         return
 
     # Un texto suelto puede ser un código promocional.
-    dias = db.usar_promo(texto)
+    dias = db.usar_promo(texto, tg_id)
     if dias is None:
         await mensaje.answer(t(idi, "promo_mal"), reply_markup=teclado_fijo(tg_id))
         return
@@ -919,15 +919,91 @@ async def pago_recibido(mensaje: Message, bot: Bot):
 # --------------------------------------------------------------------------- #
 @router.message(Command("promo"))
 async def comando_promo(mensaje: Message, command: CommandObject):
+    """Administrador: crea o borra códigos promocionales.
+
+    /promo CODIGO DIAS USOS [dd.mm.aaaa]
+    /promo borrar CODIGO
+    """
     if mensaje.from_user.id != ADMIN:
         return
+
     partes = (command.args or "").split()
-    if len(partes) != 3:
-        await mensaje.answer("Uso: /promo CODIGO DIAS USOS")
+
+    if len(partes) == 2 and partes[0].lower() == "borrar":
+        codigo = partes[1].upper()
+        if db.borrar_promo(codigo):
+            await mensaje.answer(f"🗑 Código {codigo} eliminado.")
+        else:
+            await mensaje.answer(f"El código {codigo} no existe.")
         return
-    codigo, dias, usos = partes[0], int(partes[1]), int(partes[2])
-    db.crear_promo(codigo, dias, usos)
-    await mensaje.answer(f"Código {codigo.upper()}: {dias} días, {usos} usos.")
+
+    if len(partes) < 3:
+        await mensaje.answer(
+            "Uso:\n"
+            "/promo CODIGO DIAS USOS [dd.mm.aaaa]\n"
+            "/promo borrar CODIGO\n\n"
+            "Ejemplo: /promo VERANO 7 20 31.12.2026\n"
+            "  → código VERANO, 7 días, 20 usos, caduca el 31.12.2026\n\n"
+            "Ver todos: /promos"
+        )
+        return
+
+    codigo = partes[0].upper()
+    try:
+        dias = int(partes[1])
+        usos = int(partes[2])
+    except ValueError:
+        await mensaje.answer("Los días y los usos tienen que ser números.")
+        return
+
+    caduca = None
+    if len(partes) >= 4:
+        try:
+            dia, mes, anio = partes[3].split(".")
+            from datetime import datetime as _dt
+            caduca = int(
+                _dt(int(anio), int(mes), int(dia), 23, 59).timestamp()
+            )
+        except Exception:  # noqa: BLE001
+            await mensaje.answer(
+                "La fecha debe ser dd.mm.aaaa (por ejemplo 31.12.2026)."
+            )
+            return
+
+    db.crear_promo(codigo, dias, usos, caduca)
+    extra = f", caduca el {partes[3]}" if caduca else ""
+    await mensaje.answer(
+        f"✅ Código {codigo}: {dias} días, {usos} usos{extra}.\n"
+        "Cada persona puede usarlo una sola vez."
+    )
+
+
+@router.message(Command("promos"))
+async def comando_promos(mensaje: Message):
+    if mensaje.from_user.id != ADMIN:
+        return
+
+    promos = db.listar_promos()
+    if not promos:
+        await mensaje.answer("No hay códigos creados. Usa /promo CODIGO DIAS USOS")
+        return
+
+    from datetime import datetime as _dt
+
+    lineas = ["🎟 <b>Códigos promocionales</b>\n"]
+    for p in promos:
+        restantes = p["usos"] - p["usados"]
+        caduca = p.get("caduca")
+        vence = ""
+        if caduca:
+            vence = " · caduca " + _dt.fromtimestamp(caduca).strftime("%d.%m.%Y")
+        estado = "✅" if restantes > 0 else "⛔"
+        lineas.append(
+            f"{estado} <code>{p['codigo']}</code> · {p['dias']} días · "
+            f"{restantes}/{p['usos']} usos{vence}"
+        )
+
+    await mensaje.answer("\n".join(lineas), parse_mode=ParseMode.HTML)
 
 
 @router.message(Command("regalar"))
@@ -1166,7 +1242,8 @@ async def configurar_comandos(bot: Bot):
                     BotCommand(command="estado", description="Estado del bot"),
                     BotCommand(command="activar", description="Activar ID MESES"),
                     BotCommand(command="regalar", description="Regalar ID DÍAS"),
-                    BotCommand(command="promo", description="Crear código"),
+                    BotCommand(command="promo", description="Crear o borrar código"),
+                    BotCommand(command="promos", description="Ver códigos"),
                 ],
                 scope=BotCommandScopeChat(chat_id=ADMIN),
             )

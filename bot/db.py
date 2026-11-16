@@ -30,7 +30,15 @@ CREATE TABLE IF NOT EXISTS promos (
     codigo      TEXT PRIMARY KEY,
     dias        INTEGER NOT NULL,
     usos        INTEGER NOT NULL,
-    usados      INTEGER DEFAULT 0
+    usados      INTEGER DEFAULT 0,
+    caduca      INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS promos_usos (
+    codigo      TEXT NOT NULL,
+    tg_id       INTEGER NOT NULL,
+    cuando      INTEGER NOT NULL,
+    PRIMARY KEY (codigo, tg_id)
 );
 
 CREATE TABLE IF NOT EXISTS avisos (
@@ -155,28 +163,83 @@ def por_codigo(codigo: str):
         return dict(fila) if fila else None
 
 
-def usar_promo(codigo: str) -> int | None:
-    """Devuelve los días del código si se pudo usar, o None."""
+def _migrar_promos(con) -> None:
+    columnas = {f[1] for f in con.execute("PRAGMA table_info(promos)")}
+    if "caduca" not in columnas:
+        con.execute("ALTER TABLE promos ADD COLUMN caduca INTEGER")
+
+
+def usar_promo(codigo: str, tg_id: int = 0) -> int | None:
+    """Devuelve los dias del codigo si se pudo usar, o None."""
     codigo = codigo.strip().upper()
+    ahora = int(time.time())
     with conectar() as con:
+        _migrar_promos(con)
         fila = con.execute(
             "SELECT * FROM promos WHERE codigo = ?", (codigo,)
         ).fetchone()
-        if not fila or fila["usados"] >= fila["usos"]:
+        if not fila:
             return None
+        if fila["usados"] >= fila["usos"]:
+            return None
+        if fila["caduca"] and ahora > int(fila["caduca"]):
+            return None
+
+        # un uso por persona
+        if tg_id:
+            ya = con.execute(
+                "SELECT 1 FROM promos_usos WHERE codigo = ? AND tg_id = ?",
+                (codigo, tg_id),
+            ).fetchone()
+            if ya:
+                return None
+            con.execute(
+                "INSERT INTO promos_usos (codigo, tg_id, cuando) VALUES (?, ?, ?)",
+                (codigo, tg_id, ahora),
+            )
+
         con.execute(
             "UPDATE promos SET usados = usados + 1 WHERE codigo = ?", (codigo,)
         )
         return int(fila["dias"])
 
 
-def crear_promo(codigo: str, dias: int, usos: int):
+def crear_promo(codigo: str, dias: int, usos: int, caduca: int | None = None):
     with conectar() as con:
+        _migrar_promos(con)
         con.execute(
-            "INSERT OR REPLACE INTO promos (codigo, dias, usos, usados) "
-            "VALUES (?, ?, ?, 0)",
-            (codigo.strip().upper(), dias, usos),
+            "INSERT OR REPLACE INTO promos (codigo, dias, usos, usados, caduca) "
+            "VALUES (?, ?, ?, 0, ?)",
+            (codigo.strip().upper(), dias, usos, caduca),
         )
+        con.execute(
+            "DELETE FROM promos_usos WHERE codigo = ?", (codigo.strip().upper(),)
+        )
+
+
+def listar_promos():
+    with conectar() as con:
+        _migrar_promos(con)
+        return [
+            dict(f)
+            for f in con.execute(
+                "SELECT * FROM promos ORDER BY codigo"
+            ).fetchall()
+        ]
+
+
+def borrar_promo(codigo: str) -> bool:
+    codigo = codigo.strip().upper()
+    with conectar() as con:
+        fila = con.execute(
+            "SELECT 1 FROM promos WHERE codigo = ?", (codigo,)
+        ).fetchone()
+        if not fila:
+            return False
+        con.execute("DELETE FROM promos WHERE codigo = ?", (codigo,))
+        con.execute("DELETE FROM promos_usos WHERE codigo = ?", (codigo,))
+        return True
+
 
 def pago_existe(cargo: str) -> bool:
     with conectar() as con:
