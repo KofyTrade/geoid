@@ -12,15 +12,16 @@ set -euo pipefail
 
 PUERTO="${1:-8443}"
 BIN="/usr/local/bin/mtg"
-SERVICIO="/etc/systemd/system/mtg.service"
+CONF="/etc/mtg.toml"
 SECRETO="/etc/mtg.secret"
+SERVICIO="/etc/systemd/system/mtg.service"
 
 azul()  { printf '\033[1;36m%s\033[0m\n' "$*"; }
 verde() { printf '\033[1;32m%s\033[0m\n' "$*"; }
 rojo()  { printf '\033[1;31m%s\033[0m\n' "$*"; }
 
 if [ "$(id -u)" -ne 0 ]; then
-  rojo "Ejecútalo como root (estás en el servidor, ¿verdad?)"
+  rojo "Ejecútalo como root."
   exit 1
 fi
 
@@ -57,10 +58,17 @@ else
   echo "   clave generada"
 fi
 
-azul "4/5 · Arrancando el servicio (puerto $PUERTO)"
+azul "4/5 · Configurando y arrancando (puerto $PUERTO)"
 
-#  La linea de arranque cambia entre versiones de mtg. Se prueba cada variante
-#  y se queda la primera que consigue arrancar (timeout 124 = sigue vivo).
+# Las versiones nuevas (2.3+) leen un archivo de configuración; las viejas
+# aceptan la clave por parámetro. Se prueba lo uno y lo otro.
+cat > "$CONF" <<EOF
+# Proxy MTProto de GeoiD para Telegram
+secret = "$SECRET"
+bind-to = "0.0.0.0:$PUERTO"
+EOF
+chmod 600 "$CONF"
+
 probar() {
   timeout 4 bash -c "$1" >/tmp/mtg_prueba.log 2>&1
   [ $? -eq 124 ]
@@ -68,34 +76,25 @@ probar() {
 
 ARRANQUE=""
 for VARIANTE in \
+  "$BIN run $CONF" \
   "$BIN run --bind 0.0.0.0:$PUERTO $SECRET" \
-  "$BIN run $SECRET --bind 0.0.0.0:$PUERTO" \
-  "$BIN run -b 0.0.0.0:$PUERTO $SECRET" \
-  "$BIN run --secret $SECRET --bind 0.0.0.0:$PUERTO" \
-  "$BIN run --secret $SECRET -b 0.0.0.0:$PUERTO" \
-  "$BIN run $SECRET"; do
-  echo "   probando: ${VARIANTE/$SECRET/<clave>}"
+  "$BIN run $SECRET" ; do
+  echo "   probando: $VARIANTE"
   if probar "$VARIANTE"; then
     ARRANQUE="$VARIANTE"
     verde "   ✓ esta funciona"
     break
   fi
-  head -3 /tmp/mtg_prueba.log 2>/dev/null | sed 's/^/     /'
+  head -2 /tmp/mtg_prueba.log 2>/dev/null | sed 's/^/     /'
 done
 
 if [ -z "$ARRANQUE" ]; then
-  rojo "Ninguna variante arrancó. Esto es lo que dice mtg:"
+  rojo "Ninguna variante arrancó. Revisa el registro:"
   cat /tmp/mtg_prueba.log 2>/dev/null
   echo ""
-  "$BIN" run --help 2>&1 | head -25 || true
+  "$BIN" run --help 2>&1 | head -20 || true
   exit 1
 fi
-
-#  Si la variante buena no lleva puerto, el proxy escucha en el 3128.
-case "$ARRANQUE" in
-  *"$PUERTO"*) ;;
-  *) PUERTO=3128 ;;
-esac
 
 cat > "$SERVICIO" <<EOF
 [Unit]
@@ -116,39 +115,41 @@ EOF
 systemctl daemon-reload
 systemctl enable mtg >/dev/null 2>&1 || true
 systemctl restart mtg
-sleep 2
-systemctl is-active --quiet mtg || {
+sleep 3
+
+if ! systemctl is-active --quiet mtg; then
   rojo "El servicio no arrancó:"
   journalctl -u mtg -n 15 --no-pager
-  echo ""
-  echo "Ayuda de esta version de mtg (para ajustar los parámetros):"
-  "$BIN" run --help 2>&1 | head -25 || true
   exit 1
-}
+fi
+
+command -v ufw >/dev/null && ufw allow "${PUERTO}/tcp" >/dev/null 2>&1 || true
 
 IP=$(curl -fsSL https://api.ipify.org || echo "193.29.224.164")
+ENLACE="tg://proxy?server=${IP}&port=${PUERTO}&secret=${SECRET}"
 
 verde ""
 verde "=================================================================="
-verde " PROXY LISTO"
+verde " PROXY LISTO Y FUNCIONANDO"
 verde "=================================================================="
 echo ""
 echo "  Enlace (tócalo en el móvil con Telegram instalado):"
 echo ""
-echo "    tg://proxy?server=${IP}&port=${PUERTO}&secret=${SECRET}"
+echo "    ${ENLACE}"
 echo ""
-echo "  Si prefieres pegarlo a mano:"
+echo "  O a mano en Telegram:"
 echo "    Servidor: ${IP}"
 echo "    Puerto:   ${PUERTO}"
 echo "    Clave:    ${SECRET}"
 echo ""
-echo "  En Telegram: Ajustes → Datos y almacenamiento → Proxy"
-echo "               → Usar proxy → Añadir proxy → MTPROTO"
+echo "  Telegram → Ajustes → Datos y almacenamiento → Proxy"
+echo "           → Usar proxy → Añadir proxy → MTPROTO"
 echo ""
-verde "  Comprobar estado:   systemctl status mtg"
-verde "  Ver el registro:    journalctl -u mtg -f"
-verde "  Cambiar de puerto:  bash $0 443"
+verde "  Estado:            systemctl status mtg"
+verde "  Registro:          journalctl -u mtg -f"
+verde "  Cambiar de puerto: bash $0 443"
+verde "  Configuración:     $CONF"
 verde "=================================================================="
 echo ""
-echo "  No hace falta abrir el puerto en el firewall si usas ufw:"
-echo "    ufw allow ${PUERTO}/tcp"
+echo "  Guarda este enlace: si algún día lo bloquean, cambia de puerto"
+echo "  y avisa a tus clientes del nuevo."
