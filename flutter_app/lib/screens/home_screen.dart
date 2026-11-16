@@ -694,11 +694,11 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!esAndroid) {
         _appsResumen = t('todo_sistema');
       } else if (cuantas == 0) {
-        _appsResumen = t('todas_apps');
+        _appsResumen = t('ninguna_excluida');
       } else {
         _appsResumen = cuantas == 1
-            ? t('apps_1')
-            : t('apps_n').replaceFirst('%s', '$cuantas');
+            ? t('excluidas_1')
+            : t('excluidas_n').replaceFirst('%s', '$cuantas');
       }
     });
   }

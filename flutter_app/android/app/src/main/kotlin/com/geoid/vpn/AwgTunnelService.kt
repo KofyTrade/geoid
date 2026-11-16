@@ -118,12 +118,13 @@ class AwgTunnelService : VpnService() {
                 }
             }
 
-            // Lista blanca de aplicaciones (si esta vacia, pasa todo).
+            // Lista de EXCLUIDAS: esas aplicaciones no usan la VPN.
+            // Si esta vacia, pasan todas por el tunel.
             val marcadas = datos?.getStringArrayListExtra(EXTRA_APPS).orEmpty()
                 .filter { it != packageName }
             for (p in marcadas) {
                 try {
-                    builder.addAllowedApplication(p)
+                    builder.addDisallowedApplication(p)
                 } catch (e: Exception) {
                     // aplicacion desinstalada
                 }

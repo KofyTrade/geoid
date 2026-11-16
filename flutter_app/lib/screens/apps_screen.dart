@@ -73,7 +73,7 @@ class _AppsScreenState extends State<AppsScreen> {
         foregroundColor: GeoidColors.acento,
         elevation: 0,
         title: Text(
-          t('apps'),
+          t('apps_sin_vpn'),
           style: TextStyle(fontSize: 16, letterSpacing: 1.2),
         ),
       ),
@@ -93,16 +93,27 @@ class _AppsScreenState extends State<AppsScreen> {
               ),
             ),
             Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(
+                t('apps_sin_vpn_detalle'),
+                style: TextStyle(
+                  color: GeoidColors.textoTenue,
+                  fontSize: 11,
+                  height: 1.3,
+                ),
+              ),
+            ),
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       _marcadas.isEmpty
-                          ? t('sin_seleccion')
+                          ? t('ninguna_excluida')
                           : (_marcadas.length == 1
-                              ? t('apps_1')
-                              : t('apps_n')
+                              ? t('excluidas_1')
+                              : t('excluidas_n')
                                   .replaceFirst('%s', '${_marcadas.length}')),
                       style: TextStyle(
                         color: GeoidColors.textoSuave,
@@ -122,7 +133,7 @@ class _AppsScreenState extends State<AppsScreen> {
                       _guardar();
                     },
                     child: Text(
-                      t('seleccionar_todas'),
+                      t('marcar_todas'),
                       style: TextStyle(
                         color: GeoidColors.acento,
                         fontSize: 12,

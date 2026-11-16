@@ -43,6 +43,12 @@ String t(String clave) => I18n.t(clave);
 
 const Map<String, Map<String, String>> _textos = {
   'en': {
+    'ninguna_excluida': 'All apps use the VPN',
+    'excluidas_1': '1 app without VPN',
+    'excluidas_n': '%s apps without VPN',
+    'marcar_todas': 'Mark all',
+    'apps_sin_vpn': 'Apps without VPN',
+    'apps_sin_vpn_detalle': 'Checked apps will NOT use the VPN. Everything else will.',
     'vpn_activa': 'VPN active',
     'periodo_prueba_corto': 'Trial period',
     'perfil_activado': 'Profile activated',
@@ -120,6 +126,12 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'View configuration',
   },
   'es': {
+    'ninguna_excluida': 'Todas las apps usan la VPN',
+    'excluidas_1': '1 app sin VPN',
+    'excluidas_n': '%s apps sin VPN',
+    'marcar_todas': 'Marcar todas',
+    'apps_sin_vpn': 'Aplicaciones sin VPN',
+    'apps_sin_vpn_detalle': 'Las aplicaciones marcadas NO usarán la VPN. Las demás sí.',
     'vpn_activa': 'VPN activa',
     'periodo_prueba_corto': 'Periodo de prueba',
     'perfil_activado': 'Perfil activado',
@@ -332,6 +344,12 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'Vedi configurazione',
   },
   'ru': {
+    'ninguna_excluida': 'Все приложения через VPN',
+    'excluidas_1': '1 приложение без VPN',
+    'excluidas_n': '%s приложений без VPN',
+    'marcar_todas': 'Отметить все',
+    'apps_sin_vpn': 'Приложения без VPN',
+    'apps_sin_vpn_detalle': 'Отмеченные приложения НЕ используют VPN. Остальные — да.',
     'vpn_activa': 'VPN активна',
     'periodo_prueba_corto': 'Пробный период',
     'perfil_activado': 'Профиль активирован',
