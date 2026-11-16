@@ -414,3 +414,28 @@ sistema multiusuario, simplemente no entrega nada y avisa en el registro.
 
 Menú **🎟 Canjear código** → escribe el código (vale en minúsculas) → recibe
 los días y su `.conf` al instante.
+
+## Enlaces de descarga automáticos
+
+El bot **no lleva los enlaces escritos a mano**: cada 6 horas pregunta a GitHub
+por la última versión publicada y guarda los archivos reales en la base de datos.
+
+| Situación | Qué hace el bot |
+|---|---|
+| Se publica una versión nueva | Actualiza los enlaces y avisa al grupo de pagos |
+| Cambia el nombre de un archivo | Detecta el archivo correcto por sí solo |
+| GitHub no responde | Mantiene los enlaces anteriores y reintenta |
+| Se borra una versión antigua | No afecta: usa `releases/latest` |
+
+Comando de administrador:
+
+```
+/enlaces
+```
+
+Muestra la versión detectada, la última revisión y los enlaces guardados, y
+fuerza una comprobación inmediata.
+
+> Los enlaces que reparte el bot son del tipo
+> `releases/latest/download/GeoiD-vpn-Android-arm64-v8a.apk`: como el nombre es
+> fijo y `latest` siempre apunta a la última, no caducan nunca.

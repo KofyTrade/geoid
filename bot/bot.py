@@ -33,6 +33,11 @@ from aiogram.types import (
 
 import config
 import db
+
+try:  # opcional
+    import descargas
+except Exception:  # noqa: BLE001
+    descargas = None  # type: ignore[assignment]
 import pagos
 try:  # opcional: si falta el archivo, el bot sigue funcionando
     import proxy as proxy_personal
@@ -345,9 +350,12 @@ async def accion_promo(bot: Bot, tg_id: int) -> None:
 
 async def accion_ayuda(bot: Bot, tg_id: int) -> None:
     idi = idioma(tg_id)
+    android, windows = config.URL_ANDROID, config.URL_WINDOWS
+    if descargas is not None:
+        android, windows = descargas.enlaces(android, windows)
     await bot.send_message(
         tg_id,
-        t(idi, "ayuda", android=config.URL_ANDROID, windows=config.URL_WINDOWS),
+        t(idi, "ayuda", android=android, windows=windows),
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
     )
@@ -978,6 +986,39 @@ async def comando_promo(mensaje: Message, command: CommandObject):
     )
 
 
+
+@router.message(Command("enlaces"))
+async def comando_enlaces(mensaje: Message, bot: Bot):
+    """Administrador: ver y refrescar los enlaces de descarga."""
+    if mensaje.from_user.id != ADMIN:
+        return
+
+    if descargas is None:
+        await mensaje.answer("El actualizador de enlaces no está instalado.")
+        return
+
+    datos = await descargas.actualizar()
+    android, windows = descargas.enlaces(config.URL_ANDROID, config.URL_WINDOWS)
+
+    texto = [
+        "🔗 <b>Enlaces de descarga</b>\n",
+        f"Versión publicada: <b>v{descargas.version_actual() or '?'}</b>",
+        f"Última revisión: {descargas.ultima_revision()}",
+        "",
+        f"Android:\n<code>{android}</code>",
+        "",
+        f"Windows:\n<code>{windows}</code>",
+    ]
+    if not datos:
+        texto.append("\n⚠️ No se pudo consultar GitHub ahora mismo.")
+
+    await mensaje.answer(
+        "\n".join(texto),
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+
+
 @router.message(Command("promos"))
 async def comando_promos(mensaje: Message):
     if mensaje.from_user.id != ADMIN:
@@ -1244,6 +1285,7 @@ async def configurar_comandos(bot: Bot):
                     BotCommand(command="regalar", description="Regalar ID DÍAS"),
                     BotCommand(command="promo", description="Crear o borrar código"),
                     BotCommand(command="promos", description="Ver códigos"),
+                    BotCommand(command="enlaces", description="Enlaces de descarga"),
                 ],
                 scope=BotCommandScopeChat(chat_id=ADMIN),
             )
@@ -1344,6 +1386,39 @@ async def vigilar_proxies(bot: Bot):
             log.exception("error revisando los proxies personales")
 
 
+
+async def vigilar_descargas(bot: Bot):
+    """Cada 6 horas mira si hay versión nueva y actualiza los enlaces."""
+    if descargas is None:
+        return
+
+    destino = int(config.AVISOS_ID) if config.AVISOS_ID else ADMIN
+
+    async def avisar(version: str) -> None:
+        if not destino:
+            return
+        android, windows = descargas.enlaces(config.URL_ANDROID, config.URL_WINDOWS)
+        try:
+            await bot.send_message(
+                destino,
+                "🆕 <b>Nueva versión publicada: v" + version + "</b>\n\n"
+                "Los enlaces del bot ya están actualizados:\n"
+                f"Android: {android}\n"
+                f"Windows: {windows}",
+                parse_mode=ParseMode.HTML,
+                disable_web_page_preview=True,
+            )
+        except Exception:  # noqa: BLE001
+            log.warning("no se pudo avisar de la versión nueva")
+
+    while True:
+        try:
+            await descargas.actualizar(avisar)
+        except Exception:  # noqa: BLE001
+            log.exception("error actualizando los enlaces de descarga")
+        await asyncio.sleep(6 * 3600)
+
+
 async def main():
     if not config.TOKEN:
         raise SystemExit("Falta GEOID_TOKEN (token del bot de BotFather)")
@@ -1360,6 +1435,7 @@ async def main():
     asyncio.create_task(vigilar_cripto(bot))
     asyncio.create_task(vigilar_duplicados(bot))
     asyncio.create_task(vigilar_proxies(bot))
+    asyncio.create_task(vigilar_descargas(bot))
     log.info("bot en marcha · servidor %s", config.ENDPOINT)
     await dp.start_polling(bot)
 
