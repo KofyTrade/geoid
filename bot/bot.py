@@ -584,11 +584,7 @@ async def texto_libre(mensaje: Message, bot: Bot):
     idi = idioma(tg_id)
     texto = (mensaje.text or "").strip()
 
-    # El dueno escribiendo en el grupo no genera tickets.
-    if ADMIN and tg_id == ADMIN:
-        return
-
-    # 1) Botones del menu
+    # 1) Botones del menu (tambien para el administrador)
     accion = ACCIONES.get(texto)
     if accion:
         try:
@@ -618,7 +614,11 @@ async def texto_libre(mensaje: Message, bot: Bot):
         await enviar_conf(bot, tg_id, actualizado, t(idi, "pais"))
         return
 
-    # 3) Cualquier otro texto es un mensaje para soporte
+    # 3) Cualquier otro texto es un mensaje para soporte.
+    #    El administrador no genera tickets con sus propios mensajes.
+    if ADMIN and tg_id == ADMIN:
+        return
+
     await mensaje.answer(
         t(idi, "soporte_recibido"), reply_markup=teclado_fijo(tg_id)
     )
@@ -1174,6 +1174,30 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
         log.warning("no se pudo avisar al cliente %s", tg_id)
 
 
+@router.message(Command("ticket"))
+async def comando_ticket(mensaje: Message, bot: Bot):
+    """Administrador: genera un ticket de prueba para comprobar el soporte."""
+    if mensaje.from_user.id != ADMIN:
+        return
+
+    destino = int(config.AVISOS_ID) if config.AVISOS_ID else ADMIN
+    if not destino:
+        await mensaje.answer(
+            "Falta GEOID_AVISOS_ID (o eres el único administrador)."
+        )
+        return
+
+    usuario = db.obtener(ADMIN) or {}
+    await bot.send_message(
+        destino,
+        t("es", "soporte_ticket",
+          usuario=("@" + usuario["usuario"]) if usuario.get("usuario") else "prueba",
+          id=ADMIN,
+          mensaje="Ticket de prueba: responde a este mensaje y te llegará la respuesta al privado."),
+    )
+    await mensaje.answer("✅ Ticket de prueba enviado. Responde a ese mensaje para probar la respuesta.")
+
+
 @router.message(Command("chatid"))
 async def comando_chatid(mensaje: Message):
     """Dice el ID del chat actual. Sirve para configurar el grupo de avisos."""
@@ -1368,6 +1392,7 @@ async def configurar_comandos(bot: Bot):
                     BotCommand(command="promo", description="Crear o borrar código"),
                     BotCommand(command="promos", description="Ver códigos"),
                     BotCommand(command="enlaces", description="Enlaces de descarga"),
+                    BotCommand(command="ticket", description="Probar el soporte"),
                 ],
                 scope=BotCommandScopeChat(chat_id=ADMIN),
             )
