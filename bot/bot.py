@@ -31,11 +31,19 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
 )
 
-import avisos
 import config
 import db
 import pagos
-import proxy as proxy_personal
+try:  # opcional: si falta el archivo, el bot sigue funcionando
+    import proxy as proxy_personal
+except Exception:  # noqa: BLE001
+    proxy_personal = None  # type: ignore[assignment]
+
+try:  # opcional: avisos por correo
+    import avisos
+except Exception:  # noqa: BLE001
+    avisos = None  # type: ignore[assignment]
+
 import provision
 from textos import IDIOMAS, t
 
@@ -123,6 +131,11 @@ def teclado_volver(tg_id: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="◀️", callback_data="menu")
     ]])
+
+
+def proxies_ok() -> bool:
+    """True solo si el modulo de proxies existe y el servidor esta listo."""
+    return proxy_personal is not None and proxy_personal.disponible()
 
 
 def _dias(cantidad: int, idi: str) -> str:
@@ -730,7 +743,8 @@ async def cb_paguei(llamada: CallbackQuery, bot: Bot):
         except Exception:  # noqa: BLE001
             log.warning("no se pudo avisar al administrador")
 
-    await avisos.avisar(
+    if avisos is not None:
+        await avisos.avisar(
         f"PAGO {config.PRECIOS_RUB.get(meses, 0)} RUB - {usuario.get('usuario') or tg_id}",
         "Alguien ha pulsado «Ya he pagado».\n\n"
         f"Usuario: {usuario.get('usuario') or '—'} (ID {tg_id})\n"
@@ -786,6 +800,10 @@ async def cb_proxy(llamada: CallbackQuery, bot: Bot):
     usuario = db.obtener(tg_id) or {}
     if not usuario.get("proxy") or not usuario.get("proxy_secreto"):
         await llamada.answer(t(idioma(tg_id), "proxy_sin"), show_alert=True)
+        return
+
+    if not proxies_ok():
+        await llamada.answer("El proxy no está disponible ahora mismo.", show_alert=True)
         return
 
     puerto = usuario["proxy_puerto"]
@@ -879,7 +897,8 @@ async def pago_recibido(mensaje: Message, bot: Bot):
 
     await recompensar_padrino(bot, tg_id)
 
-    await avisos.avisar(
+    if avisos is not None:
+        await avisos.avisar(
         f"VENTA {meses} mes(es) por estrellas - {tg_id}",
         f"Pago con estrellas de {tg_id}.\n"
         f"Plan: {meses} mes(es)\n"
@@ -1059,7 +1078,7 @@ async def vigilar_caducidades(bot: Bot):
                     usuario["tg_id"],
                     ip=None, privada=None, publica=None, preshared=None,
                 )
-                if usuario.get("proxy"):
+                if usuario.get("proxy") and proxy_personal is not None:
                     try:
                         proxy_personal.eliminar(usuario["tg_id"])
                     except Exception:  # noqa: BLE001
@@ -1111,7 +1130,8 @@ async def vigilar_cripto(bot: Bot):
                     await enviar_conf(bot, tg_id, usuario, "GeoiD · cripto")
                 except Exception:  # noqa: BLE001
                     log.warning("no se pudo avisar a %s", tg_id)
-                await avisos.avisar(
+                if avisos is not None:
+                    await avisos.avisar(
                     f"VENTA {meses} mes(es) con cripto - {tg_id}",
                     f"Pago en cripto de {tg_id}.\n"
                     f"Plan: {meses} mes(es)\n"
@@ -1210,6 +1230,8 @@ async def vigilar_proxies(bot: Bot):
     destino = int(config.AVISOS_ID) if config.AVISOS_ID else ADMIN
     while True:
         await asyncio.sleep(300)
+        if not proxies_ok():
+            continue
         try:
             with db.conectar() as con:
                 usuarios = con.execute(
