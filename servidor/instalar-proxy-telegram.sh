@@ -58,6 +58,45 @@ else
 fi
 
 azul "4/5 · Arrancando el servicio (puerto $PUERTO)"
+
+#  La linea de arranque cambia entre versiones de mtg. Se prueba cada variante
+#  y se queda la primera que consigue arrancar (timeout 124 = sigue vivo).
+probar() {
+  timeout 4 bash -c "$1" >/tmp/mtg_prueba.log 2>&1
+  [ $? -eq 124 ]
+}
+
+ARRANQUE=""
+for VARIANTE in \
+  "$BIN run --bind 0.0.0.0:$PUERTO $SECRET" \
+  "$BIN run $SECRET --bind 0.0.0.0:$PUERTO" \
+  "$BIN run -b 0.0.0.0:$PUERTO $SECRET" \
+  "$BIN run --secret $SECRET --bind 0.0.0.0:$PUERTO" \
+  "$BIN run --secret $SECRET -b 0.0.0.0:$PUERTO" \
+  "$BIN run $SECRET"; do
+  echo "   probando: ${VARIANTE/$SECRET/<clave>}"
+  if probar "$VARIANTE"; then
+    ARRANQUE="$VARIANTE"
+    verde "   ✓ esta funciona"
+    break
+  fi
+  head -3 /tmp/mtg_prueba.log 2>/dev/null | sed 's/^/     /'
+done
+
+if [ -z "$ARRANQUE" ]; then
+  rojo "Ninguna variante arrancó. Esto es lo que dice mtg:"
+  cat /tmp/mtg_prueba.log 2>/dev/null
+  echo ""
+  "$BIN" run --help 2>&1 | head -25 || true
+  exit 1
+fi
+
+#  Si la variante buena no lleva puerto, el proxy escucha en el 3128.
+case "$ARRANQUE" in
+  *"$PUERTO"*) ;;
+  *) PUERTO=3128 ;;
+esac
+
 cat > "$SERVICIO" <<EOF
 [Unit]
 Description=Proxy MTProto para Telegram (GeoiD)
@@ -66,7 +105,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=$BIN run -b 0.0.0.0:$PUERTO $SECRET
+ExecStart=$ARRANQUE
 Restart=always
 RestartSec=5
 
@@ -78,7 +117,14 @@ systemctl daemon-reload
 systemctl enable mtg >/dev/null 2>&1 || true
 systemctl restart mtg
 sleep 2
-systemctl is-active --quiet mtg || { rojo "El servicio no arrancó:"; journalctl -u mtg -n 15 --no-pager; exit 1; }
+systemctl is-active --quiet mtg || {
+  rojo "El servicio no arrancó:"
+  journalctl -u mtg -n 15 --no-pager
+  echo ""
+  echo "Ayuda de esta version de mtg (para ajustar los parámetros):"
+  "$BIN" run --help 2>&1 | head -25 || true
+  exit 1
+}
 
 IP=$(curl -fsSL https://api.ipify.org || echo "193.29.224.164")
 
