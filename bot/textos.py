@@ -11,19 +11,21 @@ TEXTOS = {
         "plan_6meses": "Acceso 6 meses + proxy de Telegram de regalo",
         "proxy_boton": "🎁 Mi proxy de Telegram",
         "proxy_sin": "El proxy de regalo es para planes de 6 meses o más.",
-        "proxy_regalo": (
-            "🎁 <b>Tu regalo: proxy de Telegram</b>\n"
-            "\n"
-            "Con tu plan de 6 meses te llevas el proxy de Telegram <b>gratis</b>.\n"
-            "Sirve para usar Telegram en Rusia <b>sin VPN encendida</b>.\n"
-            "\n"
+                "proxy_regalo": (
+            "🎁 <b>Tu regalo: proxy de Telegram</b>\n\n"
+            "Con tu plan de 6 meses o más te llevas un proxy de Telegram "
+            "<b>gratis y exclusivo para ti</b>. Sirve para usar Telegram en "
+            "Rusia <b>sin VPN encendida</b>.\n\n"
             "Toca este enlace desde el móvil y Telegram se configura solo:\n"
-            "<code>{enlace}</code>\n"
-            "\n"
+            "<code>{enlace}</code>\n\n"
             "O a mano, en Telegram → Ajustes → Datos y almacenamiento → Proxy:\n"
             "Servidor: <code>{servidor}</code>\n"
             "Puerto: <code>{puerto}</code>\n"
-            "Clave: <code>{secreto}</code>\n"
+            "Clave: <code>{secreto}</code>\n\n"
+            "⚠️ <b>Este enlace es personal.</b> Puedes compartirlo si quieres, "
+            "pero si lo usa mucha gente irá más lento e incluso podría dejar de "
+            "funcionar bien: en ese caso <b>no nos hacemos responsables</b> del "
+            "rendimiento del proxy. La conexión VPN sí mantiene su garantía."
         ),
                 "bienvenida": (
             "¡Hola! Esto es <b>{marca}</b>, una VPN con <b>WireGuard ofuscado</b>: "
@@ -157,19 +159,21 @@ TEXTOS = {
         "plan_6meses": "Доступ на 6 месяцев + прокси Telegram в подарок",
         "proxy_boton": "🎁 Мой прокси Telegram",
         "proxy_sin": "Прокси в подарок — для тарифов от 6 месяцев.",
-        "proxy_regalo": (
-            "🎁 <b>Ваш подарок: прокси Telegram</b>\n"
-            "\n"
-            "С тарифом на 6 месяцев прокси Telegram <b>бесплатно</b>.\n"
-            "Он нужен, чтобы пользоваться Telegram в России <b>без VPN</b>.\n"
-            "\n"
+                "proxy_regalo": (
+            "🎁 <b>Ваш подарок: прокси Telegram</b>\n\n"
+            "С тарифом от 6 месяцев вы получаете прокси Telegram "
+            "<b>бесплатно и только для вас</b>. Он нужен, чтобы пользоваться "
+            "Telegram в России <b>без VPN</b>.\n\n"
             "Нажмите ссылку на телефоне — Telegram настроится сам:\n"
-            "<code>{enlace}</code>\n"
-            "\n"
+            "<code>{enlace}</code>\n\n"
             "Или вручную: Telegram → Настройки → Данные и память → Прокси:\n"
             "Сервер: <code>{servidor}</code>\n"
             "Порт: <code>{puerto}</code>\n"
-            "Секрет: <code>{secreto}</code>\n"
+            "Секрет: <code>{secreto}</code>\n\n"
+            "⚠️ <b>Эта ссылка персональная.</b> Вы можете ею делиться, но если "
+            "ею будет пользоваться много людей, она станет медленнее и может "
+            "работать хуже: в этом случае <b>мы не отвечаем</b> за скорость "
+            "прокси. На VPN это не влияет — его гарантия сохраняется."
         ),
                 "bienvenida": (
             "Привет! Это <b>{marca}</b>, VPN на <b>WireGuard с обфускацией</b>: "
@@ -300,19 +304,21 @@ TEXTOS = {
         "plan_6meses": "6 months + free Telegram proxy",
         "proxy_boton": "🎁 My Telegram proxy",
         "proxy_sin": "The free proxy is for plans of 6 months or more.",
-        "proxy_regalo": (
-            "🎁 <b>Your gift: Telegram proxy</b>\n"
-            "\n"
-            "With your 6-month plan the Telegram proxy is <b>free</b>.\n"
-            "It lets you use Telegram in Russia <b>without a VPN</b>.\n"
-            "\n"
+                "proxy_regalo": (
+            "🎁 <b>Your gift: Telegram proxy</b>\n\n"
+            "With a 6-month plan or longer you get a Telegram proxy "
+            "<b>free and exclusive to you</b>. It lets you use Telegram in "
+            "Russia <b>without a VPN</b>.\n\n"
             "Tap this link on your phone and Telegram sets it up:\n"
-            "<code>{enlace}</code>\n"
-            "\n"
+            "<code>{enlace}</code>\n\n"
             "Or manually: Telegram → Settings → Data and storage → Proxy:\n"
             "Server: <code>{servidor}</code>\n"
             "Port: <code>{puerto}</code>\n"
-            "Secret: <code>{secreto}</code>\n"
+            "Secret: <code>{secreto}</code>\n\n"
+            "⚠️ <b>This link is personal.</b> You may share it, but if many "
+            "people use it, it will get slower and may stop working well: in "
+            "that case <b>we are not responsible</b> for the proxy performance. "
+            "The VPN connection keeps its guarantee."
         ),
                 "bienvenida": (
             "Hi! This is <b>{marca}</b>, a VPN with <b>obfuscated WireGuard</b>: "
