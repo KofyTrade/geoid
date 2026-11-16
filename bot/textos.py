@@ -2,6 +2,11 @@
 
 TEXTOS = {
     "es": {
+        "soporte_invita": "Si necesitas ayuda, escribe tu mensaje aquí abajo y te responderemos en este mismo chat.",
+        "soporte_recibido": "Mensaje recibido. Te contestamos aquí en cuanto podamos.",
+        "soporte_ticket": "\U0001F3AB Ticket de soporte\n\nDe: {usuario} (ID {id})\n\n{mensaje}\n\nResponde a este mensaje para contestarle.",
+        "soporte_respuesta": "Respuesta del equipo:\n\n{mensaje}",
+        "soporte_enviado": "Enviado al cliente.",
         "instalar_conf": "📲 Toca el archivo de arriba y elige «Abrir con GeoiD-vpn»: la app añade el perfil y lo activa sola. Después solo tienes que pulsar Conectar.",
         "factura_desc": (
             "Acceso completo a {marca} durante {duracion}.\n"
@@ -164,6 +169,11 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "soporte_invita": "Если нужна помощь, напишите сообщение здесь — ответим в этом же чате.",
+        "soporte_recibido": "Сообщение получено. Ответим здесь, как только сможем.",
+        "soporte_ticket": "\U0001F3AB Сообщение в поддержку\n\nОт: {usuario} (ID {id})\n\n{mensaje}\n\nОтветьте на это сообщение, чтобы написать клиенту.",
+        "soporte_respuesta": "Ответ поддержки:\n\n{mensaje}",
+        "soporte_enviado": "Отправлено клиенту.",
         "instalar_conf": "📲 Нажмите на файл выше и выберите «Открыть в GeoiD-vpn»: приложение добавит профиль и активирует его само. Останется нажать «Подключиться».",
         "factura_desc": (
             "Полный доступ к {marca} на {duracion}.\n"
@@ -323,6 +333,11 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "soporte_invita": "If you need help, write your message below and we will reply in this same chat.",
+        "soporte_recibido": "Message received. We will answer here as soon as we can.",
+        "soporte_ticket": "\U0001F3AB Support ticket\n\nFrom: {usuario} (ID {id})\n\n{mensaje}\n\nReply to this message to answer.",
+        "soporte_respuesta": "Reply from the team:\n\n{mensaje}",
+        "soporte_enviado": "Sent to the customer.",
         "instalar_conf": "📲 Tap the file above and choose «Open with GeoiD-vpn»: the app adds the profile and activates it by itself. Then just press Connect.",
         "factura_desc": (
             "Full access to {marca} for {duracion}.\n"

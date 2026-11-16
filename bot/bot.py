@@ -59,6 +59,10 @@ logging.basicConfig(
 log = logging.getLogger("geoid")
 
 router = Router()
+
+# Clientes que han pulsado "Canjear codigo" y su siguiente mensaje es el codigo.
+ESPERANDO_PROMO: dict[int, float] = {}
+MINUTOS_PROMO = 10
 DIA = 86400
 ADMIN = 0
 
@@ -350,7 +354,10 @@ async def accion_invitar(bot: Bot, tg_id: int) -> None:
 
 
 async def accion_promo(bot: Bot, tg_id: int) -> None:
-    await bot.send_message(tg_id, t(idioma(tg_id), "promo_pedir"))
+    ESPERANDO_PROMO[tg_id] = time.time()
+    await bot.send_message(
+        tg_id, t(idioma(tg_id), "promo_pedir"), reply_markup=teclado_fijo(tg_id)
+    )
 
 
 async def accion_ayuda(bot: Bot, tg_id: int) -> None:
@@ -360,7 +367,9 @@ async def accion_ayuda(bot: Bot, tg_id: int) -> None:
         android, windows = descargas.enlaces(android, windows)
     await bot.send_message(
         tg_id,
-        t(idi, "ayuda", android=android, windows=windows),
+        t(idi, "ayuda", android=android, windows=windows)
+        + "\n\n"
+        + t(idi, "soporte_invita"),
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
     )
@@ -538,12 +547,48 @@ async def comando_menu(mensaje: Message, bot: Bot):
 # --------------------------------------------------------------------------- #
 # Teclado fijo (texto)
 # --------------------------------------------------------------------------- #
+@router.message(F.reply_to_message, F.from_user.id == ADMIN)
+async def responder_soporte(mensaje: Message, bot: Bot):
+    """El dueno responde a un ticket y el mensaje llega al cliente."""
+    if ADMIN and mensaje.from_user.id != ADMIN:
+        return
+
+    original = mensaje.reply_to_message
+    if original is None or not original.text:
+        return
+    if "Ticket de soporte" not in original.text and "Support ticket" not in original.text \
+            and "Сообщение в поддержку" not in original.text:
+        return
+
+    import re as _re
+    encontrado = _re.search(r"ID (\d+)", original.text)
+    if not encontrado:
+        return
+
+    tg_id = int(encontrado.group(1))
+    try:
+        await bot.send_message(
+            tg_id,
+            t(idioma(tg_id), "soporte_respuesta", mensaje=mensaje.text or ""),
+            reply_markup=teclado_fijo(tg_id),
+        )
+        await mensaje.reply(t(idioma(mensaje.from_user.id), "soporte_enviado"))
+    except Exception:  # noqa: BLE001
+        log.warning("no se pudo responder al cliente %s", tg_id)
+        await mensaje.reply("No se pudo enviar: el cliente bloqueó el bot.")
+
+
 @router.message(F.text, ~F.text.startswith("/"))
 async def texto_libre(mensaje: Message, bot: Bot):
     tg_id = mensaje.from_user.id
     idi = idioma(tg_id)
     texto = (mensaje.text or "").strip()
 
+    # El dueno escribiendo en el grupo no genera tickets.
+    if ADMIN and tg_id == ADMIN:
+        return
+
+    # 1) Botones del menu
     accion = ACCIONES.get(texto)
     if accion:
         try:
@@ -553,21 +598,47 @@ async def texto_libre(mensaje: Message, bot: Bot):
             await mensaje.answer(t(idi, "error_generico"))
         return
 
-    # Un texto suelto puede ser un código promocional.
-    dias = db.usar_promo(texto, tg_id)
-    if dias is None:
-        await mensaje.answer(t(idi, "promo_mal"), reply_markup=teclado_fijo(tg_id))
+    # 2) Si acaba de pulsar "Canjear codigo", esto es el codigo
+    cuando = ESPERANDO_PROMO.get(tg_id)
+    if cuando and time.time() - cuando < MINUTOS_PROMO * 60:
+        ESPERANDO_PROMO.pop(tg_id, None)
+        dias = db.usar_promo(texto, tg_id)
+        if dias is None:
+            await mensaje.answer(
+                t(idi, "promo_mal"), reply_markup=teclado_fijo(tg_id)
+            )
+            return
+        try:
+            actualizado = activar(tg_id, dias)
+        except Exception:  # noqa: BLE001
+            log.exception("fallo canjeando promo")
+            await mensaje.answer(t(idi, "error_generico"))
+            return
+        await mensaje.answer(t(idi, "promo_ok", dias=dias), parse_mode=ParseMode.HTML)
+        await enviar_conf(bot, tg_id, actualizado, t(idi, "pais"))
         return
 
+    # 3) Cualquier otro texto es un mensaje para soporte
+    await mensaje.answer(
+        t(idi, "soporte_recibido"), reply_markup=teclado_fijo(tg_id)
+    )
+
+    destino = int(config.AVISOS_ID) if config.AVISOS_ID else ADMIN
+    if not destino:
+        return
+
+    usuario = db.obtener(tg_id) or {}
     try:
-        actualizado = activar(tg_id, dias)
+        await bot.send_message(
+            destino,
+            t("es", "soporte_ticket",
+              usuario=("@" + usuario["usuario"]) if usuario.get("usuario") else "—",
+              id=tg_id,
+              mensaje=texto),
+            parse_mode=None,
+        )
     except Exception:  # noqa: BLE001
-        log.exception("fallo canjeando promo")
-        await mensaje.answer(t(idi, "error_generico"))
-        return
-
-    await mensaje.answer(t(idi, "promo_ok", dias=dias), parse_mode=ParseMode.HTML)
-    await enviar_conf(bot, tg_id, actualizado, t(idi, "pais"))
+        log.warning("no se pudo enviar el ticket de %s", tg_id)
 
 
 # --------------------------------------------------------------------------- #

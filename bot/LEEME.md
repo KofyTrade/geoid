@@ -439,3 +439,41 @@ fuerza una comprobación inmediata.
 > Los enlaces que reparte el bot son del tipo
 > `releases/latest/download/GeoiD-vpn-Android-arm64-v8a.apk`: como el nombre es
 > fijo y `latest` siempre apunta a la última, no caducan nunca.
+
+## Soporte privado (tickets)
+
+El botón **❓ Ayuda** sigue mostrando los enlaces de descarga y, además, invita
+al cliente a escribir. A partir de ahí:
+
+1. **El cliente escribe** lo que necesite en el chat del bot.
+2. **Al grupo de pagos** llega un ticket:
+
+```
+🎫 Ticket de soporte
+
+De: @usuario (ID 123456789)
+
+No me conecta con el perfil nuevo
+
+Responde a este mensaje para contestarle.
+```
+
+3. **Tú respondes al ticket** (mantener pulsado → Responder → escribir).
+4. El bot entrega la respuesta **en privado** a ese cliente y te confirma
+   con "✅ Enviado al cliente".
+
+Cada conversación es privada: el cliente solo ve sus mensajes y tu respuesta.
+
+### Detalles
+
+| Situación | Cómo se comporta |
+|---|---|
+| El cliente pulsa **🎟 Canjear código** y escribe | Se trata como código (10 minutos de margen) |
+| Cualquier otro texto | Se convierte en ticket de soporte |
+| Tú escribes en el grupo | No genera ticket (se ignora) |
+| El cliente bloqueó el bot | El bot te avisa de que no se pudo entregar |
+| Sin grupo configurado | Los tickets llegan a tu privado |
+
+> Para que el bot vea tus respuestas en el grupo, la **privacidad de grupos**
+> debe estar desactivada: @BotFather → /mybots → geoidvpn_bot →
+> Bot Settings → Group Privacy → Turn off.
