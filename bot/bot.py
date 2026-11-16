@@ -110,6 +110,16 @@ def teclado_volver(tg_id: int) -> InlineKeyboardMarkup:
     ]])
 
 
+def _descripcion_plan(meses: int, idi: str) -> str:
+    clave = {
+        1: "plan_mes",
+        3: "plan_3meses",
+        6: "plan_6meses",
+        12: "plan_anio",
+    }.get(meses, "plan_mes")
+    return t(idi, clave)
+
+
 def hay_qr() -> bool:
     """El pago por QR solo existe si hay un QR guardado."""
     return bool(db.leer_ajuste("qr_sbp") or config.SBP_QR_URL)
@@ -221,9 +231,12 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
         await bot.send_message(tg_id, texto, reply_markup=teclado_fijo(tg_id))
         return
 
-    teclado = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text=t(idi, "boton_reenviar"), callback_data="reenviar")
-    ]])
+    filas = [[InlineKeyboardButton(
+        text=t(idi, "boton_reenviar"), callback_data="reenviar")]]
+    if usuario.get("proxy"):
+        filas.append([InlineKeyboardButton(
+            text=t(idi, "proxy_boton"), callback_data="proxy")])
+    teclado = InlineKeyboardMarkup(inline_keyboard=filas)
     await bot.send_message(
         tg_id,
         t(idi, "mi_vpn_activo",
@@ -313,6 +326,29 @@ REPARTIDOR = {
 # --------------------------------------------------------------------------- #
 # Comandos
 # --------------------------------------------------------------------------- #
+async def entregar_proxy(bot: Bot, tg_id: int, meses: int) -> None:
+    """Si el plan llega al minimo, se entrega el proxy de Telegram de regalo."""
+    if meses < config.MIN_MESES_PROXY:
+        return
+    enlace = config.enlace_proxy()
+    if not enlace:
+        return
+    db.guardar(tg_id, proxy=1)
+    try:
+        await bot.send_message(
+            tg_id,
+            t(idioma(tg_id), "proxy_regalo",
+              enlace=enlace,
+              servidor=config.PROXY_SERVIDOR,
+              puerto=config.PROXY_PUERTO,
+              secreto=config.PROXY_SECRETO),
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
+        )
+    except Exception:  # noqa: BLE001
+        log.warning("no se pudo entregar el proxy a %s", tg_id)
+
+
 @router.message(CommandStart())
 async def start(mensaje: Message, bot: Bot, command: CommandObject):
     argumento = (command.args or "").strip().lower()
@@ -449,7 +485,7 @@ async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
     await bot.send_invoice(
         chat_id=llamada.from_user.id,
         title=f"{config.MARCA} · {meses} {'mes' if meses == 1 else 'meses'}",
-        description=t(idi, f"plan_{'mes' if meses == 1 else ('3meses' if meses == 3 else 'anio')}"),
+        description=_descripcion_plan(meses, idi),
         payload=f"plan:{meses}",
         provider_token="",
         currency="XTR",
@@ -608,7 +644,29 @@ async def admin_activar(llamada: CallbackQuery, bot: Bot):
         await enviar_conf(bot, tg_id, usuario, "GeoiD · SBP")
     except Exception:  # noqa: BLE001
         log.warning("no se pudo avisar al cliente %s", tg_id)
+    await entregar_proxy(bot, tg_id, meses)
     await llamada.answer("Activado")
+@router.callback_query(F.data == "proxy")
+async def cb_proxy(llamada: CallbackQuery, bot: Bot):
+    tg_id = llamada.from_user.id
+    usuario = db.obtener(tg_id) or {}
+    if not usuario.get("proxy"):
+        await llamada.answer(t(idioma(tg_id), "proxy_sin"), show_alert=True)
+        return
+    enlace = config.enlace_proxy()
+    await bot.send_message(
+        tg_id,
+        t(idioma(tg_id), "proxy_regalo",
+          enlace=enlace,
+          servidor=config.PROXY_SERVIDOR,
+          puerto=config.PROXY_PUERTO,
+          secreto=config.PROXY_SECRETO),
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+    await llamada.answer()
+
+
 @router.callback_query(F.data == "mi_vpn")
 async def cb_mi_vpn(llamada: CallbackQuery, bot: Bot):
     await llamada.answer()
@@ -693,6 +751,7 @@ async def pago_recibido(mensaje: Message, bot: Bot):
         parse_mode=ParseMode.HTML,
     )
     await enviar_conf(bot, tg_id, actualizado, f"{config.MARCA} · {meses} m")
+    await entregar_proxy(bot, tg_id, meses)
 
 
 # --------------------------------------------------------------------------- #
@@ -750,6 +809,7 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
             parse_mode=ParseMode.HTML,
         )
         await enviar_conf(bot, tg_id, usuario, "GeoiD · transferencia")
+        await entregar_proxy(bot, tg_id, meses)
     except Exception:  # noqa: BLE001
         log.warning("no se pudo avisar al cliente %s", tg_id)
 
@@ -909,6 +969,7 @@ async def vigilar_cripto(bot: Bot):
                     f"Importe: {factura.get('amount')} {factura.get('asset')}\n"
                     f"Activo hasta: {fecha(usuario['expira'])}",
                 )
+                await entregar_proxy(bot, tg_id, meses)
                 log.info("cripto pagado: %s -> %s meses", tg_id, meses)
         except Exception:  # noqa: BLE001
             log.exception("error revisando pagos con cripto")

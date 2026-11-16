@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     publica     TEXT,
     preshared   TEXT,
     referido    INTEGER,
-    codigo_ref  TEXT UNIQUE
+    codigo_ref  TEXT UNIQUE,
+    proxy       INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS promos (
@@ -80,12 +81,19 @@ def crear_si_falta(tg_id: int, usuario: str | None, referido: int | None = None)
     return obtener(tg_id)
 
 
+def _migrar(con) -> None:
+    columnas = {f[1] for f in con.execute("PRAGMA table_info(usuarios)")}
+    if "proxy" not in columnas:
+        con.execute("ALTER TABLE usuarios ADD COLUMN proxy INTEGER DEFAULT 0")
+
+
 def guardar(tg_id: int, **campos):
     if not campos:
         return
     claves = ", ".join(f"{k} = ?" for k in campos)
     valores = list(campos.values()) + [tg_id]
     with conectar() as con:
+        _migrar(con)
         con.execute(f"UPDATE usuarios SET {claves} WHERE tg_id = ?", valores)
 
 

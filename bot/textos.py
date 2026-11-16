@@ -2,6 +2,23 @@
 
 TEXTOS = {
     "es": {
+        "plan_6meses": "Acceso 6 meses + proxy de Telegram de regalo",
+        "proxy_boton": "🎁 Mi proxy de Telegram",
+        "proxy_sin": "El proxy de regalo es para planes de 6 meses o más.",
+        "proxy_regalo": (
+            "🎁 <b>Tu regalo: proxy de Telegram</b>\n"
+            "\n"
+            "Con tu plan de 6 meses te llevas el proxy de Telegram <b>gratis</b>.\n"
+            "Sirve para usar Telegram en Rusia <b>sin VPN encendida</b>.\n"
+            "\n"
+            "Toca este enlace desde el móvil y Telegram se configura solo:\n"
+            "<code>{enlace}</code>\n"
+            "\n"
+            "O a mano, en Telegram → Ajustes → Datos y almacenamiento → Proxy:\n"
+            "Servidor: <code>{servidor}</code>\n"
+            "Puerto: <code>{puerto}</code>\n"
+            "Clave: <code>{secreto}</code>\n"
+        ),
         "bienvenida": (
             "¡Hola! Esto es <b>{marca}</b>, una VPN con protocolo "
             "<b>AmneziaWG v3</b> (WireGuard ofuscado, no se puede bloquear "
@@ -123,6 +140,23 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "plan_6meses": "Доступ на 6 месяцев + прокси Telegram в подарок",
+        "proxy_boton": "🎁 Мой прокси Telegram",
+        "proxy_sin": "Прокси в подарок — для тарифов от 6 месяцев.",
+        "proxy_regalo": (
+            "🎁 <b>Ваш подарок: прокси Telegram</b>\n"
+            "\n"
+            "С тарифом на 6 месяцев прокси Telegram <b>бесплатно</b>.\n"
+            "Он нужен, чтобы пользоваться Telegram в России <b>без VPN</b>.\n"
+            "\n"
+            "Нажмите ссылку на телефоне — Telegram настроится сам:\n"
+            "<code>{enlace}</code>\n"
+            "\n"
+            "Или вручную: Telegram → Настройки → Данные и память → Прокси:\n"
+            "Сервер: <code>{servidor}</code>\n"
+            "Порт: <code>{puerto}</code>\n"
+            "Секрет: <code>{secreto}</code>\n"
+        ),
         "bienvenida": (
             "Привет! Это <b>{marca}</b> — VPN на протоколе <b>AmneziaWG v3</b> "
             "(обфусцированный WireGuard, его не блокируют по отпечатку "
@@ -241,6 +275,23 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "plan_6meses": "6 months + free Telegram proxy",
+        "proxy_boton": "🎁 My Telegram proxy",
+        "proxy_sin": "The free proxy is for plans of 6 months or more.",
+        "proxy_regalo": (
+            "🎁 <b>Your gift: Telegram proxy</b>\n"
+            "\n"
+            "With your 6-month plan the Telegram proxy is <b>free</b>.\n"
+            "It lets you use Telegram in Russia <b>without a VPN</b>.\n"
+            "\n"
+            "Tap this link on your phone and Telegram sets it up:\n"
+            "<code>{enlace}</code>\n"
+            "\n"
+            "Or manually: Telegram → Settings → Data and storage → Proxy:\n"
+            "Server: <code>{servidor}</code>\n"
+            "Port: <code>{puerto}</code>\n"
+            "Secret: <code>{secreto}</code>\n"
+        ),
         "bienvenida": (
             "Hi! This is <b>{marca}</b>, a VPN running <b>AmneziaWG v3</b> "
             "(obfuscated WireGuard, it can't be blocked by traffic "

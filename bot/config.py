@@ -26,6 +26,7 @@ DIAS_INVITADO = int(os.environ.get("GEOID_DIAS_INVITADO", "7"))  # bonus por inv
 PRECIOS = {
     1: int(os.environ.get("GEOID_PRECIO_1M", "150")),
     3: int(os.environ.get("GEOID_PRECIO_3M", "400")),
+    6: int(os.environ.get("GEOID_PRECIO_6M", "700")),
     12: int(os.environ.get("GEOID_PRECIO_12M", "1200")),
 }
 
@@ -57,6 +58,7 @@ CRYPTO_MONEDA = os.environ.get("GEOID_CRYPTO_MONEDA", "USDT")
 PRECIOS_USD = {
     1: float(os.environ.get("GEOID_USD_1M", "2.5")),
     3: float(os.environ.get("GEOID_USD_3M", "6.5")),
+    6: float(os.environ.get("GEOID_USD_6M", "11")),
     12: float(os.environ.get("GEOID_USD_12M", "21")),
 }
 
@@ -71,6 +73,7 @@ SBP_QR_URL = os.environ.get("GEOID_SBP_QR_URL", "").strip()   # imagen opcional
 PRECIOS_RUB = {
     1: int(os.environ.get("GEOID_RUB_1M", "199")),
     3: int(os.environ.get("GEOID_RUB_3M", "539")),
+    6: int(os.environ.get("GEOID_RUB_6M", "949")),
     12: int(os.environ.get("GEOID_RUB_12M", "1690")),
 }
 
@@ -82,3 +85,25 @@ def pago_manual_activo() -> bool:
     return bool(SBP_TELEFONO or PAGO_MANUAL)
 # Nombre comercial
 MARCA = os.environ.get("GEOID_MARCA", "GeoiD VPN")
+
+# --- Regalo del proxy de Telegram para planes largos ---
+# Meses minimos para llevarse el proxy de regalo.
+MIN_MESES_PROXY = int(os.environ.get("GEOID_PROXY_MESES", "6"))
+
+PROXY_SERVIDOR = os.environ.get("GEOID_PROXY_SERVIDOR", "193.29.224.164")
+PROXY_PUERTO = os.environ.get("GEOID_PROXY_PUERTO", "443")
+PROXY_SECRETO = os.environ.get(
+    "GEOID_PROXY_SECRETO",
+    "ee2aafaaad9922e542f900a1fb25c68cfc67656f696476706e2e6475636b646e732e6f7267",
+)
+
+
+def enlace_proxy() -> str:
+    """Enlace tg:// listo para tocar en el movil."""
+    if not PROXY_SECRETO:
+        return ""
+    return (
+        f"tg://proxy?server={PROXY_SERVIDOR}&port={PROXY_PUERTO}"
+        f"&secret={PROXY_SECRETO}"
+    )
+
