@@ -128,3 +128,56 @@ BBR activo.
 2. Comando `/ventas` con resumen de ingresos y clientes activos.
 3. Añadir más países (otro VPS por país + columna `pais`).
 4. Copia de seguridad de `bot.sqlite` y del keystore fuera del servidor/PC.
+
+---
+
+## Versión 4.0 (17 de noviembre de 2026)
+
+Primera versión "redonda": todo el ciclo de venta funciona sin intervención
+manual salvo confirmar el pago por QR.
+
+### Aplicación (Android 4.0.0 · Windows 4.0.0)
+
+- **Abrir `.conf` con la app**: aparece directamente en «Abrir con» (también
+  desde Telegram) y al abrirlo **crea y activa el perfil solo**.
+- **Botón de estado**: muestra *VPN activa*, *Periodo de prueba* o *Activar VPN*
+  leyendo el plan que el bot escribe dentro del `.conf`.
+- **Pantalla Activar VPN**: prueba de 3 días, compra y Mi VPN, con enlace al bot.
+- **Ajustes**: idioma (9), tema claro/oscuro, bloqueo de anuncios, Acerca de.
+- **Aplicaciones sin VPN**: lista negra. Dos casillas para separar
+  *instaladas* y *del sistema*; solo se marca lo del grupo visible.
+- Textos de «Acerca de»: WireGuard ofuscado (sin tecnicismos).
+
+### Bot (@geoidvpn_bot)
+
+- Menú fijo con 7 botones (sin «Cambiar país» mientras haya un solo servidor).
+- **4 planes**: 1, 3, 6 y 12 meses, con precio en rublos y 🎁 en los largos.
+- **Pagos**: ⭐ estrellas, 🪙 cripto (Crypto Pay) y 📱 QR/SBP con activación en un
+  toque desde el grupo de pagos.
+- **Proxy de Telegram de regalo** desde 6 meses: proxy **personal** por cliente,
+  puerto propio, límite de 2 dispositivos y aviso si lo divulga.
+- **Soporte privado**: el cliente escribe y llega un ticket al grupo; respondiendo
+  al ticket le llega en privado. Comando `/ticket` para probarlo.
+- **Invitaciones por niveles**: 3 amigos = 7 días, 10 = 15 días, 20 = 1 mes;
+  solo cuentan los que compran.
+- **Códigos promocionales**: un uso por persona, caducidad opcional, `/promos`
+  y `/promo borrar`.
+- **Enlaces de descarga automáticos**: cada 6 h consulta GitHub y actualiza los
+  enlaces; `/enlaces` para forzar la revisión.
+- **Anti-abuso**: aviso si varias cuentas de prueba comparten IP pública.
+
+### Servidor
+
+- AmneziaWG (UDP 21766, MTU 1280), BBR, dnsmasq con bloqueo de anuncios.
+- Proxy MTProto propio en el puerto 443 (`mtg`) para tu Telegram.
+- Plantilla `mtg-user@.service` para los proxies personales de clientes.
+
+### Pendiente para la próxima sesión
+
+1. **самозанятый** → integrar Freekassa/Lava y automatizar el SBP.
+2. Comando `/ventas` con ingresos por método y clientes activos.
+3. Segundo país (Países Bajos o Alemania) cuando haya demanda.
+4. Copias de seguridad de `bot.sqlite` y del keystore fuera del servidor.
+5. Crear el dominio `geoidvpn.duckdns.org` (quita el aviso del proxy).
+6. Avisos por correo: falta poner las claves SMTP en `/etc/geoid-bot.env`.
+

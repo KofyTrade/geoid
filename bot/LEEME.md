@@ -477,3 +477,30 @@ Cada conversación es privada: el cliente solo ve sus mensajes y tu respuesta.
 > Para que el bot vea tus respuestas en el grupo, la **privacidad de grupos**
 > debe estar desactivada: @BotFather → /mybots → geoidvpn_bot →
 > Bot Settings → Group Privacy → Turn off.
+
+---
+
+## Resumen de la versión 4.0 del bot
+
+| Función | Estado |
+|---|---|
+| Menú fijo (7 botones) | ✅ |
+| Prueba de 3 días | ✅ |
+| 4 planes con precio en ₽ | ✅ |
+| Estrellas / Cripto / QR | ✅ |
+| Proxy personal desde 6 meses | ✅ (máx. 2 dispositivos) |
+| Soporte con tickets privados | ✅ |
+| Invitaciones por niveles | ✅ |
+| Promos (1 uso por persona, caducidad) | ✅ |
+| Enlaces de descarga automáticos | ✅ |
+| Anti-abuso por IP | ✅ |
+
+Archivos del bot: `bot.py`, `config.py`, `db.py`, `textos.py`, `provision.py`,
+`pagos.py`, `proxy.py`, `avisos.py`, `descargas.py`.
+
+Comprobar antes de reiniciar:
+
+```bash
+cd /opt/geoid-bot && for f in *.py; do python3 -m py_compile $f || echo "FALLA $f"; done && echo "TODO OK"
+```
+
