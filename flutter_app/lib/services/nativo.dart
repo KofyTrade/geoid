@@ -12,7 +12,7 @@ class AppInstalada {
   final String nombre;
   final bool sistema;
 
-  const AppInstalada(this.paquete, this.nombre, this.sistema);
+  AppInstalada(this.paquete, this.nombre, this.sistema);
 
   factory AppInstalada.desde(dynamic datos) {
     final mapa = Map<String, dynamic>.from(datos as Map);

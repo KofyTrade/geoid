@@ -7,7 +7,7 @@ import '../theme.dart';
 
 /// Registro de eventos de la sesion.
 class LogScreen extends StatelessWidget {
-  const LogScreen({super.key});
+  LogScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +19,14 @@ class LogScreen extends StatelessWidget {
         elevation: 0,
         title: Text(
           t('registro'),
-          style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
+          style: TextStyle(fontSize: 16, letterSpacing: 1.2),
         ),
         actions: [
           Center(
             child: FutureBuilder<String>(
               future: Nativo.version(),
               builder: (contexto, instantanea) => Padding(
-                padding: const EdgeInsets.only(right: 6),
+                padding: EdgeInsets.only(right: 6),
                 child: Text(
                   'v${instantanea.data ?? ''}',
                   style: TextStyle(
@@ -40,7 +40,7 @@ class LogScreen extends StatelessWidget {
           IconButton(
             tooltip: t('limpiar'),
             onPressed: Registro.limpiar,
-            icon: const Icon(Icons.delete_outline, size: 20),
+            icon: Icon(Icons.delete_outline, size: 20),
           ),
         ],
       ),
@@ -60,10 +60,10 @@ class LogScreen extends StatelessWidget {
               );
             }
             return ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               itemCount: lineas.length,
               itemBuilder: (contexto, i) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
+                padding: EdgeInsets.only(bottom: 6),
                 child: Text(
                   lineas[i],
                   style: TextStyle(

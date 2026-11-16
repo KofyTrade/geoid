@@ -9,7 +9,7 @@ import '../theme.dart';
 /// Si no hay ninguna marcada, pasan todas. Se muestran todas las aplicaciones,
 /// incluidas las del sistema.
 class AppsScreen extends StatefulWidget {
-  const AppsScreen({super.key});
+  AppsScreen({super.key});
 
   @override
   State<AppsScreen> createState() => _AppsScreenState();
@@ -74,26 +74,26 @@ class _AppsScreenState extends State<AppsScreen> {
         elevation: 0,
         title: Text(
           t('apps'),
-          style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
+          style: TextStyle(fontSize: 16, letterSpacing: 1.2),
         ),
       ),
       body: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 6, 20, 10),
+              padding: EdgeInsets.fromLTRB(20, 6, 20, 10),
               child: TextField(
                 style: TextStyle(color: GeoidColors.texto, fontSize: 14),
                 decoration: InputDecoration(
                   hintText: t('buscar_apps'),
-                  prefixIcon: const Icon(Icons.search,
+                  prefixIcon: Icon(Icons.search,
                       size: 18, color: GeoidColors.textoTenue),
                 ),
                 onChanged: (v) => setState(() => _filtro = v),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
                   Expanded(
@@ -134,7 +134,7 @@ class _AppsScreenState extends State<AppsScreen> {
             ),
             Expanded(
               child: _cargando
-                  ? const Center(
+                  ? Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -193,7 +193,7 @@ class _AppsScreenState extends State<AppsScreen> {
                               ),
                               subtitle: Text(
                                 app.paquete,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 10,
                                   color: GeoidColors.textoTenue,
                                 ),

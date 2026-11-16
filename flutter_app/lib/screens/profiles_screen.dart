@@ -10,7 +10,7 @@ class ProfilesScreen extends StatefulWidget {
   /// Si viene de abrir un .conf desde fuera, el contenido ya listo.
   final String? confInicial;
 
-  const ProfilesScreen({super.key, this.confInicial});
+  ProfilesScreen({super.key, this.confInicial});
 
   @override
   State<ProfilesScreen> createState() => _ProfilesScreenState();
@@ -131,7 +131,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
           child: SingleChildScrollView(
             child: SelectableText(
               perfil.conf,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 fontFamily: 'monospace',
                 color: GeoidColors.textoSuave,
@@ -160,14 +160,14 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
         elevation: 0,
         title: Text(
           t('perfiles'),
-          style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
+          style: TextStyle(fontSize: 16, letterSpacing: 1.2),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: GeoidColors.acento,
         foregroundColor: GeoidColors.fondo,
         onPressed: () => _nuevoOEditar(),
-        icon: const Icon(Icons.add),
+        icon: Icon(Icons.add),
         label: Text(t('nuevo_perfil')),
       ),
       body: SafeArea(
@@ -185,7 +185,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 90),
+                    padding: EdgeInsets.fromLTRB(16, 8, 16, 90),
                     itemCount: _perfiles.length,
                     itemBuilder: (contexto, i) {
                       final perfil = _perfiles[i];
@@ -193,7 +193,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                       return Card(
                         color:
                             esActivo ? GeoidColors.panel : GeoidColors.botonApagado,
-                        margin: const EdgeInsets.only(bottom: 10),
+                        margin: EdgeInsets.only(bottom: 10),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18),
                           side: BorderSide(
@@ -222,7 +222,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                           ),
                           trailing: PopupMenuButton<String>(
                             color: GeoidColors.panel,
-                            icon: const Icon(Icons.more_vert,
+                            icon: Icon(Icons.more_vert,
                                 size: 18, color: GeoidColors.textoSuave),
                             onSelected: (accion) {
                               switch (accion) {
@@ -274,7 +274,7 @@ class DialogoPerfil extends StatefulWidget {
   final String? contenidoInicial;
   final String sugerido;
 
-  const DialogoPerfil({
+  DialogoPerfil({
     super.key,
     this.perfil,
     this.contenidoInicial,
@@ -354,7 +354,7 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
                 style: TextStyle(color: GeoidColors.texto),
                 decoration: InputDecoration(labelText: t('nombre')),
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               SizedBox(
                 height: 200,
                 child: TextField(
@@ -367,7 +367,7 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
                     fontSize: 11,
                     fontFamily: 'monospace',
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText:
                         '[Interface]\nPrivateKey = ...\n[Peer]\nEndpoint = ...',
                   ),
@@ -376,19 +376,19 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
                   },
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               OutlinedButton.icon(
                 onPressed: _importando ? null : _importar,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF9BE8DC),
+                  foregroundColor: Color(0xFF9BE8DC),
                   side: BorderSide(color: GeoidColors.borde),
-                  minimumSize: const Size.fromHeight(44),
+                  minimumSize: Size.fromHeight(44),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(22),
                   ),
                 ),
                 icon: _importando
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 14,
                         height: 14,
                         child: CircularProgressIndicator(
@@ -396,15 +396,15 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
                           color: GeoidColors.acento,
                         ),
                       )
-                    : const Icon(Icons.folder_open, size: 16),
+                    : Icon(Icons.folder_open, size: 16),
                 label: Text(t('importar_conf'),
-                    style: const TextStyle(fontSize: 12)),
+                    style: TextStyle(fontSize: 12)),
               ),
               if (_error != null) ...[
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Text(
                   _error!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFFFF8A80),
                     fontSize: 11,
                   ),

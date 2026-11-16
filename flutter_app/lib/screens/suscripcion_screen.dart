@@ -6,7 +6,7 @@ import '../theme.dart';
 
 /// Pantalla "Activar VPN": prueba gratis y compra, ambas en el bot de Telegram.
 class SuscripcionScreen extends StatelessWidget {
-  const SuscripcionScreen({super.key});
+  SuscripcionScreen({super.key});
 
   static const String _bot = 'https://t.me/geoidvpnbot';
 
@@ -32,12 +32,12 @@ class SuscripcionScreen extends StatelessWidget {
         elevation: 0,
         title: Text(
           t('activar_vpn'),
-          style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
+          style: TextStyle(fontSize: 16, letterSpacing: 1.2),
         ),
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+          padding: EdgeInsets.fromLTRB(20, 8, 20, 20),
           children: [
             Text(
               t('activar_vpn_texto'),
@@ -47,7 +47,7 @@ class SuscripcionScreen extends StatelessWidget {
                 height: 1.35,
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Prueba gratuita
             _tarjeta(
@@ -58,7 +58,7 @@ class SuscripcionScreen extends StatelessWidget {
               destacada: true,
               alPulsar: () => _irAlBot(context, 'trial'),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // Comprar
             _tarjeta(
@@ -68,7 +68,7 @@ class SuscripcionScreen extends StatelessWidget {
               icono: Icons.workspace_premium,
               alPulsar: () => _irAlBot(context, 'buy'),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // Mi acceso
             _tarjeta(
@@ -78,11 +78,11 @@ class SuscripcionScreen extends StatelessWidget {
               alPulsar: () => _irAlBot(context, 'my'),
             ),
 
-            const SizedBox(height: 22),
+            SizedBox(height: 22),
             Row(
               children: [
                 Icon(Icons.telegram, size: 16, color: GeoidColors.textoTenue),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     '@geoidvpnbot',
@@ -115,7 +115,7 @@ class SuscripcionScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         onTap: alPulsar,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+          padding: EdgeInsets.fromLTRB(16, 14, 12, 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
@@ -129,7 +129,7 @@ class SuscripcionScreen extends StatelessWidget {
                   color: destacada
                       ? GeoidColors.acento
                       : GeoidColors.textoSuave),
-              const SizedBox(width: 14),
+              SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +144,7 @@ class SuscripcionScreen extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    SizedBox(height: 3),
                     Text(
                       subtitulo,
                       style: TextStyle(
@@ -153,7 +153,7 @@ class SuscripcionScreen extends StatelessWidget {
                       ),
                     ),
                     if (detalle != null) ...[
-                      const SizedBox(height: 3),
+                      SizedBox(height: 3),
                       Text(
                         detalle,
                         style: TextStyle(
@@ -165,7 +165,7 @@ class SuscripcionScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
+              Icon(Icons.chevron_right,
                   size: 20, color: GeoidColors.textoTenue),
             ],
           ),

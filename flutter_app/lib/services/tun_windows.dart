@@ -55,12 +55,12 @@ class TunWindows {
 
       _lineas = proceso.stdout
           .transform(utf8.decoder)
-          .transform(const LineSplitter())
+          .transform(LineSplitter())
           .listen(_procesarLinea);
 
       proceso.stderr
           .transform(utf8.decoder)
-          .transform(const LineSplitter())
+          .transform(LineSplitter())
           .listen((linea) {
         if (linea.trim().isNotEmpty) {
           // Solo informativo; el detalle queda en geoid-tun.log
@@ -110,7 +110,7 @@ class TunWindows {
       await proceso.stdin.close();
     } catch (_) {}
     try {
-      await proceso.exitCode.timeout(const Duration(seconds: 4));
+      await proceso.exitCode.timeout(Duration(seconds: 4));
     } catch (_) {
       proceso.kill();
     }

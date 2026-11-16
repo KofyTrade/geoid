@@ -12,7 +12,7 @@ import '../theme.dart';
 class Polyhedron extends StatefulWidget {
   final bool conectado;
 
-  const Polyhedron({super.key, required this.conectado});
+  Polyhedron({super.key, required this.conectado});
 
   @override
   State<Polyhedron> createState() => _PolyhedronState();
@@ -67,7 +67,7 @@ class _PolyhedronState extends State<Polyhedron>
           angulo: _angulo,
           conectado: widget.conectado,
         ),
-        child: const SizedBox.expand(),
+        child: SizedBox.expand(),
       ),
     );
   }
@@ -139,7 +139,7 @@ class _PintorPoliedro extends CustomPainter {
     // Estrellas
     final pincelEstrella = Paint()..style = PaintingStyle.fill;
     for (final e in _estrellas) {
-      pincelEstrella.color = const Color(0xFFC8FFF8).withValues(alpha: 0.28);
+      pincelEstrella.color = Color(0xFFC8FFF8).withValues(alpha: 0.28);
       canvas.drawCircle(
         Offset(e[0] * size.width, e[1] * size.height),
         e[2],
@@ -192,7 +192,7 @@ class _PintorPoliedro extends CustomPainter {
         final alfa = alfaBase * (0.45 + 0.55 * cerca);
         pincel.color = conectado
             ? GeoidColors.acento.withValues(alpha: alfa / 255)
-            : const Color(0xFF3C8C8C).withValues(alpha: alfa / 255 * 0.55);
+            : Color(0xFF3C8C8C).withValues(alpha: alfa / 255 * 0.55);
         pincel.strokeWidth = math.max(1.0, grosor);
         canvas.drawLine(proyectados[a[0]], proyectados[a[1]], pincel);
       }
@@ -204,7 +204,7 @@ class _PintorPoliedro extends CustomPainter {
       final r = rotar(n);
       final punto = proyectar(r);
       final cerca = ((1.7 - r[2]) / 3.4).clamp(0.0, 1.0);
-      pincelNodo.color = const Color(0xFFBEFFF6)
+      pincelNodo.color = Color(0xFFBEFFF6)
           .withValues(alpha: (120 + 110 * cerca) / 255);
       canvas.drawCircle(punto, 1.4 + 1.8 * cerca, pincelNodo);
     }
@@ -213,7 +213,7 @@ class _PintorPoliedro extends CustomPainter {
     for (var i = 0; i < proyectados.length; i++) {
       final z = rotados[i][2];
       final cerca = ((1.7 - z) / 3.4).clamp(0.0, 1.0);
-      pincelNodo.color = const Color(0xFFBEFFF6)
+      pincelNodo.color = Color(0xFFBEFFF6)
           .withValues(alpha: (150 + 105 * cerca) / 255);
       canvas.drawCircle(proyectados[i], 2.2 + 3.0 * cerca, pincelNodo);
     }

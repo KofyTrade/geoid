@@ -19,7 +19,7 @@ import 'ajustes_screen.dart';
 import 'suscripcion_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -238,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _ultimoTotal = -1;
     _ultimoInstante = 0;
     _crearSocketPing();
-    _bucleStats = Timer.periodic(const Duration(seconds: 2), (_) {
+    _bucleStats = Timer.periodic(Duration(seconds: 2), (_) {
       if (_midiendo) return; // evita solaparse si una medida tarda
       _midiendo = true;
       _medir().whenComplete(() => _midiendo = false);
@@ -341,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       socket.send(_consultaDns, puerta, 53);
       return await espera.future
-          .timeout(const Duration(milliseconds: 1500), onTimeout: () => null);
+          .timeout(Duration(milliseconds: 1500), onTimeout: () => null);
     } catch (_) {
       return null;
     } finally {
@@ -407,7 +407,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const AppsScreen()),
+      MaterialPageRoute(builder: (_) => AppsScreen()),
     );
     // Al volver, se refresca el contador de la pantalla principal.
     await _actualizarResumenApps();
@@ -415,19 +415,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _abrirAjustes() {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const AjustesScreen()),
+      MaterialPageRoute(builder: (_) => AjustesScreen()),
     );
   }
 
   void _abrirSuscripcion() {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const SuscripcionScreen()),
+      MaterialPageRoute(builder: (_) => SuscripcionScreen()),
     );
   }
 
   Future<void> _abrirPerfiles() async {
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ProfilesScreen()),
+      MaterialPageRoute(builder: (_) => ProfilesScreen()),
     );
     final perfil = await Almacen.activoPerfil();
     if (mounted) setState(() => _perfil = perfil);
@@ -435,7 +435,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _abrirRegistro() {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const LogScreen()),
+      MaterialPageRoute(builder: (_) => LogScreen()),
     );
   }
 
@@ -445,7 +445,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: GeoidColors.fondo,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 22, 24, 16),
+          padding: EdgeInsets.fromLTRB(24, 22, 24, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -459,7 +459,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
                         children: [
-                          const Text(
+                          Text(
                             'GEOID-VPN',
                             style: TextStyle(
                               color: Color(0xFF5FD9C8),
@@ -468,13 +468,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontWeight: FontWeight.w300,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           FutureBuilder<String>(
                             future: Nativo.version(),
                             builder: (contexto, instantanea) {
                               final v = instantanea.data;
                               if (v == null || v.isEmpty) {
-                                return const SizedBox.shrink();
+                                return SizedBox.shrink();
                               }
                               return Text(
                                 'v$v',
@@ -487,7 +487,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       Text(
                         _conectando
                             ? t('conectando').toUpperCase()
@@ -503,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  const Spacer(),
+                  Spacer(),
                   IconButton(
                     onPressed: _abrirAjustes,
                     tooltip: t('configuracion'),
@@ -525,7 +525,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontFamily: 'monospace',
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         Text(
                           _ping,
                           style: TextStyle(
@@ -533,7 +533,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontSize: 11,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         Text(
                           'Finland',
                           style: TextStyle(
@@ -547,14 +547,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               if (_actualizacion != null) ...[
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 _bannerActualizacion(),
               ],
 
               Expanded(child: Polyhedron(conectado: _conectado)),
 
               _botonPrincipal(),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               Row(
                 children: [
@@ -565,11 +565,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       resumen: _resumenApps(),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(child: _botonSecundario(t('registro'), _abrirRegistro)),
                 ],
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               Row(
                 children: [
@@ -641,10 +641,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: TextButton.icon(
                       onPressed: _abrirSuscripcion,
-                      icon: const Icon(Icons.workspace_premium, size: 15),
+                      icon: Icon(Icons.workspace_premium, size: 15),
                       label: Text(
                         t('activar_vpn'),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Color(0xFF9BE8DC),
                           fontSize: 12,
                         ),
@@ -706,7 +706,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (mounted) setState(() => _actualizacion = null);
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
+        padding: EdgeInsets.symmetric(vertical: 11, horizontal: 14),
         decoration: BoxDecoration(
           color: GeoidColors.panel,
           borderRadius: BorderRadius.circular(20),
@@ -737,7 +737,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _conectando
               ? '…'
               : (_conectado ? t('desconectar') : t('conectar')),
-          style: const TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16),
         ),
       ),
     );
@@ -749,11 +749,11 @@ class _HomeScreenState extends State<HomeScreen> {
       child: OutlinedButton(
         onPressed: alPulsar,
         style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFF9BE8DC),
+          foregroundColor: Color(0xFF9BE8DC),
           side: BorderSide(color: GeoidColors.borde),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
-        child: Text(texto, style: const TextStyle(fontSize: 13)),
+        child: Text(texto, style: TextStyle(fontSize: 13)),
       ),
     );
   }

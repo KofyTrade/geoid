@@ -8,7 +8,7 @@ class NuevaVersion {
   final String numero;
   final String urlApk;
 
-  const NuevaVersion(this.numero, this.urlApk);
+  NuevaVersion(this.numero, this.urlApk);
 }
 
 /// Comprueba las Releases del repositorio y descarga el APK nuevo.
@@ -19,11 +19,11 @@ class Actualizador {
   static Future<String> versionInstalada() => Nativo.version();
 
   static Future<NuevaVersion?> buscar() async {
-    final cliente = HttpClient()..connectionTimeout = const Duration(seconds: 6);
+    final cliente = HttpClient()..connectionTimeout = Duration(seconds: 6);
     try {
       final peticion = await cliente.getUrl(Uri.parse(_api));
       peticion.headers.set('Accept', 'application/vnd.github+json');
-      final respuesta = await peticion.close().timeout(const Duration(seconds: 10));
+      final respuesta = await peticion.close().timeout(Duration(seconds: 10));
       if (respuesta.statusCode != 200) return null;
 
       final texto = await respuesta.transform(utf8.decoder).join();

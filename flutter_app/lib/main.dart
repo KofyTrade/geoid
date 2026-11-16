@@ -13,11 +13,11 @@ Future<void> main() async {
   await Ajustes.cargar();
   // En Windows: minimizar y cerrar llevan la app a la bandeja del sistema.
   Bandeja.iniciar();
-  runApp(const GeoidApp());
+  runApp(GeoidApp());
 }
 
 class GeoidApp extends StatelessWidget {
-  const GeoidApp({super.key});
+  GeoidApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class GeoidApp extends StatelessWidget {
               title: 'GeoiD-vpn',
               debugShowCheckedModeBanner: false,
               theme: temaGeoid(oscuro: esOscuro),
-              home: const HomeScreen(),
+              home: HomeScreen(),
             );
           },
         );

@@ -82,7 +82,7 @@ class Bandeja with TrayListener, WindowListener {
   @override
   void onWindowMinimize() {
     // Se espera a que Windows termine la animacion y luego se oculta.
-    Future.delayed(const Duration(milliseconds: 120), () {
+    Future.delayed(Duration(milliseconds: 120), () {
       windowManager.hide();
     });
   }

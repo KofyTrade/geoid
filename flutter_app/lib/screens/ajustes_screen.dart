@@ -9,7 +9,7 @@ import '../theme.dart';
 
 /// Ajustes de la app: idioma, tema y "Acerca de".
 class AjustesScreen extends StatefulWidget {
-  const AjustesScreen({super.key});
+  AjustesScreen({super.key});
 
   @override
   State<AjustesScreen> createState() => _AjustesScreenState();
@@ -51,11 +51,11 @@ class _AjustesScreenState extends State<AjustesScreen> {
         elevation: 0,
         title: Text(
           t('configuracion'),
-          style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
+          style: TextStyle(fontSize: 16, letterSpacing: 1.2),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         children: [
           _fila(
             icono: Icons.translate,
@@ -81,11 +81,11 @@ class _AjustesScreenState extends State<AjustesScreen> {
               titulo: t('cerrar_app'),
               alPulsar: () => exit(0),
             ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           Row(
             children: [
               Icon(Icons.telegram, size: 15, color: GeoidColors.textoTenue),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Text(
                 '@geoidvpnbot',
                 style: TextStyle(color: GeoidColors.textoTenue, fontSize: 12),
@@ -105,7 +105,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
     final elegido = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: GeoidColors.panel,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       builder: (hoja) {
@@ -127,7 +127,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
                   texto: _nombres[codigo] ?? codigo,
                   activo: Ajustes.idioma == codigo,
                 ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
             ],
           ),
         );
@@ -143,7 +143,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
     final elegido = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: GeoidColors.panel,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       builder: (hoja) {
@@ -164,7 +164,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
                 texto: t('tema_claro'),
                 activo: !Ajustes.oscuro.value,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
             ],
           ),
         );
@@ -178,7 +178,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
 
   Widget _tituloHoja(String texto) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
       child: Text(
         texto,
         style: TextStyle(
@@ -232,7 +232,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
               ),
               child: Icon(Icons.hub, color: GeoidColors.acento, size: 36),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Text(
               'GeoiD-vpn',
               style: TextStyle(
@@ -241,12 +241,12 @@ class _AjustesScreenState extends State<AjustesScreen> {
                 letterSpacing: 1.6,
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               _version.isEmpty ? '' : 'v$_version',
               style: TextStyle(color: GeoidColors.textoTenue, fontSize: 12),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               t('acerca_texto'),
               textAlign: TextAlign.center,
@@ -256,7 +256,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
                 height: 1.35,
               ),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Text(
               '@geoidvpnbot',
               style: TextStyle(color: GeoidColors.marca, fontSize: 12),
@@ -285,14 +285,14 @@ class _AjustesScreenState extends State<AjustesScreen> {
     return InkWell(
       onTap: alPulsar,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: GeoidColors.linea)),
         ),
         child: Row(
           children: [
             Icon(icono, size: 20, color: GeoidColors.textoSuave),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,7 +302,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
                     style: TextStyle(color: GeoidColors.texto, fontSize: 14),
                   ),
                   if (valor != null && valor.isNotEmpty) ...[
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       valor,
                       style: TextStyle(
