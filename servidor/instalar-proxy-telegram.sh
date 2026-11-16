@@ -74,6 +74,24 @@ fi
 
 azul "4/5 · Configurando y arrancando (puerto $PUERTO)"
 
+#  Si otro programa ocupa el puerto, avisar antes de tocar nada.
+OCUPADO=$(ss -tlnp 2>/dev/null | grep ":${PUERTO} " || true)
+if [ -n "$OCUPADO" ] && ! printf '%s' "$OCUPADO" | grep -q mtg; then
+  rojo "El puerto $PUERTO está ocupado por otro programa:"
+  echo "$OCUPADO"
+  echo ""
+  echo "  Libéralo, o usa otro puerto:  bash $0 2053"
+  exit 1
+fi
+
+#  El dominio del disfraz tiene que resolver, si no el cliente no conectará.
+if ! getent hosts "$DOMINIO" >/dev/null 2>&1; then
+  rojo "El dominio $DOMINIO no resuelve todavía."
+  echo "  Crea el dominio en duckdns.org, pon la IP del servidor y espera 1 minuto."
+  echo "  O usa otro que ya exista:  bash $0 $PUERTO tls www.google.com"
+  exit 1
+fi
+
 cat > "$CONF" <<EOF
 # Proxy MTProto de GeoiD para Telegram
 secret = "$SECRET"
