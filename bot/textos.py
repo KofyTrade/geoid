@@ -25,11 +25,12 @@ TEXTOS = {
             "Puerto: <code>{puerto}</code>\n"
             "Clave: <code>{secreto}</code>\n"
         ),
-        "bienvenida": (
-            "¡Hola! Esto es <b>{marca}</b>, una VPN con protocolo "
-            "<b>AmneziaWG v3</b> (WireGuard ofuscado, no se puede bloquear "
-            "por firma de tráfico).\n\n"
+                "bienvenida": (
+            "¡Hola! Esto es <b>{marca}</b>, una VPN con <b>WireGuard ofuscado</b>: "
+            "no se puede bloquear por firma de tráfico.\n\n"
             "🎁 Tienes <b>{dias} días gratis</b> para probarla, sin tarjeta.\n\n"
+            "📱 Además: con la compra de <b>6 meses o más</b> te llevas <b>gratis</b> "
+            "el proxy de Telegram, para usarlo en Rusia sin VPN.\n\n"
             "Aquí mismo recibirás tu configuración. Para usarla necesitas la "
             "aplicación <b>GeoiD-vpn</b>; los enlaces están en ❓ Ayuda.\n\n"
             "Elige una opción 👇"
@@ -69,7 +70,7 @@ TEXTOS = {
         ),
         "boton_reenviar": "📄 Reenviar configuración",
         "reenvio": "Aquí tienes tu configuración de nuevo.",
-        "comprar_titulo": "💎 <b>Elige el plan</b>\n\nEl pago se hace con estrellas de Telegram.",
+        "comprar_titulo": "💎 <b>Elige el plan</b>\n\nSe paga por QR ruso, cripto o estrellas.",
         "plan_mes": "1 mes",
         "plan_3meses": "3 meses",
         "plan_anio": "1 año",
@@ -170,14 +171,15 @@ TEXTOS = {
             "Порт: <code>{puerto}</code>\n"
             "Секрет: <code>{secreto}</code>\n"
         ),
-        "bienvenida": (
-            "Привет! Это <b>{marca}</b> — VPN на протоколе <b>AmneziaWG v3</b> "
-            "(обфусцированный WireGuard, его не блокируют по отпечатку "
-            "трафика).\n\n"
-            "🎁 Доступно <b>{dias} дня бесплатно</b>, без карты.\n\n"
+                "bienvenida": (
+            "Привет! Это <b>{marca}</b>, VPN на <b>WireGuard с обфускацией</b>: "
+            "его нельзя заблокировать по сигнатуре трафика.\n\n"
+            "🎁 У вас <b>{dias} дней бесплатно</b>, без карты.\n\n"
+            "📱 При покупке на <b>6 месяцев или больше</b> — прокси Telegram "
+            "<b>в подарок</b>, чтобы пользоваться Telegram в РФ без VPN.\n\n"
             "Конфигурация придёт сюда же. Для подключения нужно приложение "
-            "<b>GeoiD-vpn</b>, ссылки в ❓ Помощь.\n\n"
-            "Выберите действие 👇"
+            "<b>GeoiD-vpn</b>; ссылки в разделе ❓ Помощь.\n\n"
+            "Выберите вариант 👇"
         ),
         "menu_prueba": "🎁 Бесплатный доступ",
         "menu_comprar": "💎 Купить VPN",
@@ -212,7 +214,7 @@ TEXTOS = {
         ),
         "boton_reenviar": "📄 Отправить конфигурацию",
         "reenvio": "Вот ваша конфигурация.",
-        "comprar_titulo": "💎 <b>Выберите тариф</b>\n\nОплата звёздами Telegram.",
+        "comprar_titulo": "💎 <b>Выберите тариф</b>\n\nОплата по QR, криптой или звёздами.",
         "plan_mes": "1 месяц",
         "plan_3meses": "3 месяца",
         "plan_anio": "1 год",
@@ -312,12 +314,13 @@ TEXTOS = {
             "Port: <code>{puerto}</code>\n"
             "Secret: <code>{secreto}</code>\n"
         ),
-        "bienvenida": (
-            "Hi! This is <b>{marca}</b>, a VPN running <b>AmneziaWG v3</b> "
-            "(obfuscated WireGuard, it can't be blocked by traffic "
-            "fingerprinting).\n\n"
-            "🎁 Try it <b>free for {dias} days</b>, no card needed.\n\n"
-            "Your configuration is delivered right here. You need the "
+                "bienvenida": (
+            "Hi! This is <b>{marca}</b>, a VPN with <b>obfuscated WireGuard</b>: "
+            "it cannot be blocked by traffic signature.\n\n"
+            "🎁 You get <b>{dias} days free</b>, no card needed.\n\n"
+            "📱 Plus: buy <b>6 months or more</b> and get the <b>Telegram proxy</b> "
+            "free, to use Telegram in Russia without a VPN.\n\n"
+            "Your configuration arrives right here. You need the "
             "<b>GeoiD-vpn</b> app; links are under ❓ Help.\n\n"
             "Pick an option 👇"
         ),
@@ -350,7 +353,7 @@ TEXTOS = {
         ),
         "boton_reenviar": "📄 Resend configuration",
         "reenvio": "Here is your configuration again.",
-        "comprar_titulo": "💎 <b>Choose a plan</b>\n\nPayment in Telegram stars.",
+        "comprar_titulo": "💎 <b>Choose a plan</b>\n\nPay by QR, crypto or stars.",
         "plan_mes": "1 month",
         "plan_3meses": "3 months",
         "plan_anio": "1 year",

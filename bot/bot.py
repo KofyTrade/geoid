@@ -93,14 +93,17 @@ def teclado_fijo(tg_id: int) -> ReplyKeyboardMarkup:
 
 
 def teclado_planes(tg_id: int) -> InlineKeyboardMarkup:
+    """Botones con los meses y el precio en rublos (no las estrellas)."""
     idi = idioma(tg_id)
-    filas = [
-        [InlineKeyboardButton(
-            text=t(idi, "plan_boton", meses=meses, estrellas=estrellas),
+    filas = []
+    for meses in config.PRECIOS:
+        duracion = _duracion(meses, idi)
+        rub = config.PRECIOS_RUB.get(meses, 0)
+        regalo = " 🎁" if meses >= config.MIN_MESES_PROXY else ""
+        filas.append([InlineKeyboardButton(
+            text=f"{duracion} · {rub} ₽{regalo}",
             callback_data=f"plan:{meses}",
-        )]
-        for meses, estrellas in config.PRECIOS.items()
-    ]
+        )])
     return InlineKeyboardMarkup(inline_keyboard=filas)
 
 
