@@ -206,8 +206,13 @@ def activar(tg_id: int, dias: int) -> dict:
 
 
 async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
+    plan = "pago" if db.ha_pagado(tg_id) else "prueba"
     contenido = provision.generar_conf(
-        usuario["privada"], usuario["preshared"], usuario["ip"]
+        usuario["privada"],
+        usuario["preshared"],
+        usuario["ip"],
+        plan=plan,
+        expira=int(usuario.get("expira") or 0),
     )
     archivo = BufferedInputFile(
         contenido.encode("utf-8"),

@@ -43,6 +43,8 @@ String t(String clave) => I18n.t(clave);
 
 const Map<String, Map<String, String>> _textos = {
   'en': {
+    'vpn_activa': 'VPN active',
+    'periodo_prueba_corto': 'Trial period',
     'perfil_activado': 'Profile activated',
     'perfil_agregado': 'Profile added',
     'configuracion': 'Settings',
@@ -118,6 +120,8 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'View configuration',
   },
   'es': {
+    'vpn_activa': 'VPN activa',
+    'periodo_prueba_corto': 'Periodo de prueba',
     'perfil_activado': 'Perfil activado',
     'perfil_agregado': 'Perfil agregado',
     'configuracion': 'Configuracion',
@@ -328,6 +332,8 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'Vedi configurazione',
   },
   'ru': {
+    'vpn_activa': 'VPN активна',
+    'periodo_prueba_corto': 'Пробный период',
     'perfil_activado': 'Профиль активирован',
     'perfil_agregado': 'Профиль добавлен',
     'configuracion': 'Настройки',

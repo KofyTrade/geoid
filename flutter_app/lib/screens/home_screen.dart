@@ -456,6 +456,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Texto del boton de abajo a la derecha segun el plan del perfil.
+  String _etiquetaAcceso() {
+    final plan = _perfil?.plan;
+    final vence = _perfil?.vence;
+    if (vence != null && vence.isBefore(DateTime.now())) return t('activar_vpn');
+    if (plan == 'prueba') return t('periodo_prueba_corto');
+    if (plan == 'pago') return t('vpn_activa');
+    return t('activar_vpn');
+  }
+
   void _abrirSuscripcion() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => SuscripcionScreen()),
@@ -680,7 +690,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: _abrirSuscripcion,
                       icon: Icon(Icons.workspace_premium, size: 15),
                       label: Text(
-                        t('activar_vpn'),
+                        _etiquetaAcceso(),
                         style: TextStyle(
                           color: GeoidColors.textoBoton,
                           fontSize: 12,

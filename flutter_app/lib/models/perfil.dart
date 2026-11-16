@@ -30,6 +30,28 @@ class Perfil {
     return 1280;
   }
 
+  /// Plan escrito por el bot en el .conf: 'pago', 'prueba' o null.
+  String? get plan {
+    for (final bruta in conf.split('\n')) {
+      final linea = bruta.trim().toLowerCase();
+      if (linea.startsWith('# plan=')) {
+        return linea.substring(7).trim();
+      }
+    }
+    return null;
+  }
+
+  /// Fecha de caducidad escrita en el .conf (o null si es antiguo).
+  DateTime? get vence {
+    for (final bruta in conf.split('\n')) {
+      final linea = bruta.trim().toLowerCase();
+      if (linea.startsWith('# expira=')) {
+        return DateTime.tryParse(linea.substring(9).trim());
+      }
+    }
+    return null;
+  }
+
   /// IP y puerto del servidor, para mostrarlos en la lista.
   String get resumen {
     for (final bruta in conf.split('\n')) {

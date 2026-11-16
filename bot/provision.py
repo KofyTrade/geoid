@@ -138,8 +138,26 @@ def eliminar_cliente(publica: str) -> None:
         pass
 
 
-def generar_conf(privada: str, preshared: str, ip: str) -> str:
-    """Devuelve el fichero .conf listo para el cliente."""
+def generar_conf(
+    privada: str,
+    preshared: str,
+    ip: str,
+    plan: str = "",
+    expira: int = 0,
+) -> str:
+    """Devuelve el fichero .conf listo para el cliente.
+
+    Las dos primeras lineas son comentarios que lee la app para saber si el
+    acceso es de prueba o de pago, y hasta cuando dura.
+    """
+    from datetime import datetime, timezone
+
+    cabecera = ["# GeoiD-vpn"]
+    if plan:
+        cabecera.append(f"# plan={plan}")
+    if expira:
+        fecha = datetime.fromtimestamp(expira, tz=timezone.utc).strftime("%Y-%m-%d")
+        cabecera.append(f"# expira={fecha}")
     parametros = _parametros_interfaz()
     servidor = _clave_publica_servidor()
 
@@ -154,6 +172,7 @@ def generar_conf(privada: str, preshared: str, ip: str) -> str:
     ]
 
     lineas = [
+        *cabecera,
         "[Interface]",
         f"PrivateKey = {privada}",
         f"Address = {ip}/32",
