@@ -46,7 +46,7 @@ AVISOS_ID = os.environ.get("GEOID_AVISOS_ID", "").strip()
 URL_APP = "https://github.com/KofyTrade/geoid/releases/latest"
 URL_ANDROID = (
     "https://github.com/KofyTrade/geoid/releases/latest/download/"
-    "GeoiD-vpn-Android-3.0.3-arm64-v8a.apk"
+    "GeoiD-vpn-Android-arm64-v8a.apk"
 )
 URL_WINDOWS = (
     "https://github.com/KofyTrade/geoid/releases/latest/download/GeoiD-vpn-Windows.zip"

@@ -66,6 +66,10 @@ jobs:
           if [ -z "$VERSION" ]; then VERSION="manual"; fi
           ORIGEN="flutter_app/build/app/outputs/flutter-apk"
           for ABI in arm64-v8a armeabi-v7a x86_64; do
+            # Nombre fijo: el enlace releases/latest/download/<nombre> no cambia.
+            cp "$ORIGEN/app-$ABI-release.apk" \
+               "salida/GeoiD-vpn-Android-$ABI.apk"
+            # Copia con la version, para soporte y trazabilidad.
             cp "$ORIGEN/app-$ABI-release.apk" \
                "salida/GeoiD-vpn-Android-${VERSION}-$ABI.apk"
           done
