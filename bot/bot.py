@@ -314,8 +314,10 @@ REPARTIDOR = {
 # --------------------------------------------------------------------------- #
 @router.message(CommandStart())
 async def start(mensaje: Message, bot: Bot, command: CommandObject):
+    argumento = (command.args or "").strip().lower()
+
     referido = None
-    if command.args and command.args.startswith("r"):
+    if argumento.startswith("r"):
         padrino = db.por_codigo(command.args)
         if padrino and padrino["tg_id"] != mensaje.from_user.id:
             referido = padrino["tg_id"]
@@ -331,6 +333,14 @@ async def start(mensaje: Message, bot: Bot, command: CommandObject):
 
     if referido:
         await mensaje.answer(t(idi, "invitar_bienvenida"))
+
+    # Enlaces que llegan desde la app: /start trial | buy | my
+    if argumento == "trial":
+        await accion_prueba(bot, mensaje.from_user.id)
+    elif argumento == "buy":
+        await accion_comprar(bot, mensaje.from_user.id)
+    elif argumento == "my":
+        await accion_mi_vpn(bot, mensaje.from_user.id)
 
 
 @router.message(Command("menu"))

@@ -15,6 +15,7 @@ import '../widgets/polyhedron.dart';
 import 'apps_screen.dart';
 import 'log_screen.dart';
 import 'profiles_screen.dart';
+import 'suscripcion_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -411,6 +412,12 @@ class _HomeScreenState extends State<HomeScreen> {
     await _actualizarResumenApps();
   }
 
+  void _abrirSuscripcion() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const SuscripcionScreen()),
+    );
+  }
+
   Future<void> _abrirPerfiles() async {
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const ProfilesScreen()),
@@ -601,12 +608,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
 
-              TextButton(
-                onPressed: _abrirPerfiles,
-                child: Text(
-                  '${t('perfiles')}: ${_perfil?.nombre ?? t('sin_perfiles')}',
-                  style: const TextStyle(color: GeoidColors.acento, fontSize: 12),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: _abrirPerfiles,
+                      child: Text(
+                        '${t('perfiles')}: ${_perfil?.nombre ?? t('sin_perfiles')}',
+                        style: const TextStyle(
+                          color: GeoidColors.acento,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: _abrirSuscripcion,
+                      icon: const Icon(Icons.workspace_premium, size: 15),
+                      label: Text(
+                        t('activar_vpn'),
+                        style: const TextStyle(
+                          color: Color(0xFF9BE8DC),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -156,6 +156,27 @@ class Nativo {
     _escuchar();
   }
 
+  /// Abre un enlace fuera de la app (Telegram, navegador...).
+  static Future<void> abrirEnlace(String url) async {
+    if (esAndroid) {
+      try {
+        await _canal.invokeMethod('abrirEnlace', {'url': url});
+        return;
+      } catch (_) {
+        // se intenta por el navegador
+      }
+    }
+    try {
+      if (Platform.isWindows) {
+        await Process.run('cmd', ['/c', 'start', '', url], runInShell: true);
+      } else if (Platform.isMacOS) {
+        await Process.run('open', [url]);
+      } else if (Platform.isLinux) {
+        await Process.run('xdg-open', [url]);
+      }
+    } catch (_) {}
+  }
+
   /// Texto del .conf con el que han abierto la app (o null).
   static Future<String?> archivoEntrante() async {
     if (!esAndroid) return null;

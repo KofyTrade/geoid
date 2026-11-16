@@ -137,6 +137,14 @@ class MainActivity : FlutterActivity() {
                         resultado.success(true)
                     }
 
+                    "abrirEnlace" -> {
+                        val url = llamada.argument<String>("url").orEmpty()
+                        if (url.isNotEmpty()) {
+                            startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url)))
+                        }
+                        resultado.success(true)
+                    }
+
                     "desconectar" -> {
                         val intencion = Intent(this, AwgTunnelService::class.java)
                             .setAction(AwgTunnelService.ACTION_DISCONNECT)
