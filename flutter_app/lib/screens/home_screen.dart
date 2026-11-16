@@ -383,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
-  /// Si la app se ha abierto con un .conf, se va directo a crear el perfil.
+  /// Si la app se ha abierto con un .conf, se importa y se activa solo.
   Future<void> _revisarArchivoEntrante() async {
     final conf = await Nativo.archivoEntrante();
     if (conf == null || conf.trim().isEmpty || !mounted) return;
@@ -394,13 +394,50 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => ProfilesScreen(confInicial: conf)),
-    );
+    final lista = await Almacen.lista();
+    final limpio = conf.trim();
+
+    // Si ya existe (misma configuracion), solo se activa.
+    for (final perfil in lista) {
+      if (perfil.conf.trim() == limpio) {
+        await Almacen.marcarActivo(perfil.nombre);
+        await _recargarPerfil();
+        if (mounted) {
+          _aviso('${t('perfil_activado')}: ${perfil.nombre}');
+        }
+        return;
+      }
+    }
+
+    // Si no existe, se crea y se deja activo: cero pasos para el usuario.
+    final nombre = 'GeoiD ${lista.length + 1}';
+    final nuevoPerfil = Perfil(nombre, conf);
+    await Almacen.guardarLista([...lista, nuevoPerfil]);
+    await Almacen.marcarActivo(nombre);
+    await _recargarPerfil();
+    if (mounted) {
+      _aviso('${t('perfil_agregado')}: $nombre');
+    }
+  }
+
+  Future<void> _recargarPerfil() async {
     final perfil = await Almacen.activoPerfil();
     if (mounted) setState(() => _perfil = perfil);
     await _actualizarResumenApps();
   }
+
+  void _aviso(String texto) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(texto),
+        backgroundColor: GeoidColors.panel,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   Future<void> _abrirAplicaciones() async {
     if (!esAndroid) {
       _dialogoSoloAndroid();

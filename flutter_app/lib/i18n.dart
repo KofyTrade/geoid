@@ -43,6 +43,8 @@ String t(String clave) => I18n.t(clave);
 
 const Map<String, Map<String, String>> _textos = {
   'en': {
+    'perfil_activado': 'Profile activated',
+    'perfil_agregado': 'Profile added',
     'configuracion': 'Settings',
     'idioma_sistema': 'System language',
     'tema': 'Theme',
@@ -116,6 +118,8 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'View configuration',
   },
   'es': {
+    'perfil_activado': 'Perfil activado',
+    'perfil_agregado': 'Perfil agregado',
     'configuracion': 'Configuracion',
     'idioma_sistema': 'Idioma del sistema',
     'tema': 'Tema',
@@ -324,6 +328,8 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'Vedi configurazione',
   },
   'ru': {
+    'perfil_activado': 'Профиль активирован',
+    'perfil_agregado': 'Профиль добавлен',
     'configuracion': 'Настройки',
     'idioma_sistema': 'Язык системы',
     'tema': 'Тема',
