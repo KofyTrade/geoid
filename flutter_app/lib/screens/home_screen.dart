@@ -631,6 +631,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
 
+              SizedBox(height: 4),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: _abrirPerfiles,
+                      child: Text(
+                        '${t('perfiles')}: ${_perfil?.nombre ?? t('sin_perfiles')}',
+                        style: TextStyle(
+                          color: GeoidColors.marca,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: _abrirSuscripcion,
+                      icon: const Icon(Icons.workspace_premium, size: 15),
+                      label: Text(
+                        _etiquetaAcceso(),
+                        style: TextStyle(
+                          color: GeoidColors.textoBoton,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
             ],
           ),
         ),
