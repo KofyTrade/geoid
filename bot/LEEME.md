@@ -314,3 +314,28 @@ systemctl restart geoid-bot
 
 Se envía un correo en tres momentos: cuando alguien pulsa «Ya he pagado»,
 en cada pago con estrellas y en cada pago con cripto.
+
+## Plan de 6 meses con proxy de Telegram de regalo
+
+Quien compra **6 meses (o 12)** recibe automáticamente el proxy de Telegram: la
+mensajería funciona en Rusia sin VPN encendida.
+
+- Se entrega solo, al confirmarse el pago (estrellas, cripto o activación manual).
+- Vuelve a pedirlo con **Mi VPN → 🎁 Mi proxy de Telegram**.
+- El mínimo de meses se cambia con `GEOID_PROXY_MESES` (por defecto 6).
+
+| Plan | Precio | Proxy |
+|---|---|---|
+| 1 mes | 199 ₽ · 150 ⭐ · 2,5 USDT | — |
+| 3 meses | 539 ₽ · 400 ⭐ · 6,5 USDT | — |
+| **6 meses** | **949 ₽ · 700 ⭐ · 11 USDT** | ✅ regalo |
+| 12 meses | 1.690 ₽ · 1.200 ⭐ · 21 USDT | ✅ regalo |
+
+Datos del proxy en `/etc/geoid-bot.env`:
+
+```bash
+GEOID_PROXY_SERVIDOR=193.29.224.164
+GEOID_PROXY_PUERTO=443
+GEOID_PROXY_SECRETO=ee2aafaaad9922e542f900a1fb25c68cfc67656f696476706e2e6475636b646e732e6f7267
+GEOID_PROXY_MESES=6
+```
