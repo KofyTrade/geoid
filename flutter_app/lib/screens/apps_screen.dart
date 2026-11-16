@@ -83,7 +83,7 @@ class _AppsScreenState extends State<AppsScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 6, 20, 10),
               child: TextField(
-                style: const TextStyle(color: GeoidColors.texto, fontSize: 14),
+                style: TextStyle(color: GeoidColors.texto, fontSize: 14),
                 decoration: InputDecoration(
                   hintText: t('buscar_apps'),
                   prefixIcon: const Icon(Icons.search,
@@ -104,7 +104,7 @@ class _AppsScreenState extends State<AppsScreen> {
                               ? t('apps_1')
                               : t('apps_n')
                                   .replaceFirst('%s', '${_marcadas.length}')),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: GeoidColors.textoSuave,
                         fontSize: 12,
                       ),
@@ -123,7 +123,7 @@ class _AppsScreenState extends State<AppsScreen> {
                     },
                     child: Text(
                       t('seleccionar_todas'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: GeoidColors.acento,
                         fontSize: 12,
                       ),
@@ -154,7 +154,7 @@ class _AppsScreenState extends State<AppsScreen> {
                       ? Center(
                           child: Text(
                             t('sin_apps'),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: GeoidColors.textoSuave,
                               fontSize: 13,
                             ),

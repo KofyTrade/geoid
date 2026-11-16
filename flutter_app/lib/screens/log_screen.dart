@@ -29,7 +29,7 @@ class LogScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 6),
                 child: Text(
                   'v${instantanea.data ?? ''}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: GeoidColors.textoTenue,
                     fontSize: 11,
                   ),
@@ -52,7 +52,7 @@ class LogScreen extends StatelessWidget {
               return Center(
                 child: Text(
                   t('registro_vacio'),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: GeoidColors.textoSuave,
                     fontSize: 13,
                   ),
@@ -66,7 +66,7 @@ class LogScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Text(
                   lineas[i],
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: GeoidColors.textoSuave,
                     fontSize: 11,
                     fontFamily: 'monospace',

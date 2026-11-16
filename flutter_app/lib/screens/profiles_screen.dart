@@ -93,12 +93,12 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
           TextButton(
             onPressed: () => Navigator.pop(contexto, false),
             child: Text(t('cancelar'),
-                style: const TextStyle(color: GeoidColors.textoSuave)),
+                style: TextStyle(color: GeoidColors.textoSuave)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(contexto, true),
             child: Text(t('eliminar'),
-                style: const TextStyle(color: GeoidColors.acento)),
+                style: TextStyle(color: GeoidColors.acento)),
           ),
         ],
       ),
@@ -143,7 +143,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
           TextButton(
             onPressed: () => Navigator.pop(contexto),
             child: Text(t('cancelar'),
-                style: const TextStyle(color: GeoidColors.acento)),
+                style: TextStyle(color: GeoidColors.acento)),
           ),
         ],
       ),
@@ -172,13 +172,13 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
       ),
       body: SafeArea(
         child: _cargando
-            ? const Center(
+            ? Center(
                 child: CircularProgressIndicator(color: GeoidColors.acento))
             : _perfiles.isEmpty
                 ? Center(
                     child: Text(
                       t('sin_perfiles'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: GeoidColors.textoSuave,
                         fontSize: 13,
                       ),
@@ -215,7 +215,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                           ),
                           subtitle: Text(
                             perfil.resumen,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: GeoidColors.textoTenue,
                               fontSize: 11,
                             ),
@@ -351,7 +351,7 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
                 controller: _nombre,
                 autofocus: !editando,
                 textCapitalization: TextCapitalization.sentences,
-                style: const TextStyle(color: GeoidColors.texto),
+                style: TextStyle(color: GeoidColors.texto),
                 decoration: InputDecoration(labelText: t('nombre')),
               ),
               const SizedBox(height: 14),
@@ -362,7 +362,7 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
                   maxLines: null,
                   expands: true,
                   textAlignVertical: TextAlignVertical.top,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: GeoidColors.textoSuave,
                     fontSize: 11,
                     fontFamily: 'monospace',
@@ -381,7 +381,7 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
                 onPressed: _importando ? null : _importar,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF9BE8DC),
-                  side: const BorderSide(color: GeoidColors.borde),
+                  side: BorderSide(color: GeoidColors.borde),
                   minimumSize: const Size.fromHeight(44),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(22),
@@ -418,12 +418,12 @@ class _DialogoPerfilState extends State<DialogoPerfil> {
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(t('cancelar'),
-              style: const TextStyle(color: GeoidColors.textoSuave)),
+              style: TextStyle(color: GeoidColors.textoSuave)),
         ),
         TextButton(
           onPressed: _guardar,
           child: Text(t('guardar'),
-              style: const TextStyle(color: GeoidColors.acento)),
+              style: TextStyle(color: GeoidColors.acento)),
         ),
       ],
     );

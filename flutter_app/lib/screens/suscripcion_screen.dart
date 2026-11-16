@@ -41,7 +41,7 @@ class SuscripcionScreen extends StatelessWidget {
           children: [
             Text(
               t('activar_vpn_texto'),
-              style: const TextStyle(
+              style: TextStyle(
                 color: GeoidColors.textoSuave,
                 fontSize: 13,
                 height: 1.35,
@@ -81,12 +81,12 @@ class SuscripcionScreen extends StatelessWidget {
             const SizedBox(height: 22),
             Row(
               children: [
-                const Icon(Icons.telegram, size: 16, color: GeoidColors.textoTenue),
+                Icon(Icons.telegram, size: 16, color: GeoidColors.textoTenue),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     '@geoidvpnbot',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: GeoidColors.textoTenue,
                       fontSize: 12,
                     ),
@@ -147,7 +147,7 @@ class SuscripcionScreen extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       subtitulo,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: GeoidColors.textoSuave,
                         fontSize: 12,
                       ),
@@ -156,7 +156,7 @@ class SuscripcionScreen extends StatelessWidget {
                       const SizedBox(height: 3),
                       Text(
                         detalle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: GeoidColors.textoTenue,
                           fontSize: 11,
                         ),

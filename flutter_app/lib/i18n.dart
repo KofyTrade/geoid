@@ -23,6 +23,15 @@ class I18n {
 
   static String get idioma => aviso.value;
 
+  /// Fija el idioma a mano; null = volver al del sistema.
+  static void fijar(String? codigo) {
+    if (codigo == null || codigo.isEmpty) {
+      iniciar();
+      return;
+    }
+    aviso.value = soportados.contains(codigo) ? codigo : 'en';
+  }
+
   static String t(String clave) {
     final tabla = _textos[idioma] ?? _textos['en']!;
     return tabla[clave] ?? _textos['en']![clave] ?? clave;
@@ -34,6 +43,14 @@ String t(String clave) => I18n.t(clave);
 
 const Map<String, Map<String, String>> _textos = {
   'en': {
+    'configuracion': 'Settings',
+    'idioma_sistema': 'System language',
+    'tema': 'Theme',
+    'tema_oscuro': 'Dark',
+    'tema_claro': 'Light',
+    'acerca_texto': 'VPN built on AmneziaWG v3. Your configuration is activated from the Telegram bot.',
+    'cerrar_app': 'Close the app',
+    'cerrar': 'Close',
     'activar_vpn': 'Activate VPN',
     'mi_vpn': 'My VPN',
     'activar_vpn_texto': 'Trial and purchase happen in our Telegram bot. Tap an option and the bot opens with your configuration right away.',
@@ -99,6 +116,14 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'View configuration',
   },
   'es': {
+    'configuracion': 'Configuracion',
+    'idioma_sistema': 'Idioma del sistema',
+    'tema': 'Tema',
+    'tema_oscuro': 'Oscuro',
+    'tema_claro': 'Claro',
+    'acerca_texto': 'VPN con protocolo AmneziaWG v3. Tu configuracion se activa desde el bot de Telegram.',
+    'cerrar_app': 'Cerrar la aplicacion',
+    'cerrar': 'Cerrar',
     'activar_vpn': 'Activar VPN',
     'mi_vpn': 'Mi VPN',
     'activar_vpn_texto': 'La prueba y la compra se hacen en nuestro bot de Telegram. Al tocar una opción se abre el bot y recibes tu configuración al instante.',
@@ -299,6 +324,14 @@ const Map<String, Map<String, String>> _textos = {
     'ver_conf': 'Vedi configurazione',
   },
   'ru': {
+    'configuracion': 'Настройки',
+    'idioma_sistema': 'Язык системы',
+    'tema': 'Тема',
+    'tema_oscuro': 'Тёмная',
+    'tema_claro': 'Светлая',
+    'acerca_texto': 'VPN на протоколе AmneziaWG v3. Конфигурация активируется в Telegram-боте.',
+    'cerrar_app': 'Закрыть приложение',
+    'cerrar': 'Закрыть',
     'activar_vpn': 'Активировать VPN',
     'mi_vpn': 'Мой VPN',
     'activar_vpn_texto': 'Пробный доступ и оплата — в нашем Telegram-боте. Нажмите вариант, бот откроется и вы сразу получите конфигурацию.',

@@ -15,6 +15,7 @@ import '../widgets/polyhedron.dart';
 import 'apps_screen.dart';
 import 'log_screen.dart';
 import 'profiles_screen.dart';
+import 'ajustes_screen.dart';
 import 'suscripcion_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -167,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               onPressed: () => Navigator.pop(contexto),
               child: Text(t('cancelar'),
-                  style: const TextStyle(color: GeoidColors.acento)),
+                  style: TextStyle(color: GeoidColors.acento)),
             ),
           ],
         ),
@@ -192,12 +193,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 _error(t('copiado'));
               },
               child: Text(t('copiar_conf'),
-                  style: const TextStyle(color: GeoidColors.acento)),
+                  style: TextStyle(color: GeoidColors.acento)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(contexto),
               child: Text(t('cancelar'),
-                  style: const TextStyle(color: GeoidColors.textoSuave)),
+                  style: TextStyle(color: GeoidColors.textoSuave)),
             ),
           ],
         ),
@@ -412,6 +413,12 @@ class _HomeScreenState extends State<HomeScreen> {
     await _actualizarResumenApps();
   }
 
+  void _abrirAjustes() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const AjustesScreen()),
+    );
+  }
+
   void _abrirSuscripcion() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const SuscripcionScreen()),
@@ -471,7 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               }
                               return Text(
                                 'v$v',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: GeoidColors.textoTenue,
                                   fontSize: 9,
                                 ),
@@ -497,13 +504,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const Spacer(),
+                  IconButton(
+                    onPressed: _abrirAjustes,
+                    tooltip: t('configuracion'),
+                    icon: Icon(
+                      Icons.settings_outlined,
+                      color: GeoidColors.textoSuave,
+                      size: 22,
+                    ),
+                  ),
                   if (_conectado)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
                           _velocidad,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: GeoidColors.acento,
                             fontSize: 13,
                             fontFamily: 'monospace',
@@ -512,7 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 2),
                         Text(
                           _ping,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: GeoidColors.textoSuave,
                             fontSize: 11,
                           ),
@@ -560,7 +576,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: Text(
                       _resumenApps(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: GeoidColors.textoSuave,
                         fontSize: 12,
                       ),
@@ -574,7 +590,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: Text(
                       t('bloquear_anuncios'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: GeoidColors.texto,
                         fontSize: 13,
                       ),
@@ -615,7 +631,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: _abrirPerfiles,
                       child: Text(
                         '${t('perfiles')}: ${_perfil?.nombre ?? t('sin_perfiles')}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: GeoidColors.acento,
                           fontSize: 12,
                         ),
@@ -699,7 +715,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Text(
           t('nueva_version').replaceFirst('%s', _actualizacion!.numero),
           textAlign: TextAlign.center,
-          style: const TextStyle(color: GeoidColors.acento, fontSize: 12),
+          style: TextStyle(color: GeoidColors.acento, fontSize: 12),
         ),
       ),
     );
@@ -734,7 +750,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: alPulsar,
         style: OutlinedButton.styleFrom(
           foregroundColor: const Color(0xFF9BE8DC),
-          side: const BorderSide(color: GeoidColors.borde),
+          side: BorderSide(color: GeoidColors.borde),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
         child: Text(texto, style: const TextStyle(fontSize: 13)),
