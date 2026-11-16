@@ -255,7 +255,7 @@ Para ocultar el método (por ejemplo, mientras lo preparas): `/qr borrar`.
 Para que no se mezclen con los clientes y suenen con un tono propio:
 
 1. Crea un **grupo privado** en Telegram (solo tú dentro)
-2. Añade el bot **@geoidvpnbot** como miembro
+2. Añade el bot **@geoidvpn_bot** como miembro
 3. El bot te escribirá en privado con el **ID del grupo**
 4. Copia ese comando (te lo da el propio bot) o hazlo a mano:
 

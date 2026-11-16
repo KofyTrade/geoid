@@ -8,7 +8,7 @@ import '../theme.dart';
 class SuscripcionScreen extends StatelessWidget {
   SuscripcionScreen({super.key});
 
-  static const String _bot = 'https://t.me/geoidvpnbot';
+  static const String _bot = 'https://t.me/geoidvpn_bot';
 
   Future<void> _irAlBot(BuildContext contexto, String motivo) async {
     await Nativo.abrirEnlace('$_bot?start=$motivo');
@@ -85,7 +85,7 @@ class SuscripcionScreen extends StatelessWidget {
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '@geoidvpnbot',
+                    '@geoidvpn_bot',
                     style: TextStyle(
                       color: GeoidColors.textoTenue,
                       fontSize: 12,

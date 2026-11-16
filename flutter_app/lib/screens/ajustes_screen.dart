@@ -87,7 +87,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
               Icon(Icons.telegram, size: 15, color: GeoidColors.textoTenue),
               SizedBox(width: 8),
               Text(
-                '@geoidvpnbot',
+                '@geoidvpn_bot',
                 style: TextStyle(color: GeoidColors.textoTenue, fontSize: 12),
               ),
             ],
@@ -258,7 +258,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
             ),
             SizedBox(height: 14),
             Text(
-              '@geoidvpnbot',
+              '@geoidvpn_bot',
               style: TextStyle(color: GeoidColors.marca, fontSize: 12),
             ),
           ],

@@ -109,7 +109,7 @@ la caché de DNS (se intentó y el servicio falló al reiniciar; se dejó como e
 
 **App**: 3.0.3 en Android y Windows, con actualización automática desde Releases.
 
-**Bot @geoidvpnbot** (en el VPS, servicio `geoid-bot`):
+**Bot @geoidvpn_bot** (en el VPS, servicio `geoid-bot`):
 - Menú fijo abajo + menú ☰ con `/start` y `/menu`
 - Prueba de 3 días
 - Cobro con ⭐ Estrellas (automático), 🪙 Cripto Crypto Pay (automático) y
