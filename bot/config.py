@@ -89,7 +89,10 @@ MARCA = os.environ.get("GEOID_MARCA", "GeoiD VPN")
 # --- Regalo del proxy de Telegram para planes largos ---
 # Meses minimos para llevarse el proxy de regalo.
 MIN_MESES_PROXY = int(os.environ.get("GEOID_PROXY_MESES", "6"))
+# Dispositivos (IPs distintas) que puede usar a la vez cada proxy personal.
+PROXY_DISPOSITIVOS = int(os.environ.get("GEOID_PROXY_DISPOSITIVOS", "2"))
 
+PROXY_DOMINIO = os.environ.get("GEOID_PROXY_DOMINIO", "geoidvpn.duckdns.org")
 PROXY_SERVIDOR = os.environ.get("GEOID_PROXY_SERVIDOR", "193.29.224.164")
 PROXY_PUERTO = os.environ.get("GEOID_PROXY_PUERTO", "443")
 PROXY_SECRETO = os.environ.get(

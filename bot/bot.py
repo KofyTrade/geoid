@@ -35,6 +35,7 @@ import avisos
 import config
 import db
 import pagos
+import proxy as proxy_personal
 import provision
 from textos import IDIOMAS, t
 
@@ -339,21 +340,40 @@ REPARTIDOR = {
 # Comandos
 # --------------------------------------------------------------------------- #
 async def entregar_proxy(bot: Bot, tg_id: int, meses: int) -> None:
-    """Si el plan llega al minimo, se entrega el proxy de Telegram de regalo."""
+    """Crea el proxy personal del cliente y le manda su enlace."""
     if meses < config.MIN_MESES_PROXY:
         return
-    enlace = config.enlace_proxy()
-    if not enlace:
+    if not config.PROXY_SECRETO and not proxy_personal.disponible():
         return
-    db.guardar(tg_id, proxy=1)
+
+    usuario = db.obtener(tg_id) or {}
+
+    # ya lo tiene creado?
+    if usuario.get("proxy") and usuario.get("proxy_secreto") and usuario.get("proxy_puerto"):
+        puerto = usuario["proxy_puerto"]
+        secreto = usuario["proxy_secreto"]
+        if not proxy_personal.activo(tg_id):
+            datos = proxy_personal.crear(tg_id, secreto)
+            puerto, secreto = datos["puerto"], datos["secreto"]
+    elif proxy_personal.disponible():
+        datos = proxy_personal.crear(tg_id)
+        puerto, secreto = datos["puerto"], datos["secreto"]
+        db.guardar(tg_id, proxy=1, proxy_puerto=puerto, proxy_secreto=secreto)
+    else:
+        return
+
+    enlace = (
+        f"tg://proxy?server={config.PROXY_SERVIDOR}"
+        f"&port={puerto}&secret={secreto}"
+    )
     try:
         await bot.send_message(
             tg_id,
             t(idioma(tg_id), "proxy_regalo",
               enlace=enlace,
               servidor=config.PROXY_SERVIDOR,
-              puerto=config.PROXY_PUERTO,
-              secreto=config.PROXY_SECRETO),
+              puerto=puerto,
+              secreto=secreto),
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
         )
@@ -676,17 +696,31 @@ async def admin_activar(llamada: CallbackQuery, bot: Bot):
 async def cb_proxy(llamada: CallbackQuery, bot: Bot):
     tg_id = llamada.from_user.id
     usuario = db.obtener(tg_id) or {}
-    if not usuario.get("proxy"):
+    if not usuario.get("proxy") or not usuario.get("proxy_secreto"):
         await llamada.answer(t(idioma(tg_id), "proxy_sin"), show_alert=True)
         return
-    enlace = config.enlace_proxy()
+
+    puerto = usuario["proxy_puerto"]
+    secreto = usuario["proxy_secreto"]
+    if not proxy_personal.activo(tg_id):
+        datos = proxy_personal.crear(tg_id, secreto)
+        puerto = datos["puerto"]
+        db.guardar(tg_id, proxy_puerto=puerto)
+
+    ips = proxy_personal.ips_conectadas(tg_id)
+    enlace = (
+        f"tg://proxy?server={config.PROXY_SERVIDOR}"
+        f"&port={puerto}&secret={secreto}"
+    )
     await bot.send_message(
         tg_id,
         t(idioma(tg_id), "proxy_regalo",
           enlace=enlace,
           servidor=config.PROXY_SERVIDOR,
-          puerto=config.PROXY_PUERTO,
-          secreto=config.PROXY_SECRETO),
+          puerto=puerto,
+          secreto=secreto)
+        + f"\n\n⚙️ Dispositivos conectados ahora: {len(ips)}/"
+        f"{config.PROXY_DISPOSITIVOS}",
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
     )
@@ -943,6 +977,13 @@ async def vigilar_caducidades(bot: Bot):
                     usuario["tg_id"],
                     ip=None, privada=None, publica=None, preshared=None,
                 )
+                if usuario.get("proxy"):
+                    try:
+                        proxy_personal.eliminar(usuario["tg_id"])
+                    except Exception:  # noqa: BLE001
+                        log.warning("no se pudo cerrar el proxy de %s", usuario["tg_id"])
+                    db.guardar(usuario["tg_id"], proxy=0, proxy_puerto=None,
+                               proxy_secreto=None)
                 try:
                     await bot.send_message(
                         usuario["tg_id"],
@@ -1080,6 +1121,47 @@ async def vigilar_duplicados(bot: Bot):
                 log.info("duplicado detectado en %s (%s cuentas)", ip, len(cuentas))
         except Exception:  # noqa: BLE001
             log.exception("error revisando duplicados")
+
+async def vigilar_proxies(bot: Bot):
+    """Si un proxy personal supera los dispositivos permitidos, avisa y corta."""
+    destino = int(config.AVISOS_ID) if config.AVISOS_ID else ADMIN
+    while True:
+        await asyncio.sleep(300)
+        try:
+            with db.conectar() as con:
+                usuarios = con.execute(
+                    "SELECT tg_id, usuario, proxy_puerto FROM usuarios "
+                    "WHERE proxy = 1 AND proxy_puerto IS NOT NULL"
+                ).fetchall()
+
+            for usuario in usuarios:
+                tg_id = usuario["tg_id"]
+                ips = proxy_personal.ips_conectadas(tg_id)
+                if len(ips) <= config.PROXY_DISPOSITIVOS:
+                    continue
+
+                sobra = ips[config.PROXY_DISPOSITIVOS:]
+                if destino:
+                    await bot.send_message(
+                        destino,
+                        "⚠️ <b>Proxy con demasiados dispositivos</b>\n\n"
+                        f"Cliente: {usuario['usuario'] or '—'} "
+                        f"(ID <code>{tg_id}</code>)\n"
+                        f"Conectados: {len(ips)} de {config.PROXY_DISPOSITIVOS}\n"
+                        f"IPs: <code>{', '.join(ips)}</code>\n\n"
+                        "Para cortar el sobrante:\n"
+                        + "\n".join(
+                            f"<code>iptables -I INPUT -p tcp --dport "
+                            f"{usuario['proxy_puerto']} -s {ip} -j DROP</code>"
+                            for ip in sobra
+                        ),
+                        parse_mode=ParseMode.HTML,
+                    )
+                log.info("proxy %s con %s dispositivos", tg_id, len(ips))
+        except Exception:  # noqa: BLE001
+            log.exception("error revisando los proxies personales")
+
+
 async def main():
     if not config.TOKEN:
         raise SystemExit("Falta GEOID_TOKEN (token del bot de BotFather)")
@@ -1095,6 +1177,7 @@ async def main():
     asyncio.create_task(vigilar_caducidades(bot))
     asyncio.create_task(vigilar_cripto(bot))
     asyncio.create_task(vigilar_duplicados(bot))
+    asyncio.create_task(vigilar_proxies(bot))
     log.info("bot en marcha · servidor %s", config.ENDPOINT)
     await dp.start_polling(bot)
 

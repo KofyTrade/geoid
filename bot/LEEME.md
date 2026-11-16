@@ -339,3 +339,43 @@ GEOID_PROXY_PUERTO=443
 GEOID_PROXY_SECRETO=ee2aafaaad9922e542f900a1fb25c68cfc67656f696476706e2e6475636b646e732e6f7267
 GEOID_PROXY_MESES=6
 ```
+
+## Proxy personal (uno por cliente, máximo 2 dispositivos)
+
+Cada cliente con plan de 6 meses o más recibe **su propio proxy**: puerto y
+clave únicos. Así se puede limitar y revocar.
+
+### Preparar el servidor (una sola vez)
+
+```bash
+scp E:\PC\vpn\servidor\proxy-multiusuario.sh root@193.29.224.164:/root/
+bash /root/proxy-multiusuario.sh
+```
+
+Crea la plantilla `mtg-user@.service` y la carpeta `/etc/mtg/users`, y abre los
+puertos 20000–40000.
+
+### Cómo funciona
+
+| Pieza | Detalle |
+|---|---|
+| Puerto del cliente | `20000 + (ID de Telegram % 20000)` |
+| Clave | Única, generada al comprar |
+| Servicio | `systemctl status mtg-user@<ID>` |
+| Límite | `GEOID_PROXY_DISPOSITIVOS` (2 por defecto) |
+| Control | Cada 5 min el bot cuenta las IPs conectadas |
+| Aviso | Si hay más de 2, avisa al grupo con los comandos `iptables` |
+| Caducidad | Al vencer el plan, el proxy se **borra** solo |
+| Recuperar enlace | **Mi VPN → 🎁 Mi proxy de Telegram** (muestra dispositivos activos) |
+
+Configuración nueva en `/etc/geoid-bot.env`:
+
+```bash
+GEOID_PROXY_DOMINIO=geoidvpn.duckdns.org
+GEOID_PROXY_DISPOSITIVOS=2
+```
+
+> El límite se mide por **IP pública**: dos móviles con datos distintos cuentan
+> como dos; un móvil y un portátil en la misma wifi cuentan como uno. Es una
+> aproximación razonable: en el peor caso es más permisivo, nunca corta a un
+> cliente legítimo por error.
