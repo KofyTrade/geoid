@@ -2,6 +2,7 @@
 
 TEXTOS = {
     "es": {
+        "instalar_conf": "📲 Toca el archivo de arriba y elige «Abrir con GeoiD-vpn»: la app añade el perfil y lo activa sola. Después solo tienes que pulsar Conectar.",
         "factura_desc": (
             "Acceso completo a {marca} durante {duracion}.\n"
             "Se activa al instante y caduca el {fecha}."
@@ -70,7 +71,7 @@ TEXTOS = {
             "{enlace}\n\n"
             "Si quieres, te reenvío el fichero de configuración."
         ),
-        "boton_reenviar": "📄 Reenviar configuración",
+        "boton_reenviar": "📄 Mi configuración (.conf)",
         "reenvio": "Aquí tienes tu configuración de nuevo.",
         "comprar_titulo": "💎 <b>Elige el plan</b>\n\nSe paga por QR ruso, cripto o estrellas.",
         "plan_mes": "1 mes",
@@ -163,6 +164,7 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "instalar_conf": "📲 Нажмите на файл выше и выберите «Открыть в GeoiD-vpn»: приложение добавит профиль и активирует его само. Останется нажать «Подключиться».",
         "factura_desc": (
             "Полный доступ к {marca} на {duracion}.\n"
             "Активируется сразу, действует до {fecha}."
@@ -229,7 +231,7 @@ TEXTOS = {
             "{enlace}\n\n"
             "Могу отправить файл конфигурации заново."
         ),
-        "boton_reenviar": "📄 Отправить конфигурацию",
+        "boton_reenviar": "📄 Моя конфигурация (.conf)",
         "reenvio": "Вот ваша конфигурация.",
         "comprar_titulo": "💎 <b>Выберите тариф</b>\n\nОплата по QR, криптой или звёздами.",
         "plan_mes": "1 месяц",
@@ -321,6 +323,7 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "instalar_conf": "📲 Tap the file above and choose «Open with GeoiD-vpn»: the app adds the profile and activates it by itself. Then just press Connect.",
         "factura_desc": (
             "Full access to {marca} for {duracion}.\n"
             "Activates instantly and expires on {fecha}."
@@ -383,7 +386,7 @@ TEXTOS = {
             "{enlace}\n\n"
             "I can send the configuration file again."
         ),
-        "boton_reenviar": "📄 Resend configuration",
+        "boton_reenviar": "📄 My configuration (.conf)",
         "reenvio": "Here is your configuration again.",
         "comprar_titulo": "💎 <b>Choose a plan</b>\n\nPay by QR, crypto or stars.",
         "plan_mes": "1 month",

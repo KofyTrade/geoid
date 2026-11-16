@@ -856,6 +856,12 @@ async def cb_reenviar(llamada: CallbackQuery, bot: Bot):
         await llamada.answer(t(idi, "mi_vpn_sin"), show_alert=True)
         return
     await enviar_conf(bot, tg_id, usuario, t(idi, "reenvio"))
+    await bot.send_message(
+        tg_id,
+        t(idi, "instalar_conf"),
+        parse_mode=ParseMode.HTML,
+        reply_markup=teclado_fijo(tg_id),
+    )
     await llamada.answer()
 
 
