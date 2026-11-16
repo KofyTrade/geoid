@@ -55,6 +55,22 @@
             </intent-filter>
             <!-- Cualquier binario: asi Telegram y otros ofrecen la app al abrir
                  un .conf, porque su direccion interna no lleva el nombre. -->
+            <!-- Telegram y algunos gestores entregan los .conf como text/plain
+                 sin el nombre en la ruta: se acepta cualquier texto. -->
+            <intent-filter android:label="GeoiD-vpn">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter android:label="GeoiD-vpn">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
             <intent-filter android:label="GeoiD-vpn">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

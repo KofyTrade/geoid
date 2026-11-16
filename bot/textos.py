@@ -7,7 +7,7 @@ TEXTOS = {
         "soporte_ticket": "\U0001F3AB Ticket de soporte\n\nDe: {usuario} (ID {id})\n\n{mensaje}\n\nResponde a este mensaje para contestarle.",
         "soporte_respuesta": "Respuesta del equipo:\n\n{mensaje}",
         "soporte_enviado": "Enviado al cliente.",
-        "instalar_conf": "📲 Toca el archivo de arriba y elige «Abrir con GeoiD-vpn»: la app añade el perfil y lo activa sola. Después solo tienes que pulsar Conectar.",
+        "instalar_conf": "\U0001F4F2 Toca el archivo de arriba y elige \u00abAbrir con GeoiD-vpn\u00bb. La app a\u00f1ade el perfil y lo activa sola; despu\u00e9s solo pulsa Conectar.\n\nSi no aparece la app: guarda el archivo (Descargar), abre Descargas y \u00e1brelo desde ah\u00ed.",
         "factura_desc": (
             "Acceso completo a {marca} durante {duracion}.\n"
             "Se activa al instante y caduca el {fecha}."
@@ -174,7 +174,7 @@ TEXTOS = {
         "soporte_ticket": "\U0001F3AB Сообщение в поддержку\n\nОт: {usuario} (ID {id})\n\n{mensaje}\n\nОтветьте на это сообщение, чтобы написать клиенту.",
         "soporte_respuesta": "Ответ поддержки:\n\n{mensaje}",
         "soporte_enviado": "Отправлено клиенту.",
-        "instalar_conf": "📲 Нажмите на файл выше и выберите «Открыть в GeoiD-vpn»: приложение добавит профиль и активирует его само. Останется нажать «Подключиться».",
+        "instalar_conf": "\U0001F4F2 \u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u043d\u0430 \u0444\u0430\u0439\u043b \u0432\u044b\u0448\u0435 \u0438 \u0432\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u00ab\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0432 GeoiD-vpn\u00bb. \u041f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0434\u043e\u0431\u0430\u0432\u0438\u0442 \u043f\u0440\u043e\u0444\u0438\u043b\u044c \u0441\u0430\u043c\u043e.\n\n\u0415\u0441\u043b\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043d\u0435\u0442 \u0432 \u0441\u043f\u0438\u0441\u043a\u0435: \u0441\u043a\u0430\u0447\u0430\u0439\u0442\u0435 \u0444\u0430\u0439\u043b \u0438 \u043e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 \u0435\u0433\u043e \u0438\u0437 \u043f\u0430\u043f\u043a\u0438 \u00ab\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0438\u00bb.",
         "factura_desc": (
             "Полный доступ к {marca} на {duracion}.\n"
             "Активируется сразу, действует до {fecha}."
@@ -338,7 +338,7 @@ TEXTOS = {
         "soporte_ticket": "\U0001F3AB Support ticket\n\nFrom: {usuario} (ID {id})\n\n{mensaje}\n\nReply to this message to answer.",
         "soporte_respuesta": "Reply from the team:\n\n{mensaje}",
         "soporte_enviado": "Sent to the customer.",
-        "instalar_conf": "📲 Tap the file above and choose «Open with GeoiD-vpn»: the app adds the profile and activates it by itself. Then just press Connect.",
+        "instalar_conf": "\U0001F4F2 Tap the file above and choose \u00abOpen with GeoiD-vpn\u00bb. The app adds the profile and activates it by itself.\n\nIf the app is not listed: download the file, open Downloads and open it from there.",
         "factura_desc": (
             "Full access to {marca} for {duracion}.\n"
             "Activates instantly and expires on {fecha}."
