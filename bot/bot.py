@@ -80,12 +80,23 @@ def dias_restantes(instante: int) -> int:
 def teclado_fijo(tg_id: int) -> ReplyKeyboardMarkup:
     """Menú de abajo: se queda siempre visible."""
     idi = idioma(tg_id)
-    filas = [
-        [t(idi, "menu_prueba"), t(idi, "menu_comprar")],
-        [t(idi, "menu_mi_vpn"), t(idi, "menu_pais")],
-        [t(idi, "menu_invitar"), t(idi, "menu_promo")],
-        [t(idi, "menu_ayuda"), t(idi, "menu_idioma")],
+
+    botones = [
+        t(idi, "menu_prueba"),
+        t(idi, "menu_comprar"),
+        t(idi, "menu_mi_vpn"),
     ]
+    # El país solo tiene sentido con varios servidores.
+    if len(config.PAISES) > 1:
+        botones.append(t(idi, "menu_pais"))
+    botones += [
+        t(idi, "menu_invitar"),
+        t(idi, "menu_promo"),
+        t(idi, "menu_ayuda"),
+        t(idi, "menu_idioma"),
+    ]
+
+    filas = [botones[i:i + 2] for i in range(0, len(botones), 2)]
     return ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text=x) for x in fila] for fila in filas],
         resize_keyboard=True,
@@ -273,9 +284,11 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
 
 
 async def accion_pais(bot: Bot, tg_id: int) -> None:
-    await bot.send_message(
-        tg_id, t(idioma(tg_id), "pais_unico"), reply_markup=teclado_fijo(tg_id)
-    )
+    idi = idioma(tg_id)
+    texto = t(idi, "pais_unico")
+    if len(config.PAISES) > 1:
+        texto = " · ".join(config.PAISES)
+    await bot.send_message(tg_id, texto, reply_markup=teclado_fijo(tg_id))
 
 
 async def accion_invitar(bot: Bot, tg_id: int) -> None:

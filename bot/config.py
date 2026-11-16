@@ -114,3 +114,10 @@ def enlace_proxy() -> str:
         f"&secret={PROXY_SECRETO}"
     )
 
+# --- Paises disponibles ---------------------------------------------------
+# Con un solo pais, el boton "Cambiar pais" no se muestra.
+PAISES = [
+    p.strip()
+    for p in os.environ.get("GEOID_PAISES", "Finlandia").split(",")
+    if p.strip()
+]
