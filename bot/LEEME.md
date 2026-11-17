@@ -504,35 +504,17 @@ Comprobar antes de reiniciar:
 cd /opt/geoid-bot && for f in *.py; do python3 -m py_compile $f || echo "FALLA $f"; done && echo "TODO OK"
 ```
 
-## Comprar estrellas con rublos (servicio externo)
+## Pago con estrellas: solo si el cliente ya las tiene
 
-El cliente ruso no puede comprar estrellas dentro de Telegram. Ahora, al elegir
-un plan y **⭐ Estrellas**, el bot ofrece dos caminos:
+Las estrellas se quedan como opción, pero **sin servicio externo**. Motivo: para
+un cliente ruso comprar estrellas en un tercero son 4–5 pasos, dar su @usuario y
+un recargo del 10–40 %; en la práctica muchos abandonan.
 
-1. **⭐ Pagar con mis estrellas** → factura normal de Telegram.
-2. **💳 No tengo estrellas · comprar con rublos** → instrucciones y botón al
-   servicio externo; cuando vuelve, pulsa «Ya tengo mis estrellas» y paga.
+El orden de pago que se muestra ahora:
 
-El bot le dice **cuántas estrellas necesita** (115 / 300 / 520) y le recuerda
-su propio @usuario, que es lo único que le pedirán allí.
+1. **📱 Pago por QR · rublos (lo más rápido)** — su banco, 2 toques, 0 % comisión
+2. **🪙 Cripto (USDT / TON)** — para quien ya tiene cripto
+3. **⭐ Estrellas (si ya tiene)** — factura directa de Telegram
 
-Configuración en `/etc/geoid-bot.env`:
-
-```bash
-GEOID_ESTRELLAS_URL=https://telegram-stars.org
-GEOID_ESTRELLAS_SERVICIO=telegram-stars.org
-```
-
-Servicios que venden estrellas por SBP (verificados en la web):
-
-| Servicio | Cómo paga el cliente | Nota |
-|---|---|---|
-| **krab.gg** (por defecto) | tarjeta РФ, **SBP**, cripto | comercio con API pública, entrega ~3 s, 33.000+ pedidos declarados |
-| **FunPay** | tarjeta РФ, SBP, ЮMoney | mercado con depósito en garantía: el comprador confirma antes de pagar |
-| **RMT** (rmt.games) | SBP o cripto | mercado con escrow |
-| telegram-stars.org | SBP, tarjeta | reputación no verificable; los artículos que lo elogian parecen publicidad |
-
-> ⚠️ Telegram no vende estrellas fuera de la app: estos servicios las compran
-> en el mercado oficial y las **regalan** al @usuario indicado. Es una zona
-> gris respecto a las condiciones de Telegram y las comisiones cambian a menudo.
-> El bot nunca pide contraseña ni código de acceso (y el texto lo avisa).
+El código del servicio externo queda aparcado (`GEOID_ESTRELLAS_URL` en
+`config.py`) por si algún día se quiere recuperar, pero no aparece en el menú.

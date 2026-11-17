@@ -822,45 +822,6 @@ async def cb_estrellas_pagar(llamada: CallbackQuery, bot: Bot):
     )
 
 
-@router.callback_query(F.data.startswith("estrellas:comprar:"))
-async def cb_estrellas_comprar(llamada: CallbackQuery, bot: Bot):
-    """Manda al cliente a comprar estrellas en un servicio que acepta rublos."""
-    await llamada.answer()
-
-    meses = int(llamada.data.split(":")[2])
-    tg_id = llamada.from_user.id
-    idi = idioma(tg_id)
-    cantidad = config.PRECIOS[meses]
-    usuario = db.obtener(tg_id) or {}
-
-    nombre = usuario.get("usuario")
-    quien = ("@" + nombre) if nombre else "—"
-
-    teclado = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(
-            text=f"💳 {config.ESTRELLAS_SERVICIO}",
-            url=config.ESTRELLAS_URL)],
-        [InlineKeyboardButton(
-            text=t(idi, "estrellas_volver"),
-            callback_data=f"estrellas:pagar:{meses}")],
-        [InlineKeyboardButton(text="◀️", callback_data=f"metodo:stars:{meses}")],
-    ])
-
-    try:
-        await bot.send_message(
-            tg_id,
-            t(idi, "estrellas_instrucciones",
-              servicio=config.ESTRELLAS_SERVICIO,
-              cantidad=cantidad,
-              usuario=quien),
-            reply_markup=teclado,
-            parse_mode=ParseMode.HTML,
-            disable_web_page_preview=True,
-        )
-    except Exception:  # noqa: BLE001
-        log.exception("no se pudo mostrar la compra de estrellas")
-
-
 @router.callback_query(F.data.startswith("metodo:crypto:"))
 async def cb_cripto(llamada: CallbackQuery):
     meses = int(llamada.data.split(":")[2])
@@ -1316,26 +1277,26 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
 
 @router.message(Command("estrellas"))
 async def comando_estrellas(mensaje: Message, bot: Bot, command: CommandObject):
-    """Muestra la pantalla de pago con estrellas (para probar o para soporte)."""
+    """Manda la factura de estrellas del plan indicado (por defecto 1 mes)."""
     argumento = (command.args or "").strip()
     meses = int(argumento) if argumento.isdigit() else 1
     if meses not in config.PRECIOS:
         meses = 1
 
     idi = idioma(mensaje.from_user.id)
-    cantidad = config.PRECIOS[meses]
-    teclado = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(
-            text=t(idi, "estrellas_pagar"),
-            callback_data=f"estrellas:pagar:{meses}")],
-        [InlineKeyboardButton(
-            text=t(idi, "estrellas_comprar"),
-            callback_data=f"estrellas:comprar:{meses}")],
-    ])
-    await mensaje.answer(
-        t(idi, "estrellas_titulo", cantidad=cantidad),
-        reply_markup=teclado,
-        parse_mode=ParseMode.HTML,
+    await bot.send_invoice(
+        chat_id=mensaje.from_user.id,
+        title=f"{config.MARCA} · {_duracion(meses, idi)}",
+        description=t(
+            idi, "factura_desc",
+            marca=config.MARCA,
+            duracion=_duracion(meses, idi),
+            fecha=fecha(int(time.time()) + (30 * meses + config.dias_de_regalo(meses)) * DIA),
+        ),
+        payload=f"plan:{meses}",
+        provider_token="",
+        currency="XTR",
+        prices=[LabeledPrice(label=f"{meses} m", amount=config.PRECIOS[meses])],
     )
 
 
