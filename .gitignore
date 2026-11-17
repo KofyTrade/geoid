@@ -18,3 +18,7 @@ bot/tmp/
 
 # APK de prueba descargados
 tools/apk-*
+
+# Python
+__pycache__/
+*.pyc
