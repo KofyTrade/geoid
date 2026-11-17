@@ -2,6 +2,7 @@
 
 TEXTOS = {
     "es": {
+        "plan_precios": "⭐ {estrellas} estrellas · {rub} ₽",
         "metodo_web": "🌐 Web",
         "estrellas_ir": "💳 Comprar {cantidad} estrellas",
 "metodo_estrellas_comprar": "Comprar estrellas",
@@ -89,7 +90,7 @@ TEXTOS = {
         ),
         "boton_reenviar": "📄 Mi configuración (.conf)",
         "reenvio": "Aquí tienes tu configuración de nuevo.",
-        "comprar_titulo": "💎 <b>Elige el plan</b>\n\nSe paga por QR ruso, cripto o estrellas.",
+        "comprar_titulo": "💎 <b>Elige el plan</b>\n\nPuedes pagar con estrellas o desde la web.",
         "plan_mes": "1 mes",
         "plan_3meses": "3 meses",
         "plan_anio": "1 año",
@@ -187,6 +188,7 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "plan_precios": "⭐ {estrellas} звёзд · {rub} ₽",
         "metodo_web": "🌐 Сайт",
         "estrellas_ir": "💳 Купить {cantidad} звёзд",
 "metodo_estrellas_comprar": "Купить звёзды",
@@ -272,7 +274,7 @@ TEXTOS = {
         ),
         "boton_reenviar": "📄 Моя конфигурация (.conf)",
         "reenvio": "Вот ваша конфигурация.",
-        "comprar_titulo": "💎 <b>Выберите тариф</b>\n\nОплата по QR, криптой или звёздами.",
+        "comprar_titulo": "💎 <b>Выберите тариф</b>\n\nОплата звёздами или на сайте.",
         "plan_mes": "1 месяц",
         "plan_3meses": "3 месяца",
         "plan_anio": "1 год",
@@ -369,6 +371,7 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "plan_precios": "⭐ {estrellas} stars · {rub} ₽",
         "metodo_web": "🌐 Website",
         "estrellas_ir": "💳 Buy {cantidad} stars",
 "metodo_estrellas_comprar": "Buy stars",
@@ -450,7 +453,7 @@ TEXTOS = {
         ),
         "boton_reenviar": "📄 My configuration (.conf)",
         "reenvio": "Here is your configuration again.",
-        "comprar_titulo": "💎 <b>Choose a plan</b>\n\nPay by QR, crypto or stars.",
+        "comprar_titulo": "💎 <b>Choose a plan</b>\n\nPay with stars or on the website.",
         "plan_mes": "1 month",
         "plan_3meses": "3 months",
         "plan_anio": "1 year",
