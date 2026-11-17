@@ -764,8 +764,10 @@ async def cb_plan(llamada: CallbackQuery):
 
 
 @router.callback_query(F.data.startswith("metodo:stars:"))
-async def cb_estrellas(llamada: CallbackQuery):
+async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
     """Estrellas: pagar con las que ya tiene o comprarlas con rublos."""
+    await llamada.answer()
+
     meses = int(llamada.data.split(":")[2])
     tg_id = llamada.from_user.id
     idi = idioma(tg_id)
@@ -781,16 +783,21 @@ async def cb_estrellas(llamada: CallbackQuery):
         [InlineKeyboardButton(text="◀️", callback_data=f"plan:{meses}")],
     ])
 
-    await llamada.message.edit_text(
-        t(idi, "estrellas_titulo", cantidad=cantidad),
-        reply_markup=teclado,
-        parse_mode=ParseMode.HTML,
-    )
-    await llamada.answer()
+    try:
+        await bot.send_message(
+            tg_id,
+            t(idi, "estrellas_titulo", cantidad=cantidad),
+            reply_markup=teclado,
+            parse_mode=ParseMode.HTML,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception("no se pudo mostrar la pantalla de estrellas")
 
 
 @router.callback_query(F.data.startswith("estrellas:pagar:"))
 async def cb_estrellas_pagar(llamada: CallbackQuery, bot: Bot):
+    await llamada.answer()
+
     meses = int(llamada.data.split(":")[2])
     estrellas = config.PRECIOS[meses]
     idi = idioma(llamada.from_user.id)
@@ -809,12 +816,13 @@ async def cb_estrellas_pagar(llamada: CallbackQuery, bot: Bot):
         currency="XTR",
         prices=[LabeledPrice(label=f"{meses} m", amount=estrellas)],
     )
-    await llamada.answer()
 
 
 @router.callback_query(F.data.startswith("estrellas:comprar:"))
-async def cb_estrellas_comprar(llamada: CallbackQuery):
+async def cb_estrellas_comprar(llamada: CallbackQuery, bot: Bot):
     """Manda al cliente a comprar estrellas en un servicio que acepta rublos."""
+    await llamada.answer()
+
     meses = int(llamada.data.split(":")[2])
     tg_id = llamada.from_user.id
     idi = idioma(tg_id)
@@ -834,16 +842,19 @@ async def cb_estrellas_comprar(llamada: CallbackQuery):
         [InlineKeyboardButton(text="◀️", callback_data=f"metodo:stars:{meses}")],
     ])
 
-    await llamada.message.edit_text(
-        t(idi, "estrellas_instrucciones",
-          servicio=config.ESTRELLAS_SERVICIO,
-          cantidad=cantidad,
-          usuario=quien),
-        reply_markup=teclado,
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
-    await llamada.answer()
+    try:
+        await bot.send_message(
+            tg_id,
+            t(idi, "estrellas_instrucciones",
+              servicio=config.ESTRELLAS_SERVICIO,
+              cantidad=cantidad,
+              usuario=quien),
+            reply_markup=teclado,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception("no se pudo mostrar la compra de estrellas")
 
 
 @router.callback_query(F.data.startswith("metodo:crypto:"))
