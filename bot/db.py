@@ -10,7 +10,7 @@ ESQUEMA = """
 CREATE TABLE IF NOT EXISTS usuarios (
     tg_id       INTEGER PRIMARY KEY,
     usuario     TEXT,
-    idioma      TEXT DEFAULT 'es',
+    idioma      TEXT DEFAULT 'ru',
     creado      INTEGER NOT NULL,
     prueba_usada INTEGER DEFAULT 0,
     expira      INTEGER DEFAULT 0,
@@ -85,9 +85,10 @@ def crear_si_falta(tg_id: int, usuario: str | None, referido: int | None = None)
     with conectar() as con:
         codigo = f"r{tg_id:x}"
         con.execute(
-            "INSERT INTO usuarios (tg_id, usuario, creado, referido, codigo_ref) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (tg_id, usuario, int(time.time()), referido, codigo),
+            "INSERT INTO usuarios "
+            "(tg_id, usuario, creado, referido, codigo_ref, idioma) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (tg_id, usuario, int(time.time()), referido, codigo, config.IDIOMA_DEFECTO),
         )
     return obtener(tg_id)
 

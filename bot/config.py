@@ -121,3 +121,8 @@ PAISES = [
     for p in os.environ.get("GEOID_PAISES", "Finlandia").split(",")
     if p.strip()
 ]
+
+# --- Idioma ---------------------------------------------------------------
+# Idioma con el que empieza un cliente nuevo. Cada uno puede cambiarlo con
+# el boton de idioma del menu.
+IDIOMA_DEFECTO = os.environ.get("GEOID_IDIOMA", "ru").strip().lower() or "ru"

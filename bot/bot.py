@@ -83,7 +83,7 @@ ADMIN = _admin()
 # --------------------------------------------------------------------------- #
 def idioma(tg_id: int) -> str:
     usuario = db.obtener(tg_id)
-    return (usuario or {}).get("idioma") or "es"
+    return (usuario or {}).get("idioma") or config.IDIOMA_DEFECTO
 
 
 def fecha(instante: int) -> str:
