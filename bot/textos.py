@@ -7,7 +7,7 @@ TEXTOS = {
         "soporte_ticket": "\U0001F3AB Ticket de soporte\n\nDe: {usuario} (ID {id})\n\n{mensaje}\n\nResponde a este mensaje para contestarle.",
         "soporte_respuesta": "Respuesta del equipo:\n\n{mensaje}",
         "soporte_enviado": "Enviado al cliente.",
-        "instalar_conf": "\U0001F4F2 Toca el archivo de arriba y elige \u00abAbrir con GeoiD-vpn\u00bb. La app a\u00f1ade el perfil y lo activa sola; despu\u00e9s solo pulsa Conectar.\n\nSi no aparece la app: guarda el archivo (Descargar), abre Descargas y \u00e1brelo desde ah\u00ed.",
+        "instalar_conf": "📲 <b>Último paso</b>\n\nToca el archivo de arriba y elige <b>«Abrir con GeoiD-vpn»</b>.\nLa app lo añade y lo activa sola: después solo tienes que pulsar <b>Conectar</b>.\n\n<i>¿No aparece la app? Guarda el archivo, ábrelo desde Descargas y elige GeoiD-vpn.</i>",
         "factura_desc": (
             "Acceso completo a {marca} durante {duracion}.\n"
             "Se activa al instante y caduca el {fecha}."
@@ -117,15 +117,22 @@ TEXTOS = {
         "promo_pedir": "Escribe el código promocional:",
         "promo_ok": "✅ Código canjeado: <b>{dias} días</b> añadidos.",
         "promo_mal": "❌ Ese código no es válido o ya no tiene usos.",
-        "ayuda": (
+                "ayuda": (
             "❓ <b>Cómo usarla</b>\n\n"
-            "1. Instala la app:\n"
-            "• Android: {android}\n"
-            "• Windows: {windows}\n\n"
-            "2. Descarga tu configuración desde 📱 Mi VPN.\n"
-            "3. En la app: <b>Perfiles → + → Importar .conf</b>.\n"
-            "4. Pulsa <b>Conectar</b> y listo.\n\n"
-            "Si algo no funciona, escríbenos aquí mismo."
+            "<b>1.</b> Instala la app:\n"
+            "· Android: {android}\n"
+            "· Windows: {windows}\n\n"
+            "<b>2.</b> Pide tu configuración en <b>📱 Mi VPN</b> → "
+            "<b>📄 Mi configuración (.conf)</b>. Te llegará como archivo.\n\n"
+            "<b>3.</b> Toca ese archivo y elige <b>«Abrir con GeoiD-vpn»</b>. "
+            "La app añade el perfil y lo deja activo al instante, sin escribir "
+            "nada a mano.\n\n"
+            "<b>4.</b> Vuelve a la pantalla principal y pulsa <b>Conectar</b>. "
+            "Eso es todo.\n\n"
+            "<i>¿No aparece la app al tocar el archivo? Guárdalo primero y "
+            "ábrelo desde Descargas, eligiendo GeoiD-vpn. También puedes "
+            "importarlo a mano: Perfiles → + → Importar .conf.</i>\n\n"
+            "¿Alguna duda? Escríbenos aquí mismo y te respondemos en privado."
         ),
         "idioma_pedir": "Elige tu idioma:",
         "idioma_ok": "Idioma cambiado.",
@@ -174,7 +181,7 @@ TEXTOS = {
         "soporte_ticket": "\U0001F3AB Сообщение в поддержку\n\nОт: {usuario} (ID {id})\n\n{mensaje}\n\nОтветьте на это сообщение, чтобы написать клиенту.",
         "soporte_respuesta": "Ответ поддержки:\n\n{mensaje}",
         "soporte_enviado": "Отправлено клиенту.",
-        "instalar_conf": "\U0001F4F2 \u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u043d\u0430 \u0444\u0430\u0439\u043b \u0432\u044b\u0448\u0435 \u0438 \u0432\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u00ab\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0432 GeoiD-vpn\u00bb. \u041f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0434\u043e\u0431\u0430\u0432\u0438\u0442 \u043f\u0440\u043e\u0444\u0438\u043b\u044c \u0441\u0430\u043c\u043e.\n\n\u0415\u0441\u043b\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043d\u0435\u0442 \u0432 \u0441\u043f\u0438\u0441\u043a\u0435: \u0441\u043a\u0430\u0447\u0430\u0439\u0442\u0435 \u0444\u0430\u0439\u043b \u0438 \u043e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 \u0435\u0433\u043e \u0438\u0437 \u043f\u0430\u043f\u043a\u0438 \u00ab\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0438\u00bb.",
+        "instalar_conf": "📲 <b>Последний шаг</b>\n\nНажмите на файл выше и выберите <b>«Открыть в GeoiD-vpn»</b>.\nПриложение добавит профиль и активирует его само — останется нажать <b>«Подключиться»</b>.\n\n<i>Приложение не появилось? Скачайте файл, откройте его из папки «Загрузки» и выберите GeoiD-vpn.</i>",
         "factura_desc": (
             "Полный доступ к {marca} на {duracion}.\n"
             "Активируется сразу, действует до {fecha}."
@@ -281,15 +288,22 @@ TEXTOS = {
         "promo_pedir": "Введите промокод:",
         "promo_ok": "✅ Промокод принят: добавлено <b>{dias} дней</b>.",
         "promo_mal": "❌ Код недействителен или уже использован.",
-        "ayuda": (
-            "❓ <b>Как подключиться</b>\n\n"
-            "1. Установите приложение:\n"
-            "• Android: {android}\n"
-            "• Windows: {windows}\n\n"
-            "2. Скачайте конфигурацию в 📱 Мой VPN.\n"
-            "3. В приложении: <b>Профили → + → импорт .conf</b>.\n"
-            "4. Нажмите <b>Подключить</b>.\n\n"
-            "Если что-то не работает — напишите здесь."
+                "ayuda": (
+            "❓ <b>Как пользоваться</b>\n\n"
+            "<b>1.</b> Установите приложение:\n"
+            "· Android: {android}\n"
+            "· Windows: {windows}\n\n"
+            "<b>2.</b> Запросите конфигурацию в <b>📱 Мой VPN</b> → "
+            "<b>📄 Моя конфигурация (.conf)</b>. Она придёт файлом.\n\n"
+            "<b>3.</b> Нажмите на файл и выберите <b>«Открыть в GeoiD-vpn»</b>. "
+            "Приложение добавит профиль и сразу его активирует — вручную ничего "
+            "вводить не нужно.\n\n"
+            "<b>4.</b> Вернитесь на главный экран и нажмите <b>«Подключиться»</b>. "
+            "Готово.\n\n"
+            "<i>Приложение не появилось в списке? Скачайте файл и откройте его "
+            "из папки «Загрузки», выбрав GeoiD-vpn. Можно и вручную: "
+            "Профили → + → Импорт .conf.</i>\n\n"
+            "Есть вопросы? Напишите здесь — ответим лично."
         ),
         "idioma_pedir": "Выберите язык:",
         "idioma_ok": "Язык изменён.",
@@ -338,7 +352,7 @@ TEXTOS = {
         "soporte_ticket": "\U0001F3AB Support ticket\n\nFrom: {usuario} (ID {id})\n\n{mensaje}\n\nReply to this message to answer.",
         "soporte_respuesta": "Reply from the team:\n\n{mensaje}",
         "soporte_enviado": "Sent to the customer.",
-        "instalar_conf": "\U0001F4F2 Tap the file above and choose \u00abOpen with GeoiD-vpn\u00bb. The app adds the profile and activates it by itself.\n\nIf the app is not listed: download the file, open Downloads and open it from there.",
+        "instalar_conf": "📲 <b>Last step</b>\n\nTap the file above and choose <b>“Open with GeoiD-vpn”</b>.\nThe app adds it and activates it by itself: then you only have to press <b>Connect</b>.\n\n<i>App not listed? Save the file, open it from Downloads and choose GeoiD-vpn.</i>",
         "factura_desc": (
             "Full access to {marca} for {duracion}.\n"
             "Activates instantly and expires on {fecha}."
@@ -440,15 +454,22 @@ TEXTOS = {
         "promo_pedir": "Type the promo code:",
         "promo_ok": "✅ Code redeemed: <b>{dias} days</b> added.",
         "promo_mal": "❌ That code is invalid or used up.",
-        "ayuda": (
-            "❓ <b>How to connect</b>\n\n"
-            "1. Install the app:\n"
-            "• Android: {android}\n"
-            "• Windows: {windows}\n\n"
-            "2. Download your configuration in 📱 My VPN.\n"
-            "3. In the app: <b>Profiles → + → import .conf</b>.\n"
-            "4. Tap <b>Connect</b>.\n\n"
-            "If something fails, write to us here."
+                "ayuda": (
+            "❓ <b>How to use it</b>\n\n"
+            "<b>1.</b> Install the app:\n"
+            "· Android: {android}\n"
+            "· Windows: {windows}\n\n"
+            "<b>2.</b> Get your configuration in <b>📱 My VPN</b> → "
+            "<b>📄 My configuration (.conf)</b>. It arrives as a file.\n\n"
+            "<b>3.</b> Tap that file and choose <b>“Open with GeoiD-vpn”</b>. "
+            "The app adds the profile and activates it instantly — nothing to "
+            "type by hand.\n\n"
+            "<b>4.</b> Go back to the main screen and press <b>Connect</b>. "
+            "That is all.\n\n"
+            "<i>The app is not listed when you tap the file? Save it first and "
+            "open it from Downloads, choosing GeoiD-vpn. You can also import it "
+            "manually: Profiles → + → Import .conf.</i>\n\n"
+            "Any questions? Write to us here and we will reply privately."
         ),
         "idioma_pedir": "Choose your language:",
         "idioma_ok": "Language changed.",
