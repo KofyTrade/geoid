@@ -504,17 +504,28 @@ Comprobar antes de reiniciar:
 cd /opt/geoid-bot && for f in *.py; do python3 -m py_compile $f || echo "FALLA $f"; done && echo "TODO OK"
 ```
 
-## Pago con estrellas: solo si el cliente ya las tiene
+## Comprar estrellas con rublos (sin salir de Telegram)
 
-Las estrellas se quedan como opción, pero **sin servicio externo**. Motivo: para
-un cliente ruso comprar estrellas en un tercero son 4–5 pasos, dar su @usuario y
-un recargo del 10–40 %; en la práctica muchos abandonan.
+Algunos clientes solo tienen estrellas en mente. En la pantalla de pago hay un
+cuarto botón: **💳 Estrellas nuevas · comprar con SBP**.
 
-El orden de pago que se muestra ahora:
+Flujo: abre el servicio (un **bot de Telegram**, no una web), pide las estrellas
+exactas que cuesta el plan, indica su @usuario, paga con SBP y vuelve. Tres
+pasos, sin registro.
 
-1. **📱 Pago por QR · rublos (lo más rápido)** — su banco, 2 toques, 0 % comisión
-2. **🪙 Cripto (USDT / TON)** — para quien ya tiene cripto
-3. **⭐ Estrellas (si ya tiene)** — factura directa de Telegram
+Configuración:
 
-El código del servicio externo queda aparcado (`GEOID_ESTRELLAS_URL` en
-`config.py`) por si algún día se quiere recuperar, pero no aparece en el menú.
+```bash
+GEOID_ESTRELLAS_URL=https://t.me/BuyStarsOfficial_bot
+GEOID_ESTRELLAS_SERVICIO=BuyStars
+```
+
+Se puede cambiar por otro servicio sin tocar código (por ejemplo
+`https://funpay.com/lots/telegram-stars/` o `https://krab.gg/ru/buy-stars`).
+
+Orden de los métodos de pago:
+
+1. **📱 Pago por QR · rublos (lo más rápido)** — 0 % de comisión
+2. **🪙 Cripto (USDT / TON)** — 3 %
+3. **⭐ Estrellas (si ya tiene)** — factura directa
+4. **💳 Estrellas nuevas · comprar con SBP** — con el servicio externo

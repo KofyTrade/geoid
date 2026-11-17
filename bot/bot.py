@@ -753,10 +753,15 @@ async def cb_plan(llamada: CallbackQuery):
         text=t(idi, "metodo_crypto"),
         callback_data=f"metodo:crypto:{meses}")])
 
-    # 3) Estrellas, solo si ya las tiene
+    # 3) Estrellas, si ya las tiene
     filas.append([InlineKeyboardButton(
         text=t(idi, "metodo_stars_corto"),
         callback_data=f"metodo:stars:{meses}")])
+
+    # 4) Estrellas nuevas: se compran en un bot que acepta SBP
+    filas.append([InlineKeyboardButton(
+        text=t(idi, "metodo_estrellas_comprar"),
+        callback_data=f"estrellas:comprar:{meses}")])
 
     filas.append([InlineKeyboardButton(text="◀️", callback_data="comprar")])
 
@@ -795,6 +800,41 @@ async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
         provider_token="",
         currency="XTR",
         prices=[LabeledPrice(label=f"{meses} m", amount=estrellas)],
+    )
+
+
+@router.callback_query(F.data.startswith("estrellas:comprar:"))
+async def cb_estrellas_comprar(llamada: CallbackQuery, bot: Bot):
+    """Explica cómo comprar estrellas con SBP y vuelve a la factura."""
+    await llamada.answer()
+
+    meses = int(llamada.data.split(":")[2])
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+    cantidad = config.PRECIOS[meses]
+    usuario = db.obtener(tg_id) or {}
+    nombre = usuario.get("usuario")
+    quien = ("@" + nombre) if nombre else "—"
+
+    teclado = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text=t(idi, "estrellas_ir", cantidad=cantidad),
+            url=config.ESTRELLAS_URL)],
+        [InlineKeyboardButton(
+            text=t(idi, "estrellas_volver"),
+            callback_data=f"metodo:stars:{meses}")],
+        [InlineKeyboardButton(text="◀️", callback_data=f"plan:{meses}")],
+    ])
+
+    await bot.send_message(
+        tg_id,
+        t(idi, "estrellas_instrucciones",
+          servicio=config.ESTRELLAS_SERVICIO,
+          cantidad=cantidad,
+          usuario=quien),
+        reply_markup=teclado,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
     )
 
 
