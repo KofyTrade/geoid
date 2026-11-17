@@ -28,10 +28,10 @@ NIVELES_INVITACION = [(3, 7), (10, 15), (20, 30)]  # bonus por invitar
 
 # Precios en estrellas de Telegram (XTR). 1 estrella ~ 0,013 $.
 PRECIOS = {
-    1: int(os.environ.get("GEOID_PRECIO_1M", "150")),
-    3: int(os.environ.get("GEOID_PRECIO_3M", "400")),
-    6: int(os.environ.get("GEOID_PRECIO_6M", "700")),
-    12: int(os.environ.get("GEOID_PRECIO_12M", "1200")),
+    1: int(os.environ.get("GEOID_PRECIO_1M", "115")),
+    3: int(os.environ.get("GEOID_PRECIO_3M", "300")),
+    6: int(os.environ.get("GEOID_PRECIO_6M", "520")),
+    12: int(os.environ.get("GEOID_PRECIO_12M", "900")),
 }
 
 # --- Ficheros ---
@@ -60,10 +60,10 @@ CRYPTO_MONEDA = os.environ.get("GEOID_CRYPTO_MONEDA", "USDT")
 
 # Precios en dolares para cripto (los de estrellas son aparte).
 PRECIOS_USD = {
-    1: float(os.environ.get("GEOID_USD_1M", "2.5")),
-    3: float(os.environ.get("GEOID_USD_3M", "6.5")),
-    6: float(os.environ.get("GEOID_USD_6M", "11")),
-    12: float(os.environ.get("GEOID_USD_12M", "21")),
+    1: float(os.environ.get("GEOID_USD_1M", "1.9")),
+    3: float(os.environ.get("GEOID_USD_3M", "4.8")),
+    6: float(os.environ.get("GEOID_USD_6M", "8")),
+    12: float(os.environ.get("GEOID_USD_12M", "15")),
 }
 
 # --- Pago con SBP / tarjeta rusa (manual) ---
@@ -75,10 +75,10 @@ SBP_QR_URL = os.environ.get("GEOID_SBP_QR_URL", "").strip()   # imagen opcional
 
 # Precios en rublos para este metodo.
 PRECIOS_RUB = {
-    1: int(os.environ.get("GEOID_RUB_1M", "199")),
-    3: int(os.environ.get("GEOID_RUB_3M", "539")),
-    6: int(os.environ.get("GEOID_RUB_6M", "949")),
-    12: int(os.environ.get("GEOID_RUB_12M", "1690")),
+    1: int(os.environ.get("GEOID_RUB_1M", "150")),
+    3: int(os.environ.get("GEOID_RUB_3M", "399")),
+    6: int(os.environ.get("GEOID_RUB_6M", "699")),
+    12: int(os.environ.get("GEOID_RUB_12M", "1290")),
 }
 
 # Texto libre por si algun dia quieres otro metodo (vacio = no se muestra).
@@ -92,7 +92,7 @@ MARCA = os.environ.get("GEOID_MARCA", "GeoiD VPN")
 
 # --- Regalo del proxy de Telegram para planes largos ---
 # Meses minimos para llevarse el proxy de regalo.
-MIN_MESES_PROXY = int(os.environ.get("GEOID_PROXY_MESES", "6"))
+MIN_MESES_PROXY = int(os.environ.get("GEOID_PROXY_MESES", "3"))
 # Dispositivos (IPs distintas) que puede usar a la vez cada proxy personal.
 PROXY_DISPOSITIVOS = int(os.environ.get("GEOID_PROXY_DISPOSITIVOS", "2"))
 
@@ -126,3 +126,26 @@ PAISES = [
 # Idioma con el que empieza un cliente nuevo. Cada uno puede cambiarlo con
 # el boton de idioma del menu.
 IDIOMA_DEFECTO = os.environ.get("GEOID_IDIOMA", "ru").strip().lower() or "ru"
+
+# Cuantos proxies de regalo segun los meses comprados.
+PROXY_POR_MESES = {
+    3: 1,
+    6: 2,
+    12: 2,
+}
+
+# Dias extra de regalo segun los meses comprados.
+REGALO_DIAS = {
+    6: 20,
+    12: 60,
+}
+
+
+def proxies_de_regalo(meses: int) -> int:
+    """Proxies que le corresponden a un plan."""
+    return PROXY_POR_MESES.get(meses, 1 if meses >= MIN_MESES_PROXY else 0)
+
+
+def dias_de_regalo(meses: int) -> int:
+    """Dias extra que se suman al plan."""
+    return REGALO_DIAS.get(meses, 0)

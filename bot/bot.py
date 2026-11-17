@@ -459,48 +459,113 @@ async def recompensar_padrino(bot: Bot, comprador: int) -> None:
     log.info("premio nivel %s (%s dias) para %s", nivel_nuevo, dias, padrino)
 
 
+def activar_plan(tg_id: int, meses: int) -> dict:
+    """Activa un plan: los meses comprados más los días de regalo."""
+    dias = 30 * meses + config.dias_de_regalo(meses)
+    return activar(tg_id, dias)
+
+
 async def entregar_proxy(bot: Bot, tg_id: int, meses: int) -> None:
-    """Crea el proxy personal del cliente y le manda su enlace."""
-    if meses < config.MIN_MESES_PROXY:
+    """Crea y entrega los proxies de regalo que toquen (1 o 2)."""
+    cantidad = config.proxies_de_regalo(meses)
+    if cantidad <= 0:
         return
-    # Los clientes NUNCA usan el proxy del dueno (puerto 443): siempre uno propio.
-    if not proxy_personal.disponible():
+
+    # Los clientes NUNCA usan el proxy del dueño (puerto 443).
+    if not proxies_ok():
         log.warning(
             "proxy personal no disponible: falta ejecutar proxy-multiusuario.sh"
         )
         return
 
     usuario = db.obtener(tg_id) or {}
+    idi = usuario.get("idioma") or config.IDIOMA_DEFECTO
 
-    # ya lo tiene creado?
-    if usuario.get("proxy") and usuario.get("proxy_secreto") and usuario.get("proxy_puerto"):
-        puerto = usuario["proxy_puerto"]
-        secreto = usuario["proxy_secreto"]
-        if not proxy_personal.activo(tg_id):
-            datos = proxy_personal.crear(tg_id, secreto)
+    for numero in (1, 2):
+        if numero > cantidad:
+            break
+
+        if numero == 1:
+            puerto, secreto = usuario.get("proxy_puerto"), usuario.get("proxy_secreto")
+        else:
+            puerto, secreto = usuario.get("proxy2_puerto"), usuario.get("proxy2_secreto")
+
+        if not (puerto and secreto):
+            datos = proxy_personal.crear(tg_id, numero=numero)
             puerto, secreto = datos["puerto"], datos["secreto"]
-    else:
-        datos = proxy_personal.crear(tg_id)
-        puerto, secreto = datos["puerto"], datos["secreto"]
-        db.guardar(tg_id, proxy=1, proxy_puerto=puerto, proxy_secreto=secreto)
+            if numero == 1:
+                db.guardar(tg_id, proxy=1, proxy_puerto=puerto, proxy_secreto=secreto)
+            else:
+                db.guardar(tg_id, proxy2_puerto=puerto, proxy2_secreto=secreto)
+        elif not proxy_personal.activo(tg_id, numero):
+            datos = proxy_personal.crear(tg_id, secreto, numero=numero)
+            puerto = datos["puerto"]
 
-    enlace = (
-        f"tg://proxy?server={config.PROXY_SERVIDOR}"
-        f"&port={puerto}&secret={secreto}"
+        enlace = (
+            f"tg://proxy?server={config.PROXY_SERVIDOR}"
+            f"&port={puerto}&secret={secreto}"
+        )
+        texto = t(idi, "proxy_regalo",
+                  enlace=enlace,
+                  servidor=config.PROXY_SERVIDOR,
+                  puerto=puerto,
+                  secreto=secreto)
+        if cantidad > 1:
+            texto = t(idi, "proxy_cual", numero=numero, total=cantidad) + "\n\n" + texto
+
+        try:
+            await bot.send_message(
+                tg_id, texto,
+                parse_mode=ParseMode.HTML,
+                disable_web_page_preview=True,
+            )
+        except Exception:  # noqa: BLE001
+            log.warning("no se pudo entregar el proxy %s a %s", numero, tg_id)
+
+
+async def recompensar_padrino(bot: Bot, comprador: int) -> None:
+    """Si el amigo ha comprado, mira los niveles del padrino y premia."""
+    usuario = db.obtener(comprador) or {}
+    padrino = usuario.get("referido")
+    if not padrino:
+        return
+
+    datos = db.obtener(padrino) or {}
+    nivel_previo = int(datos.get("nivel_ref") or 0)
+    cuantos = db.referidos_pagados(padrino)
+
+    nivel_nuevo = 0
+    for numero, (amigos, _dias) in enumerate(config.NIVELES_INVITACION, start=1):
+        if cuantos >= amigos:
+            nivel_nuevo = numero
+
+    if nivel_nuevo <= nivel_previo:
+        return
+
+    dias = sum(
+        premio
+        for numero, (_amigos, premio) in enumerate(config.NIVELES_INVITACION, start=1)
+        if nivel_previo < numero <= nivel_nuevo
     )
+    if dias <= 0:
+        return
+
+    db.crear_si_falta(padrino, None)
+    actualizado = activar(padrino, dias)
+    db.guardar(padrino, nivel_ref=nivel_nuevo)
+
     try:
         await bot.send_message(
-            tg_id,
-            t(idioma(tg_id), "proxy_regalo",
-              enlace=enlace,
-              servidor=config.PROXY_SERVIDOR,
-              puerto=puerto,
-              secreto=secreto),
+            padrino,
+            t(idioma(padrino), "premio_invitacion",
+              cuantos=cuantos, dias=dias, fecha=fecha(actualizado["expira"])),
             parse_mode=ParseMode.HTML,
-            disable_web_page_preview=True,
+            reply_markup=teclado_fijo(padrino),
         )
     except Exception:  # noqa: BLE001
-        log.warning("no se pudo entregar el proxy a %s", tg_id)
+        log.warning("no se pudo avisar del premio a %s", padrino)
+
+    log.info("premio nivel %s (%s dias) para %s", nivel_nuevo, dias, padrino)
 
 
 @router.message(CommandStart())
@@ -711,7 +776,7 @@ async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
             idi, "factura_desc",
             marca=config.MARCA,
             duracion=_duracion(meses, idi),
-            fecha=fecha(int(time.time()) + 30 * meses * DIA),
+            fecha=fecha(int(time.time()) + (30 * meses + config.dias_de_regalo(meses)) * DIA),
         ),
         payload=f"plan:{meses}",
         provider_token="",
@@ -855,7 +920,7 @@ async def admin_activar(llamada: CallbackQuery, bot: Bot):
     _, sid, smeses = llamada.data.split(":")
     tg_id, meses = int(sid), int(smeses)
     db.crear_si_falta(tg_id, None)
-    usuario = activar(tg_id, 30 * meses)
+    usuario = activar_plan(tg_id, meses)
     db.registrar_pago(
         tg_id, meses, config.PRECIOS_RUB.get(meses, 0),
         f"sbp:{int(time.time())}",
@@ -976,7 +1041,7 @@ async def pago_recibido(mensaje: Message, bot: Bot):
     idi = idioma(tg_id)
 
     try:
-        actualizado = activar(tg_id, 30 * meses)
+        actualizado = activar_plan(tg_id, meses)
     except Exception:  # noqa: BLE001
         log.exception("fallo activando tras el pago")
         await mensaje.answer(t(idi, "error_generico"))
@@ -1154,7 +1219,7 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
         return
     tg_id, meses = int(partes[0]), int(partes[1])
     db.crear_si_falta(tg_id, None)
-    usuario = activar(tg_id, 30 * meses)
+    usuario = activar_plan(tg_id, meses)
     db.registrar_pago(tg_id, meses, 0, f"manual:{int(time.time())}")
     await mensaje.answer(
         t(idioma(mensaje.from_user.id), "activar_ok",
@@ -1339,7 +1404,7 @@ async def vigilar_cripto(bot: Bot):
                     continue
 
                 db.crear_si_falta(tg_id, None)
-                usuario = activar(tg_id, 30 * meses)
+                usuario = activar_plan(tg_id, meses)
                 db.registrar_pago(
                     tg_id, meses,
                     int(float(factura.get("amount") or 0)), cargo,

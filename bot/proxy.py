@@ -28,12 +28,19 @@ def disponible() -> bool:
     return Path(BIN).exists() and Path("/etc/systemd/system/mtg-user@.service").exists()
 
 
-def puerto_de(tg_id: int) -> int:
-    return PUERTO_BASE + (tg_id % (PUERTO_TOPE - PUERTO_BASE))
+def puerto_de(tg_id: int, numero: int = 1) -> int:
+    """Puerto propio. El segundo proxy usa otro puerto para el mismo cliente."""
+    hueco = tg_id % ((PUERTO_TOPE - PUERTO_BASE) // 2)
+    return PUERTO_BASE + hueco * 2 + (numero - 1)
 
 
-def _ruta(tg_id: int) -> Path:
-    return CARPETA / f"{tg_id}.toml"
+def _nombre(tg_id: int, numero: int = 1) -> str:
+    """Nombre del servicio: 123 para el primero, 123b para el segundo."""
+    return str(tg_id) if numero <= 1 else f"{tg_id}b"
+
+
+def _ruta(tg_id: int, numero: int = 1) -> Path:
+    return CARPETA / f"{_nombre(tg_id, numero)}.toml"
 
 
 def _systemctl(*args: str) -> subprocess.CompletedProcess:
@@ -51,44 +58,45 @@ def _generar_clave() -> str:
     return salida.stdout.strip()
 
 
-def crear(tg_id: int, clave: str | None = None) -> dict:
+def crear(tg_id: int, clave: str | None = None, numero: int = 1) -> dict:
     """Crea (o reutiliza) el proxy personal de un cliente."""
     CARPETA.mkdir(parents=True, exist_ok=True)
-    puerto = puerto_de(tg_id)
+    puerto = puerto_de(tg_id, numero)
     clave = clave or _generar_clave()
+    nombre = _nombre(tg_id, numero)
 
-    _ruta(tg_id).write_text(
+    _ruta(tg_id, numero).write_text(
         "# Proxy personal de GeoiD\n"
         f'secret = "{clave}"\n'
         f'bind-to = "0.0.0.0:{puerto}"\n',
         encoding="utf-8",
     )
-    os.chmod(_ruta(tg_id), 0o600)
+    os.chmod(_ruta(tg_id, numero), 0o600)
 
     _systemctl("daemon-reload")
-    _systemctl("enable", f"mtg-user@{tg_id}")
-    _systemctl("restart", f"mtg-user@{tg_id}")
+    _systemctl("enable", f"mtg-user@{nombre}")
+    _systemctl("restart", f"mtg-user@{nombre}")
     time.sleep(1)
 
     return {"puerto": puerto, "secreto": clave}
 
 
-def eliminar(tg_id: int) -> None:
-    _systemctl("disable", "--now", f"mtg-user@{tg_id}")
+def eliminar(tg_id: int, numero: int = 1) -> None:
+    _systemctl("disable", "--now", f"mtg-user@{_nombre(tg_id, numero)}")
     try:
-        _ruta(tg_id).unlink(missing_ok=True)
+        _ruta(tg_id, numero).unlink(missing_ok=True)
     except Exception:  # noqa: BLE001
         log.warning("no se pudo borrar la config del proxy %s", tg_id)
 
 
-def activo(tg_id: int) -> bool:
-    resultado = _systemctl("is-active", f"mtg-user@{tg_id}")
+def activo(tg_id: int, numero: int = 1) -> bool:
+    resultado = _systemctl("is-active", f"mtg-user@{_nombre(tg_id, numero)}")
     return resultado.stdout.strip() == "active"
 
 
-def ips_conectadas(tg_id: int) -> list[str]:
+def ips_conectadas(tg_id: int, numero: int = 1) -> list[str]:
     """IPs publicas conectadas a ese proxy (una por dispositivo, normalmente)."""
-    puerto = puerto_de(tg_id)
+    puerto = puerto_de(tg_id, numero)
     try:
         salida = subprocess.run(
             ["ss", "-tn", "state", "established"],
@@ -113,8 +121,8 @@ def ips_conectadas(tg_id: int) -> list[str]:
     return ips
 
 
-def enlace(tg_id: int, secreto: str) -> str:
+def enlace(tg_id: int, secreto: str, numero: int = 1) -> str:
     return (
         f"tg://proxy?server={config.PROXY_SERVIDOR}"
-        f"&port={puerto_de(tg_id)}&secret={secreto}"
+        f"&port={puerto_de(tg_id, numero)}&secret={secreto}"
     )

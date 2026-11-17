@@ -2,6 +2,7 @@
 
 TEXTOS = {
     "es": {
+        "proxy_cual": "🎁 <b>Proxy {numero} de {total}</b>",
         "soporte_invita": "Si necesitas ayuda, escribe tu mensaje aquí abajo y te responderemos en este mismo chat.",
         "soporte_recibido": "Mensaje recibido. Te contestamos aquí en cuanto podamos.",
         "soporte_ticket": "\U0001F3AB Ticket de soporte\n\nDe: {usuario} (ID {id})\n\n{mensaje}\n\nResponde a este mensaje para contestarle.",
@@ -38,7 +39,7 @@ TEXTOS = {
             "no se puede bloquear por firma de tráfico.\n\n"
             "🎁 Tienes <b>{dias} días gratis</b> para probarla, sin tarjeta.\n\n"
             "📱 Además: con la compra de <b>6 meses o más</b> te llevas <b>gratis</b> "
-            "el proxy de Telegram, para usarlo sin VPN.\n\n"
+            "el proxy de Telegram. Desde 3 meses: <b>1 proxy gratis</b>; desde 6 meses: <b>2 proxies y 20 días extra</b>; 12 meses: <b>2 proxies y 2 meses extra</b>.\n\n"
             "Aquí mismo recibirás tu configuración. Para usarla necesitas la "
             "aplicación <b>GeoiD-vpn</b>; los enlaces están en ❓ Ayuda.\n\n"
             "Elige una opción 👇"
@@ -176,6 +177,7 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "proxy_cual": "🎁 <b>Прокси {numero} из {total}</b>",
         "soporte_invita": "Если нужна помощь, напишите сообщение здесь — ответим в этом же чате.",
         "soporte_recibido": "Сообщение получено. Ответим здесь, как только сможем.",
         "soporte_ticket": "\U0001F3AB Сообщение в поддержку\n\nОт: {usuario} (ID {id})\n\n{mensaje}\n\nОтветьте на это сообщение, чтобы написать клиенту.",
@@ -347,6 +349,7 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "proxy_cual": "🎁 <b>Proxy {numero} of {total}</b>",
         "soporte_invita": "If you need help, write your message below and we will reply in this same chat.",
         "soporte_recibido": "Message received. We will answer here as soon as we can.",
         "soporte_ticket": "\U0001F3AB Support ticket\n\nFrom: {usuario} (ID {id})\n\n{mensaje}\n\nReply to this message to answer.",
@@ -383,7 +386,7 @@ TEXTOS = {
             "it cannot be blocked by traffic signature.\n\n"
             "🎁 You get <b>{dias} days free</b>, no card needed.\n\n"
             "📱 Plus: buy <b>6 months or more</b> and get the <b>Telegram proxy</b> "
-            "free, to use Telegram without a VPN.\n\n"
+            "free. From 3 months: <b>1 proxy free</b>; from 6 months: <b>2 proxies and 20 extra days</b>; 12 months: <b>2 proxies and 2 extra months</b>.\n\n"
             "Your configuration arrives right here. You need the "
             "<b>GeoiD-vpn</b> app; links are under ❓ Help.\n\n"
             "Pick an option 👇"

@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
     proxy       INTEGER DEFAULT 0,
     nivel_ref   INTEGER DEFAULT 0,
     proxy_puerto INTEGER,
-    proxy_secreto TEXT
+    proxy_secreto TEXT,
+    proxy2_puerto INTEGER,
+    proxy2_secreto TEXT
 );
 
 CREATE TABLE IF NOT EXISTS promos (
@@ -103,6 +105,10 @@ def _migrar(con) -> None:
         con.execute("ALTER TABLE usuarios ADD COLUMN proxy_puerto INTEGER")
     if "proxy_secreto" not in columnas:
         con.execute("ALTER TABLE usuarios ADD COLUMN proxy_secreto TEXT")
+    if "proxy2_puerto" not in columnas:
+        con.execute("ALTER TABLE usuarios ADD COLUMN proxy2_puerto INTEGER")
+    if "proxy2_secreto" not in columnas:
+        con.execute("ALTER TABLE usuarios ADD COLUMN proxy2_secreto TEXT")
 
 
 def guardar(tg_id: int, **campos):
