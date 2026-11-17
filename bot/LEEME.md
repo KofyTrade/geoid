@@ -543,32 +543,28 @@ Orden en el bot al elegir un plan:
 2. **💳 Estrellas nuevas · comprar con SBP** — servicio externo en un bot
 3. **🌐 Tarjeta rusa / SBP (en la web)** — abre la página de pago del servidor
 
-### Página de pago
+### Página de pago (GitHub Pages)
 
 ```
-https://<dominio>/?p=<meses>&u=<telegram_id>
+https://kofytrade.github.io/geoid-pagos/?p=<meses>&u=<telegram_id>
 ```
 
-- Muestra plan, días, importe y el **QR** de tu banco
-- Botón **«Ya he pagado X ₽»** → te llega al grupo el aviso con
-  **✅ Activar** (el botón que ya existía)
-- Si falta `qr.png`, la página lo indica
+- Repositorio público: `KofyTrade/geoid-pagos` (index.html + qr.png)
+- Abre en Rusia (GitHub no está bloqueado; DuckDNS sí puede estarlo)
+- El botón «Ya he pagado» abre `t.me/geoidvpn_bot?start=pagado_<meses>`
+- El bot avisa al dueño con el botón ✅ Activar, igual que antes
+- **Sustituir `qr.png`** por el QR real del banco (mismo nombre, misma carpeta)
 
-Instalación (una vez, con el dominio ya apuntando al servidor):
+Para actualizar la página:
 
 ```bash
-# en el PC
-scp E:\PC\vpn\servidor\pagina-pagos\pagos_web.py root@193.29.224.164:/root/
-scp E:\PC\vpn\servidor\pagina-pagos\instalar-pagina-pagos.sh root@193.29.224.164:/root/
-
-# en el servidor
-bash /root/instalar-pagina-pagos.sh geoidvpn.duckdns.org
-scp de tu QR a /opt/geoid-pagos/qr.png
-
-# y en el bot
-echo 'GEOID_WEB_PAGOS=https://geoidvpn.duckdns.org' >> /etc/geoid-bot.env
-systemctl restart geoid-bot
+cd E:\PC\vpn\web-pagos
+git add -A && git commit -m "cambio" && git push
 ```
 
-Servicios: `geoid-pagos` (la página) y `caddy` (HTTPS automático).
+Y en el bot, para que use esta web:
 
+```bash
+echo 'GEOID_WEB_PAGOS=https://kofytrade.github.io/geoid-pagos/' >> /etc/geoid-bot.env
+systemctl restart geoid-bot
+```

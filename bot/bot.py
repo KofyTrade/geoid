@@ -590,6 +590,20 @@ async def start(mensaje: Message, bot: Bot, command: CommandObject):
     if referido:
         await mensaje.answer(t(idi, "invitar_bienvenida"))
 
+    # Enlaces que llegan desde la página de pago: /start pagado_1 | pagado_3 | pagado_6
+    if argumento.startswith("pagado_"):
+        trozo = argumento.split("_", 1)[1]
+        meses_pagados = int(trozo) if trozo.isdigit() else 1
+        if meses_pagados not in config.PRECIOS_RUB:
+            meses_pagados = 1
+        await avisar_pago(bot, mensaje.from_user.id, meses_pagados)
+        await mensaje.answer(
+            t(idi, "manual_aviso"),
+            reply_markup=teclado_volver(mensaje.from_user.id),
+            parse_mode=ParseMode.HTML,
+        )
+        return
+
     # Enlaces que llegan desde la app: /start trial | buy | my
     if argumento == "trial":
         await accion_prueba(bot, mensaje.from_user.id)
@@ -933,13 +947,9 @@ async def cb_manual(llamada: CallbackQuery, bot: Bot):
         )
 
 
-@router.callback_query(F.data.startswith("paguei:"))
-async def cb_paguei(llamada: CallbackQuery, bot: Bot):
-    meses = int(llamada.data.split(":")[1])
-    tg_id = llamada.from_user.id
-    idi = idioma(tg_id)
+async def avisar_pago(bot: Bot, tg_id: int, meses: int) -> None:
+    """Avisa al dueño de un pago pendiente (botón para activar)."""
     usuario = db.obtener(tg_id) or {}
-
     destino = int(config.AVISOS_ID) if config.AVISOS_ID else ADMIN
     if destino:
         try:
@@ -962,14 +972,23 @@ async def cb_paguei(llamada: CallbackQuery, bot: Bot):
 
     if avisos is not None:
         await avisos.avisar(
-        f"PAGO {config.PRECIOS_RUB.get(meses, 0)} RUB - {usuario.get('usuario') or tg_id}",
-        "Alguien ha pulsado «Ya he pagado».\n\n"
-        f"Usuario: {usuario.get('usuario') or '—'} (ID {tg_id})\n"
-        f"Plan: {meses} mes(es)\n"
-        f"Importe: {config.PRECIOS_RUB.get(meses, 0)} RUB\n\n"
-        "Comprueba tu banco y activa con /activar "
-        f"{tg_id} {meses}",
-    )
+            f"PAGO {config.PRECIOS_RUB.get(meses, 0)} RUB - "
+            f"{usuario.get('usuario') or tg_id}",
+            "Pago avisado desde la web de pago.\n\n"
+            f"Usuario: {usuario.get('usuario') or '—'} (ID {tg_id})\n"
+            f"Plan: {meses} mes(es)\n"
+            f"Importe: {config.PRECIOS_RUB.get(meses, 0)} RUB\n\n"
+            f"Comprueba tu banco y activa con /activar {tg_id} {meses}",
+        )
+
+
+@router.callback_query(F.data.startswith("paguei:"))
+async def cb_paguei(llamada: CallbackQuery, bot: Bot):
+    meses = int(llamada.data.split(":")[1])
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+
+    await avisar_pago(bot, tg_id, meses)
 
     await llamada.message.edit_text(
         t(idi, "manual_aviso"), reply_markup=teclado_volver(tg_id)
