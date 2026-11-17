@@ -736,20 +736,30 @@ async def cb_comprar(llamada: CallbackQuery, bot: Bot):
 
 @router.callback_query(F.data.startswith("plan:"))
 async def cb_plan(llamada: CallbackQuery):
+    """Elige el plan y muestra las formas de pago, de la más fácil a la menos."""
     meses = int(llamada.data.split(":")[1])
     idi = idioma(llamada.from_user.id)
 
-    filas = [
-        [InlineKeyboardButton(
-            text=t(idi, "metodo_stars"), callback_data=f"metodo:stars:{meses}")],
-        [InlineKeyboardButton(
-            text=t(idi, "metodo_crypto"), callback_data=f"metodo:crypto:{meses}")],
-    ]
-    # El pago por QR solo aparece si hay un QR guardado.
+    filas = []
+
+    # 1) QR / SBP: lo más rápido para un cliente ruso.
     if hay_qr():
         filas.append([InlineKeyboardButton(
-            text=t(idi, "metodo_manual"), callback_data=f"metodo:manual:{meses}")])
+            text=t(idi, "metodo_qr_recomendado"),
+            callback_data=f"metodo:manual:{meses}")])
+
+    # 2) Cripto
+    filas.append([InlineKeyboardButton(
+        text=t(idi, "metodo_crypto"),
+        callback_data=f"metodo:crypto:{meses}")])
+
+    # 3) Estrellas, solo si ya las tiene
+    filas.append([InlineKeyboardButton(
+        text=t(idi, "metodo_stars_corto"),
+        callback_data=f"metodo:stars:{meses}")])
+
     filas.append([InlineKeyboardButton(text="◀️", callback_data="comprar")])
+
     texto = (
         t(idi, "plan_linea", duracion=_duracion(meses, idi))
         + "\n\n"
@@ -765,33 +775,27 @@ async def cb_plan(llamada: CallbackQuery):
 
 @router.callback_query(F.data.startswith("metodo:stars:"))
 async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
-    """Estrellas: pagar con las que ya tiene o comprarlas con rublos."""
+    """Factura de estrellas en un solo toque."""
     await llamada.answer()
 
     meses = int(llamada.data.split(":")[2])
-    tg_id = llamada.from_user.id
-    idi = idioma(tg_id)
-    cantidad = config.PRECIOS[meses]
+    estrellas = config.PRECIOS[meses]
+    idi = idioma(llamada.from_user.id)
 
-    teclado = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(
-            text=t(idi, "estrellas_pagar"),
-            callback_data=f"estrellas:pagar:{meses}")],
-        [InlineKeyboardButton(
-            text=t(idi, "estrellas_comprar"),
-            callback_data=f"estrellas:comprar:{meses}")],
-        [InlineKeyboardButton(text="◀️", callback_data=f"plan:{meses}")],
-    ])
-
-    try:
-        await bot.send_message(
-            tg_id,
-            t(idi, "estrellas_titulo", cantidad=cantidad),
-            reply_markup=teclado,
-            parse_mode=ParseMode.HTML,
-        )
-    except Exception:  # noqa: BLE001
-        log.exception("no se pudo mostrar la pantalla de estrellas")
+    await bot.send_invoice(
+        chat_id=llamada.from_user.id,
+        title=f"{config.MARCA} · {_duracion(meses, idi)}",
+        description=t(
+            idi, "factura_desc",
+            marca=config.MARCA,
+            duracion=_duracion(meses, idi),
+            fecha=fecha(int(time.time()) + (30 * meses + config.dias_de_regalo(meses)) * DIA),
+        ),
+        payload=f"plan:{meses}",
+        provider_token="",
+        currency="XTR",
+        prices=[LabeledPrice(label=f"{meses} m", amount=estrellas)],
+    )
 
 
 @router.callback_query(F.data.startswith("estrellas:pagar:"))

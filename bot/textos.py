@@ -2,6 +2,8 @@
 
 TEXTOS = {
     "es": {
+        "metodo_qr_recomendado": "📱 Pago por QR · rublos (lo más rápido)",
+        "metodo_stars_corto": "⭐ Estrellas (si ya tienes)",
         "estrellas_titulo": "⭐ <b>Pago con estrellas</b>\n\nEste plan cuesta <b>{cantidad} estrellas</b>.",
         "estrellas_pagar": "⭐ Pagar con mis estrellas",
         "estrellas_comprar": "💳 No tengo estrellas · comprar con rublos",
@@ -182,6 +184,8 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "metodo_qr_recomendado": "📱 Оплата по QR · рубли (быстрее всего)",
+        "metodo_stars_corto": "⭐ Звёзды (если они у вас есть)",
         "estrellas_titulo": "⭐ <b>Оплата звёздами</b>\n\nЭтот тариф стоит <b>{cantidad} звёзд</b>.",
         "estrellas_pagar": "⭐ Оплатить своими звёздами",
         "estrellas_comprar": "💳 Нет звёзд · купить за рубли",
@@ -359,6 +363,8 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "metodo_qr_recomendado": "📱 Pay by QR · rubles (fastest)",
+        "metodo_stars_corto": "⭐ Stars (if you already have them)",
         "estrellas_titulo": "⭐ <b>Pay with stars</b>\n\nThis plan costs <b>{cantidad} stars</b>.",
         "estrellas_pagar": "⭐ Pay with my stars",
         "estrellas_comprar": "💳 No stars · buy them with rubles",
