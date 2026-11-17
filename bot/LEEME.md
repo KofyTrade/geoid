@@ -551,6 +551,7 @@ https://kofytrade.github.io/geoid-pagos/?p=<meses>&u=<telegram_id>
 
 - Repositorio público: `KofyTrade/geoid-pagos` (index.html + qr.png)
 - Abre en Rusia (GitHub no está bloqueado; DuckDNS sí puede estarlo)
+- **En ruso por defecto**; botones РУ / ES / EN o `?lang=es` para cambiar
 - El botón «Ya he pagado» abre `t.me/geoidvpn_bot?start=pagado_<meses>`
 - El bot avisa al dueño con el botón ✅ Activar, igual que antes
 - **Sustituir `qr.png`** por el QR real del banco (mismo nombre, misma carpeta)
