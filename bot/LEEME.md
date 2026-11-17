@@ -326,10 +326,10 @@ mensajería funciona en Rusia sin VPN encendida.
 
 | Plan | Precio | Proxy |
 |---|---|---|
-| 1 mes | 199 ₽ · 150 ⭐ · 2,5 USDT | — |
-| 3 meses | 539 ₽ · 400 ⭐ · 6,5 USDT | — |
-| **6 meses** | **949 ₽ · 700 ⭐ · 11 USDT** | ✅ regalo |
-| 12 meses | 1.690 ₽ · 1.200 ⭐ · 21 USDT | ✅ regalo |
+| 1 mes | 150 ₽ · 115 ⭐ · 1,9 USDT | — |
+| 3 meses | 399 ₽ · 300 ⭐ · 4,8 USDT | ✅ 1 proxy |
+| **6 meses** | **699 ₽ · 520 ⭐ · 8 USDT** | ✅ 2 proxies + 20 días |
+
 
 Datos del proxy en `/etc/geoid-bot.env`:
 
@@ -486,7 +486,7 @@ Cada conversación es privada: el cliente solo ve sus mensajes y tu respuesta.
 |---|---|
 | Menú fijo (7 botones) | ✅ |
 | Prueba de 3 días | ✅ |
-| 4 planes con precio en ₽ | ✅ |
+| 3 planes con precio en ₽ (máx. 6 meses) | ✅ |
 | Estrellas / Cripto / QR | ✅ |
 | Proxy personal desde 6 meses | ✅ (máx. 2 dispositivos) |
 | Soporte con tickets privados | ✅ |

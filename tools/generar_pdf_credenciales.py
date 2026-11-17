@@ -279,8 +279,7 @@ parrafo("Promoción por tramos: el proxy de Telegram es de regalo desde 3 meses.
 tabla([
     ("1 mes", "150 ₽ · 115 ⭐ · 1,9 USDT"),
     ("3 meses", "399 ₽ · 300 ⭐ · 4,8 USDT · 1 proxy de regalo"),
-    ("6 meses", "699 ₽ · 520 ⭐ · 8 USDT · 2 proxies + 20 días extra"),
-    ("12 meses", "1.290 ₽ · 900 ⭐ · 15 USDT · 2 proxies + 2 meses extra"),
+    ("6 meses (máximo)", "699 ₽ · 520 ⭐ · 8 USDT · 2 proxies + 20 días extra"),
     ("Prueba gratis", "3 días, sin tarjeta"),
 ])
 

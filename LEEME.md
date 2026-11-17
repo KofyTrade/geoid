@@ -117,7 +117,7 @@ la caché de DNS (se intentó y el servicio falló al reiniciar; se dejó como e
 - Avisos de pago en un grupo privado aparte (`GEOID_AVISOS_ID`)
 - Comandos de administrador: `/estado`, `/qr`, `/chatid`, `/activar`,
   `/regalar`, `/promo`
-- Precios: 199 / 539 / 1690 ₽ · 150 / 400 / 1200 ⭐ · 2.5 / 6.5 / 21 USDT
+- Precios: 150 / 399 / 699 ₽ · 115 / 300 / 520 ⭐ · 1.9 / 4.8 / 8 USDT
 
 **Servidor**: AmneziaWG (UDP 21766, MTU 1280), dnsmasq con bloqueo de anuncios,
 BBR activo.
@@ -151,7 +151,7 @@ manual salvo confirmar el pago por QR.
 ### Bot (@geoidvpn_bot)
 
 - Menú fijo con 7 botones (sin «Cambiar país» mientras haya un solo servidor).
-- **4 planes**: 1, 3, 6 y 12 meses, con precio en rublos y 🎁 en los largos.
+- **3 planes**: 1, 3 y 6 meses (máximo 6), con precio en rublos y 🎁 en los largos.
 - **Pagos**: ⭐ estrellas, 🪙 cripto (Crypto Pay) y 📱 QR/SBP con activación en un
   toque desde el grupo de pagos.
 - **Proxy de Telegram de regalo** desde 6 meses: proxy **personal** por cliente,

@@ -31,7 +31,6 @@ PRECIOS = {
     1: int(os.environ.get("GEOID_PRECIO_1M", "115")),
     3: int(os.environ.get("GEOID_PRECIO_3M", "300")),
     6: int(os.environ.get("GEOID_PRECIO_6M", "520")),
-    12: int(os.environ.get("GEOID_PRECIO_12M", "900")),
 }
 
 # --- Ficheros ---
@@ -63,7 +62,6 @@ PRECIOS_USD = {
     1: float(os.environ.get("GEOID_USD_1M", "1.9")),
     3: float(os.environ.get("GEOID_USD_3M", "4.8")),
     6: float(os.environ.get("GEOID_USD_6M", "8")),
-    12: float(os.environ.get("GEOID_USD_12M", "15")),
 }
 
 # --- Pago con SBP / tarjeta rusa (manual) ---
@@ -78,7 +76,6 @@ PRECIOS_RUB = {
     1: int(os.environ.get("GEOID_RUB_1M", "150")),
     3: int(os.environ.get("GEOID_RUB_3M", "399")),
     6: int(os.environ.get("GEOID_RUB_6M", "699")),
-    12: int(os.environ.get("GEOID_RUB_12M", "1290")),
 }
 
 # Texto libre por si algun dia quieres otro metodo (vacio = no se muestra).
@@ -131,13 +128,11 @@ IDIOMA_DEFECTO = os.environ.get("GEOID_IDIOMA", "ru").strip().lower() or "ru"
 PROXY_POR_MESES = {
     3: 1,
     6: 2,
-    12: 2,
 }
 
 # Dias extra de regalo segun los meses comprados.
 REGALO_DIAS = {
     6: 20,
-    12: 60,
 }
 
 
