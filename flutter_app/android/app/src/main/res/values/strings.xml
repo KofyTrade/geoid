@@ -3,4 +3,5 @@
     <string name="app_name">GeoiD-vpn</string>
     <string name="canal_desc">Estado de la conexión VPN</string>
     <string name="notificacion_texto">Túnel activo</string>
+    <string name="tile_falta">Abre GeoiD-vpn y configura tu perfil primero</string>
 </resources>

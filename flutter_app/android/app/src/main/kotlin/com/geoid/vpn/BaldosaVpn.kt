@@ -9,6 +9,7 @@ import android.graphics.drawable.Icon
 import android.net.VpnService
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import android.widget.Toast
 
 /**
  * Azulejo del panel rápido: conectar y desconectar la VPN desde arriba.
@@ -56,7 +57,12 @@ class BaldosaVpn : TileService() {
                     startActivityAndCollapse(abrir)
                 }
             } catch (e: Exception) {
-                // si el sistema lo impide, al menos no se cae el panel
+                // Si el sistema no deja abrir la app desde el panel, se avisa.
+                Toast.makeText(
+                    this,
+                    getString(R.string.tile_falta),
+                    Toast.LENGTH_LONG
+                ).show()
             }
             return
         }
