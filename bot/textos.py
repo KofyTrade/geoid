@@ -2,6 +2,11 @@
 
 TEXTOS = {
     "es": {
+        "estrellas_titulo": "⭐ <b>Pago con estrellas</b>\n\nEste plan cuesta <b>{cantidad} estrellas</b>.",
+        "estrellas_pagar": "⭐ Pagar con mis estrellas",
+        "estrellas_comprar": "💳 No tengo estrellas · comprar con rublos",
+        "estrellas_instrucciones": "💳 <b>Comprar estrellas con rublos</b>\n\n1. Abre <b>{servicio}</b> y pide <b>{cantidad} estrellas</b>.\n2. Escribe tu usuario de Telegram: <b>{usuario}</b>\n3. Paga con <b>SBP</b> o tarjeta rusa.\n4. Las estrellas llegan a tu cuenta en pocos minutos.\n5. Vuelve aquí y pulsa «Ya tengo mis estrellas».\n\n⚠️ Solo te pedirán tu @usuario. Nunca des tu contraseña ni un código de acceso.",
+        "estrellas_volver": "✅ Ya tengo mis estrellas",
         "proxy_cual": "🎁 <b>Proxy {numero} de {total}</b>",
         "soporte_invita": "Si necesitas ayuda, escribe tu mensaje aquí abajo y te responderemos en este mismo chat.",
         "soporte_recibido": "Mensaje recibido. Te contestamos aquí en cuanto podamos.",
@@ -177,6 +182,11 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "estrellas_titulo": "⭐ <b>Оплата звёздами</b>\n\nЭтот тариф стоит <b>{cantidad} звёзд</b>.",
+        "estrellas_pagar": "⭐ Оплатить своими звёздами",
+        "estrellas_comprar": "💳 Нет звёзд · купить за рубли",
+        "estrellas_instrucciones": "💳 <b>Покупка звёзд за рубли</b>\n\n1. Откройте <b>{servicio}</b> и укажите <b>{cantidad} звёзд</b>.\n2. Введите свой юзернейм: <b>{usuario}</b>\n3. Оплатите через <b>СБП</b> или картой РФ.\n4. Звёзды придут на аккаунт в течение нескольких минут.\n5. Вернитесь сюда и нажмите «Звёзды у меня».\n\n⚠️ У вас попросят только @юзернейм. Никогда не сообщайте пароль или код входа.",
+        "estrellas_volver": "✅ Звёзды у меня",
         "proxy_cual": "🎁 <b>Прокси {numero} из {total}</b>",
         "soporte_invita": "Если нужна помощь, напишите сообщение здесь — ответим в этом же чате.",
         "soporte_recibido": "Сообщение получено. Ответим здесь, как только сможем.",
@@ -349,6 +359,11 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "estrellas_titulo": "⭐ <b>Pay with stars</b>\n\nThis plan costs <b>{cantidad} stars</b>.",
+        "estrellas_pagar": "⭐ Pay with my stars",
+        "estrellas_comprar": "💳 No stars · buy them with rubles",
+        "estrellas_instrucciones": "💳 <b>Buy stars with rubles</b>\n\n1. Open <b>{servicio}</b> and ask for <b>{cantidad} stars</b>.\n2. Enter your Telegram username: <b>{usuario}</b>\n3. Pay with <b>SBP</b> or a Russian card.\n4. The stars arrive in a few minutes.\n5. Come back here and press “I have my stars”.\n\n⚠️ They will only ask for your @username. Never share your password or a login code.",
+        "estrellas_volver": "✅ I have my stars",
         "proxy_cual": "🎁 <b>Proxy {numero} of {total}</b>",
         "soporte_invita": "If you need help, write your message below and we will reply in this same chat.",
         "soporte_recibido": "Message received. We will answer here as soon as we can.",

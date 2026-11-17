@@ -764,7 +764,33 @@ async def cb_plan(llamada: CallbackQuery):
 
 
 @router.callback_query(F.data.startswith("metodo:stars:"))
-async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
+async def cb_estrellas(llamada: CallbackQuery):
+    """Estrellas: pagar con las que ya tiene o comprarlas con rublos."""
+    meses = int(llamada.data.split(":")[2])
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+    cantidad = config.PRECIOS[meses]
+
+    teclado = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text=t(idi, "estrellas_pagar"),
+            callback_data=f"estrellas:pagar:{meses}")],
+        [InlineKeyboardButton(
+            text=t(idi, "estrellas_comprar"),
+            callback_data=f"estrellas:comprar:{meses}")],
+        [InlineKeyboardButton(text="◀️", callback_data=f"plan:{meses}")],
+    ])
+
+    await llamada.message.edit_text(
+        t(idi, "estrellas_titulo", cantidad=cantidad),
+        reply_markup=teclado,
+        parse_mode=ParseMode.HTML,
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("estrellas:pagar:"))
+async def cb_estrellas_pagar(llamada: CallbackQuery, bot: Bot):
     meses = int(llamada.data.split(":")[2])
     estrellas = config.PRECIOS[meses]
     idi = idioma(llamada.from_user.id)
@@ -782,6 +808,40 @@ async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
         provider_token="",
         currency="XTR",
         prices=[LabeledPrice(label=f"{meses} m", amount=estrellas)],
+    )
+    await llamada.answer()
+
+
+@router.callback_query(F.data.startswith("estrellas:comprar:"))
+async def cb_estrellas_comprar(llamada: CallbackQuery):
+    """Manda al cliente a comprar estrellas en un servicio que acepta rublos."""
+    meses = int(llamada.data.split(":")[2])
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+    cantidad = config.PRECIOS[meses]
+    usuario = db.obtener(tg_id) or {}
+
+    nombre = usuario.get("usuario")
+    quien = ("@" + nombre) if nombre else "—"
+
+    teclado = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text=f"💳 {config.ESTRELLAS_SERVICIO}",
+            url=config.ESTRELLAS_URL)],
+        [InlineKeyboardButton(
+            text=t(idi, "estrellas_volver"),
+            callback_data=f"estrellas:pagar:{meses}")],
+        [InlineKeyboardButton(text="◀️", callback_data=f"metodo:stars:{meses}")],
+    ])
+
+    await llamada.message.edit_text(
+        t(idi, "estrellas_instrucciones",
+          servicio=config.ESTRELLAS_SERVICIO,
+          cantidad=cantidad,
+          usuario=quien),
+        reply_markup=teclado,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
     )
     await llamada.answer()
 

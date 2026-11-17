@@ -144,3 +144,13 @@ def proxies_de_regalo(meses: int) -> int:
 def dias_de_regalo(meses: int) -> int:
     """Dias extra que se suman al plan."""
     return REGALO_DIAS.get(meses, 0)
+
+# --- Recarga de estrellas con rublos (servicio externo) -------------------
+# Al cliente ruso no le deja Telegram comprar estrellas; se le manda a este
+# servicio, que las vende cobrando por SBP y las entrega como regalo.
+ESTRELLAS_URL = os.environ.get(
+    "GEOID_ESTRELLAS_URL", "https://telegram-stars.org"
+).strip()
+ESTRELLAS_SERVICIO = os.environ.get(
+    "GEOID_ESTRELLAS_SERVICIO", "telegram-stars.org"
+).strip()

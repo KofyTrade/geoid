@@ -504,3 +504,35 @@ Comprobar antes de reiniciar:
 cd /opt/geoid-bot && for f in *.py; do python3 -m py_compile $f || echo "FALLA $f"; done && echo "TODO OK"
 ```
 
+## Comprar estrellas con rublos (servicio externo)
+
+El cliente ruso no puede comprar estrellas dentro de Telegram. Ahora, al elegir
+un plan y **⭐ Estrellas**, el bot ofrece dos caminos:
+
+1. **⭐ Pagar con mis estrellas** → factura normal de Telegram.
+2. **💳 No tengo estrellas · comprar con rublos** → instrucciones y botón al
+   servicio externo; cuando vuelve, pulsa «Ya tengo mis estrellas» y paga.
+
+El bot le dice **cuántas estrellas necesita** (115 / 300 / 520) y le recuerda
+su propio @usuario, que es lo único que le pedirán allí.
+
+Configuración en `/etc/geoid-bot.env`:
+
+```bash
+GEOID_ESTRELLAS_URL=https://telegram-stars.org
+GEOID_ESTRELLAS_SERVICIO=telegram-stars.org
+```
+
+Servicios que venden estrellas por SBP (verificados en la web):
+
+| Servicio | Cómo paga el cliente | Nota |
+|---|---|---|
+| telegram-stars.org | SBP, tarjeta | el más citado; comisión variable |
+| krab.gg (@krabggbot) | SBP, tarjeta, cripto | 50–100.000 estrellas por pedido |
+| RMT (rmt.games) | SBP o cripto (con depósito en garantía) | mercado con escrow |
+| @BuyStarsOfficial_bot | SBP | bot de Telegram |
+
+> ⚠️ Telegram no vende estrellas fuera de la app: estos servicios las compran
+> en el mercado oficial y las **regalan** al @usuario indicado. Es una zona
+> gris respecto a las condiciones de Telegram y las comisiones cambian a menudo.
+> El bot nunca pide contraseña ni código de acceso (y el texto lo avisa).
