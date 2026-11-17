@@ -207,6 +207,9 @@ class AwgTunnelService : VpnService() {
     }
 
     private fun avisarEstado() {
+        // El azulejo del panel rapido necesita saber si esta conectada.
+        ControlVpn.marcar(this, Estado.activo)
+
         val i = Intent(ACTION_STATE)
             .setPackage(packageName)
             .putExtra(EXTRA_ACTIVE, Estado.activo)

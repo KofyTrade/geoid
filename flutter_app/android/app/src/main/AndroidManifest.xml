@@ -119,5 +119,17 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Azulejo del panel rapido: conectar/desconectar la VPN -->
+        <service
+            android:name=".BaldosaVpn"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="GeoiD VPN"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>
