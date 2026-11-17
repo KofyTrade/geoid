@@ -81,9 +81,31 @@ ADMIN = _admin()
 # --------------------------------------------------------------------------- #
 # Utilidades
 # --------------------------------------------------------------------------- #
+def _regalo_dias(meses: int) -> int:
+    """Días extra del plan; 0 si el config.py es antiguo."""
+    funcion = getattr(config, "dias_de_regalo", None)
+    return funcion(meses) if callable(funcion) else 0
+
+
+def _regalo_proxies(meses: int) -> int:
+    """Proxies de regalo; cálculo de reserva si el config.py es antiguo."""
+    funcion = getattr(config, "proxies_de_regalo", None)
+    if callable(funcion):
+        return funcion(meses)
+    minimo = getattr(config, "MIN_MESES_PROXY", 3)
+    if meses < minimo:
+        return 0
+    return 2 if meses >= 6 else 1
+
+
+def _web_pagos() -> str:
+    """URL de la página de pago (vacía si no está configurada)."""
+    return (getattr(config, "WEB_PAGOS", "") or "").strip()
+
+
 def idioma(tg_id: int) -> str:
     usuario = db.obtener(tg_id)
-    return (usuario or {}).get("idioma") or config.IDIOMA_DEFECTO
+    return (usuario or {}).get("idioma") or getattr(config, "IDIOMA_DEFECTO", "ru")
 
 
 def fecha(instante: int) -> str:
@@ -461,13 +483,13 @@ async def recompensar_padrino(bot: Bot, comprador: int) -> None:
 
 def activar_plan(tg_id: int, meses: int) -> dict:
     """Activa un plan: los meses comprados más los días de regalo."""
-    dias = 30 * meses + config.dias_de_regalo(meses)
+    dias = 30 * meses + _regalo_dias(meses)
     return activar(tg_id, dias)
 
 
 async def entregar_proxy(bot: Bot, tg_id: int, meses: int) -> None:
     """Crea y entrega los proxies de regalo que toquen (1 o 2)."""
-    cantidad = config.proxies_de_regalo(meses)
+    cantidad = _regalo_proxies(meses)
     if cantidad <= 0:
         return
 
@@ -479,7 +501,7 @@ async def entregar_proxy(bot: Bot, tg_id: int, meses: int) -> None:
         return
 
     usuario = db.obtener(tg_id) or {}
-    idi = usuario.get("idioma") or config.IDIOMA_DEFECTO
+    idi = usuario.get("idioma") or getattr(config, "IDIOMA_DEFECTO", "ru")
 
     for numero in (1, 2):
         if numero > cantidad:
@@ -768,7 +790,7 @@ async def cb_plan(llamada: CallbackQuery, bot: Bot):
 
     # Tarjeta rusa y SBP: se cobran en la web, fuera de Telegram.
     enlace = ""
-    base = (config.WEB_PAGOS or "").strip().rstrip("/")
+    base = _web_pagos().rstrip("/")
     if base.startswith("https://") or base.startswith("http://"):
         enlace = f"{base}/?p={meses}&u={tg_id}"
         filas.append([InlineKeyboardButton(text=t(idi, "metodo_web"), url=enlace)])
@@ -808,7 +830,7 @@ async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
             idi, "factura_desc",
             marca=config.MARCA,
             duracion=_duracion(meses, idi),
-            fecha=fecha(int(time.time()) + (30 * meses + config.dias_de_regalo(meses)) * DIA),
+            fecha=fecha(int(time.time()) + (30 * meses + _regalo_dias(meses)) * DIA),
         ),
         payload=f"plan:{meses}",
         provider_token="",
@@ -833,7 +855,7 @@ async def cb_estrellas_comprar(llamada: CallbackQuery, bot: Bot):
     teclado = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text=t(idi, "estrellas_ir", cantidad=cantidad),
-            url=config.ESTRELLAS_URL)],
+            url=getattr(config, "ESTRELLAS_URL", ""))],
         [InlineKeyboardButton(
             text=t(idi, "estrellas_volver"),
             callback_data=f"metodo:stars:{meses}")],
@@ -843,7 +865,7 @@ async def cb_estrellas_comprar(llamada: CallbackQuery, bot: Bot):
     await bot.send_message(
         tg_id,
         t(idi, "estrellas_instrucciones",
-          servicio=config.ESTRELLAS_SERVICIO,
+          servicio=getattr(config, "ESTRELLAS_SERVICIO", "krab.gg bot"),
           cantidad=cantidad,
           usuario=quien),
         reply_markup=teclado,
@@ -867,7 +889,7 @@ async def cb_estrellas_pagar(llamada: CallbackQuery, bot: Bot):
             idi, "factura_desc",
             marca=config.MARCA,
             duracion=_duracion(meses, idi),
-            fecha=fecha(int(time.time()) + (30 * meses + config.dias_de_regalo(meses)) * DIA),
+            fecha=fecha(int(time.time()) + (30 * meses + _regalo_dias(meses)) * DIA),
         ),
         payload=f"plan:{meses}",
         provider_token="",
@@ -1351,7 +1373,7 @@ async def comando_diag(mensaje: Message, bot: Bot):
         "<b>Diagnóstico</b>",
         f"bot.py: {'con avisar_pago' if 'avisar_pago' in globals() else 'VIEJO'}",
         f"pagado_: {'sí' if 'pagado_' in open(__file__, encoding='utf-8').read() else 'NO'}",
-        f"WEB_PAGOS: <code>{config.WEB_PAGOS or '(vacío)'}</code>",
+        f"WEB_PAGOS: <code>{_web_pagos() or '(vacío)'}</code>",
         f"precios ₽: {config.PRECIOS_RUB}",
         f"precios ⭐: {config.PRECIOS}",
         f"idioma por defecto: {config.IDIOMA_DEFECTO}",
@@ -1378,7 +1400,7 @@ async def comando_estrellas(mensaje: Message, bot: Bot, command: CommandObject):
             idi, "factura_desc",
             marca=config.MARCA,
             duracion=_duracion(meses, idi),
-            fecha=fecha(int(time.time()) + (30 * meses + config.dias_de_regalo(meses)) * DIA),
+            fecha=fecha(int(time.time()) + (30 * meses + _regalo_dias(meses)) * DIA),
         ),
         payload=f"plan:{meses}",
         provider_token="",
