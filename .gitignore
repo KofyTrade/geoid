@@ -15,3 +15,6 @@ vpn-enlace.txt
 awg/
 bot/tmp/
 *.secreto
+
+# APK de prueba descargados
+tools/apk-*

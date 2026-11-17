@@ -1,8 +1,10 @@
 package com.geoid.vpn
 
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.graphics.drawable.Icon
 import android.net.VpnService
 import android.service.quicksettings.Tile
@@ -39,8 +41,23 @@ class BaldosaVpn : TileService() {
         if (permiso != null || !ControlVpn.hayPerfil(this)) {
             val abrir = Intent(this, MainActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            @Suppress("DEPRECATION")
-            startActivityAndCollapse(abrir)
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    // Android 14+: hay que pasar un PendingIntent.
+                    val pendiente = PendingIntent.getActivity(
+                        this,
+                        0,
+                        abrir,
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                    startActivityAndCollapse(pendiente)
+                } else {
+                    @Suppress("DEPRECATION")
+                    startActivityAndCollapse(abrir)
+                }
+            } catch (e: Exception) {
+                // si el sistema lo impide, al menos no se cae el panel
+            }
             return
         }
 
