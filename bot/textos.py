@@ -20,8 +20,8 @@ TEXTOS = {
                 "proxy_regalo": (
             "🎁 <b>Tu regalo: proxy de Telegram</b>\n\n"
             "Con tu plan de 6 meses o más te llevas un proxy de Telegram "
-            "<b>gratis y exclusivo para ti</b>. Sirve para usar Telegram en "
-            "Rusia <b>sin VPN encendida</b>.\n\n"
+            "<b>gratis y exclusivo para ti</b>. Sirve para usar Telegram "
+            "<b>sin VPN encendida</b>.\n\n"
             "Toca este enlace desde el móvil y Telegram se configura solo:\n"
             "<code>{enlace}</code>\n\n"
             "O a mano, en Telegram → Ajustes → Datos y almacenamiento → Proxy:\n"
@@ -38,7 +38,7 @@ TEXTOS = {
             "no se puede bloquear por firma de tráfico.\n\n"
             "🎁 Tienes <b>{dias} días gratis</b> para probarla, sin tarjeta.\n\n"
             "📱 Además: con la compra de <b>6 meses o más</b> te llevas <b>gratis</b> "
-            "el proxy de Telegram, para usarlo en Rusia sin VPN.\n\n"
+            "el proxy de Telegram, para usarlo sin VPN.\n\n"
             "Aquí mismo recibirás tu configuración. Para usarla necesitas la "
             "aplicación <b>GeoiD-vpn</b>; los enlaces están en ❓ Ayuda.\n\n"
             "Elige una opción 👇"
@@ -91,7 +91,7 @@ TEXTOS = {
         "pais_unico": (
             "Ahora mismo solo hay un servidor disponible: <b>Finlandia</b> "
             "(Helsinki).\n\n"
-            "Es la ruta más rápida hacia Rusia. Cuando añadamos más países "
+            "Es la ruta más rápida. Cuando añadamos más países "
             "aparecerán aquí."
         ),
                 "invitar_texto": (
@@ -195,7 +195,7 @@ TEXTOS = {
             "🎁 <b>Ваш подарок: прокси Telegram</b>\n\n"
             "С тарифом от 6 месяцев вы получаете прокси Telegram "
             "<b>бесплатно и только для вас</b>. Он нужен, чтобы пользоваться "
-            "Telegram в России <b>без VPN</b>.\n\n"
+            "Telegram <b>без VPN</b>.\n\n"
             "Нажмите ссылку на телефоне — Telegram настроится сам:\n"
             "<code>{enlace}</code>\n\n"
             "Или вручную: Telegram → Настройки → Данные и память → Прокси:\n"
@@ -365,8 +365,8 @@ TEXTOS = {
                 "proxy_regalo": (
             "🎁 <b>Your gift: Telegram proxy</b>\n\n"
             "With a 6-month plan or longer you get a Telegram proxy "
-            "<b>free and exclusive to you</b>. It lets you use Telegram in "
-            "Russia <b>without a VPN</b>.\n\n"
+            "<b>free and exclusive to you</b>. It lets you use Telegram "
+            "<b>without a VPN</b>.\n\n"
             "Tap this link on your phone and Telegram sets it up:\n"
             "<code>{enlace}</code>\n\n"
             "Or manually: Telegram → Settings → Data and storage → Proxy:\n"
@@ -383,7 +383,7 @@ TEXTOS = {
             "it cannot be blocked by traffic signature.\n\n"
             "🎁 You get <b>{dias} days free</b>, no card needed.\n\n"
             "📱 Plus: buy <b>6 months or more</b> and get the <b>Telegram proxy</b> "
-            "free, to use Telegram in Russia without a VPN.\n\n"
+            "free, to use Telegram without a VPN.\n\n"
             "Your configuration arrives right here. You need the "
             "<b>GeoiD-vpn</b> app; links are under ❓ Help.\n\n"
             "Pick an option 👇"
@@ -429,7 +429,7 @@ TEXTOS = {
         ),
         "pais_unico": (
             "Only one server for now: <b>Finland</b> (Helsinki).\n\n"
-            "It's the fastest route to Russia. More countries will appear here."
+            "It's the fastest route. More countries will appear here."
         ),
                 "invitar_texto": (
             "👥 <b>Invite and earn days</b>\n\n"
