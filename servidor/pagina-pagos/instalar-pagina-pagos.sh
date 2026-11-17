@@ -58,10 +58,12 @@ chmod 700 "$DESTINO"
 
 azul "2/5 · Probando la página en local"
 cd "$DESTINO"
-set -a
-# shellcheck disable=SC1091
-. /etc/geoid-bot.env
-set +a
+if [ ! -f /etc/geoid-bot.env ]; then
+  rojo "   falta /etc/geoid-bot.env (lo necesita el bot)"
+  exit 1
+fi
+# El env NO se sourcea: tiene valores con espacios y bash los romperia.
+# systemd lo lee con EnvironmentFile, que si admite espacios sin comillas.
 timeout 4 python3 pagos_web.py >/tmp/pagos_prueba.log 2>&1 || true
 if grep -q "escuchando" /tmp/pagos_prueba.log; then
   verde "   responde correctamente"
