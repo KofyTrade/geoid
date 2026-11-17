@@ -750,7 +750,9 @@ async def cb_comprar(llamada: CallbackQuery, bot: Bot):
 
 @router.callback_query(F.data.startswith("plan:"))
 async def cb_plan(llamada: CallbackQuery, bot: Bot):
-    """Formas de pago: en el bot solo estrellas (norma de Telegram)."""
+    """Formas de pago de un plan. Nunca deja el botón pensando."""
+    await llamada.answer()          # primero se quita el relojito
+
     meses = int(llamada.data.split(":")[1])
     tg_id = llamada.from_user.id
     idi = idioma(tg_id)
@@ -765,8 +767,10 @@ async def cb_plan(llamada: CallbackQuery, bot: Bot):
     ]
 
     # Tarjeta rusa y SBP: se cobran en la web, fuera de Telegram.
-    if config.WEB_PAGOS:
-        enlace = f"{config.WEB_PAGOS}?p={meses}&u={tg_id}"
+    enlace = ""
+    base = (config.WEB_PAGOS or "").strip().rstrip("/")
+    if base.startswith("https://") or base.startswith("http://"):
+        enlace = f"{base}/?p={meses}&u={tg_id}"
         filas.append([InlineKeyboardButton(text=t(idi, "metodo_web"), url=enlace)])
 
     filas.append([InlineKeyboardButton(text="◀️", callback_data="comprar")])
@@ -776,12 +780,16 @@ async def cb_plan(llamada: CallbackQuery, bot: Bot):
         + "\n\n"
         + t(idi, "metodo_titulo")
     )
-    await llamada.message.edit_text(
-        texto,
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
-        parse_mode=ParseMode.HTML,
-    )
-    await llamada.answer()
+    teclado = InlineKeyboardMarkup(inline_keyboard=filas)
+
+    try:
+        await llamada.message.edit_text(texto, reply_markup=teclado, parse_mode=ParseMode.HTML)
+    except Exception:  # noqa: BLE001
+        log.exception("no se pudo editar el mensaje del plan %s", meses)
+        try:
+            await bot.send_message(tg_id, texto, reply_markup=teclado, parse_mode=ParseMode.HTML)
+        except Exception:  # noqa: BLE001
+            log.exception("tampoco se pudo enviar el plan %s", meses)
 
 
 @router.callback_query(F.data.startswith("metodo:stars:"))
@@ -1324,6 +1332,34 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
         await entregar_proxy(bot, tg_id, meses)
     except Exception:  # noqa: BLE001
         log.warning("no se pudo avisar al cliente %s", tg_id)
+
+
+@router.message(Command("diag"))
+async def comando_diag(mensaje: Message, bot: Bot):
+    """Diagnóstico para el dueño: qué versión hay y cómo está configurado."""
+    if ADMIN and mensaje.from_user.id != ADMIN:
+        return
+
+    claves = [
+        "metodo_web", "metodo_estrellas_comprar", "metodo_stars_corto",
+        "estrellas_titulo", "estrellas_instrucciones", "estrellas_ir",
+        "estrellas_volver", "manual_aviso",
+    ]
+    faltan = [c for c in claves if c not in textos.TEXTOS.get("ru", {})]
+
+    lineas = [
+        "<b>Diagnóstico</b>",
+        f"bot.py: {'con avisar_pago' if 'avisar_pago' in globals() else 'VIEJO'}",
+        f"pagado_: {'sí' if 'pagado_' in open(__file__, encoding='utf-8').read() else 'NO'}",
+        f"WEB_PAGOS: <code>{config.WEB_PAGOS or '(vacío)'}</code>",
+        f"precios ₽: {config.PRECIOS_RUB}",
+        f"precios ⭐: {config.PRECIOS}",
+        f"idioma por defecto: {config.IDIOMA_DEFECTO}",
+        f"claves de texto que faltan: {faltan or 'ninguna'}",
+        f"QR en el bot: {'sí' if hay_qr() else 'no'}",
+        f"proxy propio: {'listo' if proxies_ok() else 'no disponible'}",
+    ]
+    await mensaje.answer("\n".join(lineas), parse_mode=ParseMode.HTML)
 
 
 @router.message(Command("estrellas"))
