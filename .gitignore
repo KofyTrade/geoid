@@ -1,63 +1,17 @@
-# ---------------------------------------------------------------------------
-#  Geoid — archivos que NUNCA deben subirse al repositorio
-# ---------------------------------------------------------------------------
 
-# --- Secretos ---
-# Enlace de conexion (UUID, clave publica, short id)
-vpn-enlace.txt
-# Perfiles de AmneziaWG: contienen la clave privada del cliente
-awg/
-*.vpnuri
-*.vpnuri.png
-# Claves del servidor
-server_private.key
-server_public.key
-server_hpk.key
-keys/
 
-# --- Claves de firma ---
+# Documentos con secretos (locales)
+
+
+# --- Secretos locales: NUNCA al repositorio -------------------------------
+CREDENCIALES.txt
+CREDENCIALES-GeoiD.pdf
+CREDENCIALES-GeoiD.docx
 *.jks
 *.keystore
-
-# --- Artefactos de compilacion ---
-*.apk
-*.aab
-*.aar
-!app/android-proyecto/app/libs/awg.aar
-!flutter_app/android/app/libs/awg.aar
-build/
-.gradle/
-.idea/
-local.properties
-captures/
-*.hprof
-
-# --- Herramientas descargadas (6 GB) ---
-tools/
-
-# --- Capturas de trabajo ---
-app/_*.png
-app/*.png
-gh-login.txt*
-
-_*.xml
-
-*.jks
-firma-geoid.txt
 keystore.properties
-gh-refresh.txt*
-
-# --- Flutter ---
-flutter_app/flutter-sdk/
-flutter_app/build/
-flutter_app/.dart_tool/
-flutter_app/.flutter-plugins
-flutter_app/.flutter-plugins-dependencies
-flutter_app/android/.gradle/
-flutter_app/android/local.properties
-flutter_app/windows/flutter/ephemeral/
-flutter_app/**/*.iml
-
-# Secretos locales (nunca al repositorio)
-CREDENCIALES.txt
+firma-*.txt
+vpn-enlace.txt
+awg/
+bot/tmp/
 *.secreto
