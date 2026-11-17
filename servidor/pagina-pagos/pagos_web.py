@@ -205,5 +205,6 @@ class Manejador(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     puerto = int(os.environ.get("GEOID_WEB_PUERTO", "8099"))
-    print(f"página de pagos escuchando en 127.0.0.1:{puerto}", flush=True)
-    ThreadingHTTPServer(("127.0.0.1", puerto), Manejador).serve_forever()
+    direccion = os.environ.get("GEOID_WEB_BIND", "127.0.0.1").strip() or "127.0.0.1"
+    print(f"página de pagos escuchando en {direccion}:{puerto}", flush=True)
+    ThreadingHTTPServer((direccion, puerto), Manejador).serve_forever()

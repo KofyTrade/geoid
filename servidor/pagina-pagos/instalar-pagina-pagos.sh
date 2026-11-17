@@ -7,7 +7,8 @@
 #  - Instala Caddy y le pone HTTPS para el dominio indicado
 #
 #  Uso:
-#     bash instalar-pagina-pagos.sh geoidvpn.duckdns.org
+#     bash instalar-pagina-pagos.sh geoidvpn.duckdns.org   (HTTPS, definitivo)
+#     bash instalar-pagina-pagos.sh local                  (prueba por IP, sin TLS)
 #
 #  El dominio debe existir y apuntar a este servidor (DuckDNS gratis).
 #  El QR se sube después a /opt/geoid-pagos/qr.png
@@ -15,6 +16,10 @@
 set -euo pipefail
 
 DOMINIO="${1:-}"
+MODO="dominio"
+if [ "$DOMINIO" = "local" ] || [ "$DOMINIO" = "prueba" ]; then
+  MODO="local"
+fi
 DESTINO="/opt/geoid-pagos"
 PUERTO="8099"
 SERVICIO="/etc/systemd/system/geoid-pagos.service"
@@ -33,7 +38,7 @@ if [ -z "$DOMINIO" ]; then
   exit 1
 fi
 
-if ! getent hosts "$DOMINIO" >/dev/null 2>&1; then
+if [ "$MODO" = "dominio" ] && ! getent hosts "$DOMINIO" >/dev/null 2>&1; then
   rojo "El dominio $DOMINIO todavía no resuelve."
   echo "  Créalo en duckdns.org apuntando a la IP de este servidor y espera 1 minuto."
   exit 1
@@ -90,6 +95,32 @@ systemctl restart geoid-pagos
 sleep 2
 systemctl is-active --quiet geoid-pagos || { rojo "El servicio no arrancó:"; journalctl -u geoid-pagos -n 15 --no-pager; exit 1; }
 verde "   servicio activo en 127.0.0.1:$PUERTO"
+
+if [ "$MODO" = "local" ]; then
+  # Modo prueba: escucha en todas las interfaces y no instala Caddy.
+  sed -i 's|^Environment=GEOID_WEB_BIND=.*|Environment=GEOID_WEB_BIND=0.0.0.0|' "$SERVICIO"
+  systemctl daemon-reload
+  systemctl restart geoid-pagos
+  sleep 2
+  command -v ufw >/dev/null && ufw allow "$PUERTO"/tcp >/dev/null 2>&1 || true
+  IP=$(curl -fsSL https://api.ipify.org || echo "?")
+  CODIGO=$(curl -s -o /dev/null -w "%{http_code}" --max-time 8 "http://$IP:$PUERTO/?p=1&u=123" || echo "000")
+  verde ""
+  verde "================================================================"
+  verde " PÁGINA EN MODO PRUEBA (sin HTTPS)"
+  verde "================================================================"
+  echo ""
+  echo "  Abre en el móvil:  http://$IP:$PUERTO/?p=1&u=123"
+  echo "  Respuesta:         HTTP $CODIGO  (200 = funciona)"
+  echo ""
+  echo "  Para el modo definitivo con HTTPS:"
+  echo "    1. crea el dominio en duckdns.org -> 193.29.224.164"
+  echo "    2. bash $0 geoidvpn.duckdns.org"
+  echo ""
+  echo "  QR pendiente de subir a: $DESTINO/qr.png"
+  verde "================================================================"
+  exit 0
+fi
 
 azul "4/5 · Instalando Caddy (HTTPS automático)"
 if ! command -v caddy >/dev/null 2>&1; then
