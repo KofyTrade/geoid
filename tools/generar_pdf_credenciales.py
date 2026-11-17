@@ -275,19 +275,19 @@ tabla([
     ("Activación", "el cliente pulsa «Ya he pagado» → te llega el aviso → /activar ID MESES"),
 ])
 
-parrafo("Precios actuales", negrita=True)
+parrafo("Promoción por tramos: el proxy de Telegram es de regalo desde 3 meses.", negrita=True)
 tabla([
-    ("1 mes", "199 ₽ · 150 ⭐ · 2,5 USDT"),
-    ("3 meses", "539 ₽ · 400 ⭐ · 6,5 USDT"),
-    ("6 meses (con proxy de regalo)", "949 ₽ · 700 ⭐ · 11 USDT"),
-    ("12 meses (con proxy de regalo)", "1.690 ₽ · 1.200 ⭐ · 21 USDT"),
-    ("Prueba gratis", "3 días"),
+    ("1 mes", "150 ₽ · 115 ⭐ · 1,9 USDT"),
+    ("3 meses", "399 ₽ · 300 ⭐ · 4,8 USDT · 1 proxy de regalo"),
+    ("6 meses", "699 ₽ · 520 ⭐ · 8 USDT · 2 proxies + 20 días extra"),
+    ("12 meses", "1.290 ₽ · 900 ⭐ · 15 USDT · 2 proxies + 2 meses extra"),
+    ("Prueba gratis", "3 días, sin tarjeta"),
 ])
 
 # ---------------------------------------------------------------- 6. proxy
 titulo("6 · Proxy de Telegram propio", 1)
 tabla([
-    ("Para qué", "usar Telegram en Rusia sin encender la VPN"),
+    ("Para qué", "usar Telegram sin encender la VPN"),
     ("Servicio", "mtg · systemctl status mtg"),
     ("Puerto", "443/tcp"),
     ("Configuración", "/etc/mtg.toml · clave en /etc/mtg.secret"),
