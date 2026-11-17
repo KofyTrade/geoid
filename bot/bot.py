@@ -1310,6 +1310,31 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
         log.warning("no se pudo avisar al cliente %s", tg_id)
 
 
+@router.message(Command("estrellas"))
+async def comando_estrellas(mensaje: Message, bot: Bot, command: CommandObject):
+    """Muestra la pantalla de pago con estrellas (para probar o para soporte)."""
+    argumento = (command.args or "").strip()
+    meses = int(argumento) if argumento.isdigit() else 1
+    if meses not in config.PRECIOS:
+        meses = 1
+
+    idi = idioma(mensaje.from_user.id)
+    cantidad = config.PRECIOS[meses]
+    teclado = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text=t(idi, "estrellas_pagar"),
+            callback_data=f"estrellas:pagar:{meses}")],
+        [InlineKeyboardButton(
+            text=t(idi, "estrellas_comprar"),
+            callback_data=f"estrellas:comprar:{meses}")],
+    ])
+    await mensaje.answer(
+        t(idi, "estrellas_titulo", cantidad=cantidad),
+        reply_markup=teclado,
+        parse_mode=ParseMode.HTML,
+    )
+
+
 @router.message(Command("ticket"))
 async def comando_ticket(mensaje: Message, bot: Bot):
     """Administrador: genera un ticket de prueba para comprobar el soporte."""
