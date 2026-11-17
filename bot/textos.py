@@ -2,6 +2,7 @@
 
 TEXTOS = {
     "es": {
+        "metodo_web": "🌐 Tarjeta rusa / SBP (en la web)",
         "estrellas_ir": "💳 Comprar {cantidad} estrellas",
 "metodo_estrellas_comprar": "Estrellas nuevas · comprar con SBP",
         "metodo_qr_recomendado": "📱 Pago por QR · rublos (lo más rápido)",
@@ -186,6 +187,7 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "metodo_web": "🌐 Карта РФ / СБП (на сайте)",
         "estrellas_ir": "💳 Купить {cantidad} звёзд",
 "metodo_estrellas_comprar": "Купить звёзды · СБП",
         "metodo_qr_recomendado": "📱 Оплата по QR · рубли (быстрее всего)",
@@ -367,6 +369,7 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "metodo_web": "🌐 Russian card / SBP (on the web)",
         "estrellas_ir": "💳 Buy {cantidad} stars",
 "metodo_estrellas_comprar": "Buy stars · SBP",
         "metodo_qr_recomendado": "📱 Pay by QR · rubles (fastest)",

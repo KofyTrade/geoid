@@ -154,3 +154,8 @@ ESTRELLAS_URL = os.environ.get(
 ESTRELLAS_SERVICIO = os.environ.get(
     "GEOID_ESTRELLAS_SERVICIO", "krab.gg bot"
 ).strip()
+
+# --- Página de pagos fuera de Telegram ------------------------------------
+# Telegram solo permite cobrar con estrellas dentro de los bots, así que la
+# tarjeta rusa y el SBP se cobran en una página web propia.
+WEB_PAGOS = os.environ.get("GEOID_WEB_PAGOS", "").strip()

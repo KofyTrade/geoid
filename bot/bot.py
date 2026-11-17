@@ -735,33 +735,25 @@ async def cb_comprar(llamada: CallbackQuery, bot: Bot):
 
 
 @router.callback_query(F.data.startswith("plan:"))
-async def cb_plan(llamada: CallbackQuery):
-    """Elige el plan y muestra las formas de pago, de la más fácil a la menos."""
+async def cb_plan(llamada: CallbackQuery, bot: Bot):
+    """Formas de pago: en el bot solo estrellas (norma de Telegram)."""
     meses = int(llamada.data.split(":")[1])
-    idi = idioma(llamada.from_user.id)
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
 
-    filas = []
+    filas = [
+        [InlineKeyboardButton(
+            text=t(idi, "metodo_stars_corto"),
+            callback_data=f"metodo:stars:{meses}")],
+        [InlineKeyboardButton(
+            text=t(idi, "metodo_estrellas_comprar"),
+            callback_data=f"estrellas:comprar:{meses}")],
+    ]
 
-    # 1) QR / SBP: lo más rápido para un cliente ruso.
-    if hay_qr():
-        filas.append([InlineKeyboardButton(
-            text=t(idi, "metodo_qr_recomendado"),
-            callback_data=f"metodo:manual:{meses}")])
-
-    # 2) Cripto
-    filas.append([InlineKeyboardButton(
-        text=t(idi, "metodo_crypto"),
-        callback_data=f"metodo:crypto:{meses}")])
-
-    # 3) Estrellas, si ya las tiene
-    filas.append([InlineKeyboardButton(
-        text=t(idi, "metodo_stars_corto"),
-        callback_data=f"metodo:stars:{meses}")])
-
-    # 4) Estrellas nuevas: se compran en un bot que acepta SBP
-    filas.append([InlineKeyboardButton(
-        text=t(idi, "metodo_estrellas_comprar"),
-        callback_data=f"estrellas:comprar:{meses}")])
+    # Tarjeta rusa y SBP: se cobran en la web, fuera de Telegram.
+    if config.WEB_PAGOS:
+        enlace = f"{config.WEB_PAGOS}?p={meses}&u={tg_id}"
+        filas.append([InlineKeyboardButton(text=t(idi, "metodo_web"), url=enlace)])
 
     filas.append([InlineKeyboardButton(text="◀️", callback_data="comprar")])
 

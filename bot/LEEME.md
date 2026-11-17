@@ -529,3 +529,46 @@ Orden de los métodos de pago:
 2. **🪙 Cripto (USDT / TON)** — 3 %
 3. **⭐ Estrellas (si ya tiene)** — factura directa
 4. **💳 Estrellas nuevas · comprar con SBP** — con el servicio externo
+
+## Cobro fuera de Telegram (obligatorio desde noviembre de 2026)
+
+Telegram empezó a exigir que los bots vendan **solo con Telegram Stars**: si un
+bot cobra tarjetas o SBP, lo pueden bloquear sin aviso. Por eso el cobro con
+tarjeta rusa y SBP se ha movido a una **página web propia** y el bot solo hace
+dos cosas: vender estrellas y entregar la configuración.
+
+Orden en el bot al elegir un plan:
+
+1. **⭐ Estrellas (si ya tiene)** — factura directa de Telegram
+2. **💳 Estrellas nuevas · comprar con SBP** — servicio externo en un bot
+3. **🌐 Tarjeta rusa / SBP (en la web)** — abre la página de pago del servidor
+
+### Página de pago
+
+```
+https://<dominio>/?p=<meses>&u=<telegram_id>
+```
+
+- Muestra plan, días, importe y el **QR** de tu banco
+- Botón **«Ya he pagado X ₽»** → te llega al grupo el aviso con
+  **✅ Activar** (el botón que ya existía)
+- Si falta `qr.png`, la página lo indica
+
+Instalación (una vez, con el dominio ya apuntando al servidor):
+
+```bash
+# en el PC
+scp E:\PC\vpn\servidor\pagina-pagos\pagos_web.py root@193.29.224.164:/root/
+scp E:\PC\vpn\servidor\pagina-pagos\instalar-pagina-pagos.sh root@193.29.224.164:/root/
+
+# en el servidor
+bash /root/instalar-pagina-pagos.sh geoidvpn.duckdns.org
+scp de tu QR a /opt/geoid-pagos/qr.png
+
+# y en el bot
+echo 'GEOID_WEB_PAGOS=https://geoidvpn.duckdns.org' >> /etc/geoid-bot.env
+systemctl restart geoid-bot
+```
+
+Servicios: `geoid-pagos` (la página) y `caddy` (HTTPS automático).
+
