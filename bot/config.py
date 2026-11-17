@@ -149,8 +149,8 @@ def dias_de_regalo(meses: int) -> int:
 # Al cliente ruso no le deja Telegram comprar estrellas; se le manda a este
 # servicio, que las vende cobrando por SBP y las entrega como regalo.
 ESTRELLAS_URL = os.environ.get(
-    "GEOID_ESTRELLAS_URL", "https://telegram-stars.org"
+    "GEOID_ESTRELLAS_URL", "https://krab.gg/ru/buy-stars"
 ).strip()
 ESTRELLAS_SERVICIO = os.environ.get(
-    "GEOID_ESTRELLAS_SERVICIO", "telegram-stars.org"
+    "GEOID_ESTRELLAS_SERVICIO", "krab.gg"
 ).strip()

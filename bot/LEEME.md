@@ -527,10 +527,10 @@ Servicios que venden estrellas por SBP (verificados en la web):
 
 | Servicio | Cómo paga el cliente | Nota |
 |---|---|---|
-| telegram-stars.org | SBP, tarjeta | el más citado; comisión variable |
-| krab.gg (@krabggbot) | SBP, tarjeta, cripto | 50–100.000 estrellas por pedido |
-| RMT (rmt.games) | SBP o cripto (con depósito en garantía) | mercado con escrow |
-| @BuyStarsOfficial_bot | SBP | bot de Telegram |
+| **krab.gg** (por defecto) | tarjeta РФ, **SBP**, cripto | comercio con API pública, ~3 s de entrega, 33.000+ pedidos declarados |
+| **FunPay** | tarjeta РФ, SBP, ЮMoney | mercado con depósito en garantía (el comprador confirma) |
+| **RMT** (rmt.games) | SBP o cripto | mercado con escrow |
+| telegram-stars.org | SBP, tarjeta | sin reputación verificable; artículos que lo elogian parecen publicidad |
 
 > ⚠️ Telegram no vende estrellas fuera de la app: estos servicios las compran
 > en el mercado oficial y las **regalan** al @usuario indicado. Es una zona
