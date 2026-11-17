@@ -22,3 +22,6 @@ tools/apk-*
 # Python
 __pycache__/
 *.pyc
+
+# La pagina de pagos es su propio repositorio
+web-pagos/
