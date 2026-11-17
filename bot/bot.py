@@ -783,12 +783,9 @@ async def cb_plan(llamada: CallbackQuery, bot: Bot):
         [InlineKeyboardButton(
             text=t(idi, "metodo_stars_corto"),
             callback_data=f"metodo:stars:{meses}")],
-        [InlineKeyboardButton(
-            text=t(idi, "metodo_estrellas_comprar"),
-            callback_data=f"estrellas:comprar:{meses}")],
     ]
 
-    # Tarjeta rusa y SBP: se cobran en la web, fuera de Telegram.
+    # La web se cobra fuera de Telegram (norma de noviembre de 2026).
     enlace = ""
     base = _web_pagos().rstrip("/")
     if base.startswith("https://") or base.startswith("http://"):
@@ -816,27 +813,33 @@ async def cb_plan(llamada: CallbackQuery, bot: Bot):
 
 @router.callback_query(F.data.startswith("metodo:stars:"))
 async def cb_estrellas(llamada: CallbackQuery, bot: Bot):
-    """Factura de estrellas en un solo toque."""
+    """Estrellas: pagar con las que tiene o comprar si no tiene."""
     await llamada.answer()
 
     meses = int(llamada.data.split(":")[2])
-    estrellas = config.PRECIOS[meses]
-    idi = idioma(llamada.from_user.id)
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+    cantidad = config.PRECIOS[meses]
 
-    await bot.send_invoice(
-        chat_id=llamada.from_user.id,
-        title=f"{config.MARCA} · {_duracion(meses, idi)}",
-        description=t(
-            idi, "factura_desc",
-            marca=config.MARCA,
-            duracion=_duracion(meses, idi),
-            fecha=fecha(int(time.time()) + (30 * meses + _regalo_dias(meses)) * DIA),
-        ),
-        payload=f"plan:{meses}",
-        provider_token="",
-        currency="XTR",
-        prices=[LabeledPrice(label=f"{meses} m", amount=estrellas)],
-    )
+    teclado = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text=t(idi, "estrellas_pagar"),
+            callback_data=f"estrellas:pagar:{meses}")],
+        [InlineKeyboardButton(
+            text=t(idi, "estrellas_comprar"),
+            callback_data=f"estrellas:comprar:{meses}")],
+        [InlineKeyboardButton(text="◀️", callback_data=f"plan:{meses}")],
+    ])
+
+    try:
+        await bot.send_message(
+            tg_id,
+            t(idi, "estrellas_titulo", cantidad=cantidad),
+            reply_markup=teclado,
+            parse_mode=ParseMode.HTML,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception("no se pudo mostrar la pantalla de estrellas")
 
 
 @router.callback_query(F.data.startswith("estrellas:comprar:"))
