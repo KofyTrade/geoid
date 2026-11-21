@@ -360,6 +360,29 @@ async def accion_comprar(bot: Bot, tg_id: int) -> None:
     )
 
 
+def crear_perfiles_faltantes(tg_id: int) -> int:
+    """Crea el perfil de los paises que le falten al cliente."""
+    usuario = db.obtener(tg_id) or {}
+    if not usuario.get("ip"):
+        return 0
+    existentes = {f["nodo"] for f in db.perfiles(tg_id)}
+    creados = 0
+    for nodo in nodos.lista():
+        if nodo["id"] in existentes:
+            continue
+        try:
+            cliente = nodos.crear(nodo, usuario.get("usuario") or str(tg_id))
+        except Exception:  # noqa: BLE001
+            log.exception("no se pudo crear el perfil de %s para %s", nodo["nombre"], tg_id)
+            continue
+        db.guardar_perfil(
+            tg_id, nodo["id"], cliente["ip"],
+            cliente["privada"], cliente["publica"], cliente["preshared"],
+        )
+        creados += 1
+    return creados
+
+
 async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
     usuario = db.obtener(tg_id) or {}
     idi = usuario.get("idioma") or "es"
@@ -370,36 +393,35 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
         await bot.send_message(tg_id, texto, reply_markup=teclado_fijo(tg_id))
         return
 
-    nodo = nodos.por_id(usuario.get("servidor"))
+    # Si le falta el perfil de algun pais, se crea ahora mismo.
+    crear_perfiles_faltantes(tg_id)
 
-    filas = [[InlineKeyboardButton(
-        text=t(idi, "boton_reenviar"), callback_data="reenviar")]]
+    filas = []
     if usuario.get("proxy"):
         filas.append([InlineKeyboardButton(
             text=t(idi, "proxy_boton"), callback_data="proxy")])
-    teclado = InlineKeyboardMarkup(inline_keyboard=filas)
-    lista_perfiles = db.perfiles(tg_id)
-    if lista_perfiles:
-        lineas_pais = [
-            f"{nodos.por_id(f['nodo'])['bandera']} {nodos.por_id(f['nodo'])['nombre']}: "
-            f"<code>{f['ip']}</code>"
-            for f in lista_perfiles
-        ]
-        lineas_pais = "\n".join(lineas_pais)
-    else:
-        lineas_pais = ""
+    teclado = InlineKeyboardMarkup(inline_keyboard=filas) if filas else None
+
+    lista = db.perfiles(tg_id)
+    lineas_pais = "\n".join(
+        f"{nodos.por_id(f['nodo'])['bandera']} {nodos.por_id(f['nodo'])['nombre']}: "
+        f"<code>{f['ip']}</code>"
+        for f in lista
+    )
 
     await bot.send_message(
         tg_id,
         t(idi, "mi_vpn_activo",
-          pais=f"{nodo['bandera']} {nodo['nombre']}",
-          ip=usuario["ip"],
+          pais="", ip="",
           fecha=fecha(usuario["expira"]),
           dias=dias_restantes(usuario["expira"]),
           enlace=lineas_pais),
         reply_markup=teclado,
         parse_mode=ParseMode.HTML,
     )
+
+    # Y los archivos, sin pedir nada mas.
+    await enviar_conf(bot, tg_id, usuario, t(idi, "reenvio_texto"))
 
 
 async def accion_pais(bot: Bot, tg_id: int) -> None:

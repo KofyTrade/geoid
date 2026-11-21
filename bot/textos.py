@@ -89,8 +89,7 @@ TEXTOS = {
             "🔐 <b>Tu acceso</b>\n\n"
             "Estado: <b>activo</b>\n"
             "Caduca: <b>{fecha}</b> ({dias} días)\n\n"
-            "{enlace}\n\n"
-            "Te reenvío la configuración cuando quieras."
+            "{enlace}"
         ),
         "boton_reenviar": "📄 Mi configuración (.conf)",
         "reenvio": "Aquí tienes tu configuración de nuevo.",
@@ -277,8 +276,7 @@ TEXTOS = {
             "🔐 <b>Ваш доступ</b>\n\n"
             "Статус: <b>активен</b>\n"
             "Действует до: <b>{fecha}</b> ({dias} дн.)\n\n"
-            "{enlace}\n\n"
-            "Пришлю конфигурацию в любой момент."
+            "{enlace}"
         ),
         "boton_reenviar": "📄 Моя конфигурация (.conf)",
         "reenvio": "Вот ваша конфигурация.",
@@ -460,8 +458,7 @@ TEXTOS = {
             "🔐 <b>Your access</b>\n\n"
             "Status: <b>active</b>\n"
             "Expires: <b>{fecha}</b> ({dias} days)\n\n"
-            "{enlace}\n\n"
-            "I can resend the configuration whenever you want."
+            "{enlace}"
         ),
         "boton_reenviar": "📄 My configuration (.conf)",
         "reenvio": "Here is your configuration again.",
