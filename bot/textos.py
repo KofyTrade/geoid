@@ -2,6 +2,7 @@
 
 TEXTOS = {
     "es": {
+        "pais_primero": "🌍 <b>¿En qué país quieres tu VPN?</b>\n\nPuedes cambiarlo después cuando quieras.",
         "mudar_boton": "🌍 Cambiar de país",
         "mudar_titulo": "🌍 <b>¿A qué país quieres moverte?</b>\n\nTu fecha de caducidad no cambia.",
         "mudar_hecho": "✅ Ya estás en {pais}.\n\nAquí tienes tu configuración nueva. La anterior deja de funcionar.",
@@ -85,13 +86,11 @@ TEXTOS = {
             "Puedes empezar con 🎁 Prueba gratis."
         ),
         "mi_vpn_activo": (
-            "📱 <b>Tu acceso</b>\n\n"
-            "Servidor: <b>{pais}</b>\n"
-            "Dirección: <code>{ip}</code>\n"
+            "🔐 <b>Tu acceso</b>\n\n"
             "Estado: <b>activo</b>\n"
             "Caduca: <b>{fecha}</b> ({dias} días)\n\n"
             "{enlace}\n\n"
-            "Si quieres, te reenvío el fichero de configuración."
+            "Te reenvío la configuración cuando quieras."
         ),
         "boton_reenviar": "📄 Mi configuración (.conf)",
         "reenvio": "Aquí tienes tu configuración de nuevo.",
@@ -193,6 +192,7 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "pais_primero": "🌍 <b>В какой стране нужен VPN?</b>\n\nСтрану можно поменять позже.",
         "mudar_boton": "🌍 Сменить страну",
         "mudar_titulo": "🌍 <b>В какую страну перейти?</b>\n\nДата окончания не меняется.",
         "mudar_hecho": "✅ Теперь вы в {pais}.\n\nВот новая конфигурация. Прежняя больше не работает.",
@@ -274,13 +274,11 @@ TEXTOS = {
         "prueba_cabecera": "⚠️ У вас уже есть доступ до {fecha}.",
         "mi_vpn_sin": "Активного доступа нет.\n\nНачните с 🎁 Бесплатный доступ.",
         "mi_vpn_activo": (
-            "📱 <b>Ваш доступ</b>\n\n"
-            "Сервер: <b>{pais}</b>\n"
-            "Адрес: <code>{ip}</code>\n"
+            "🔐 <b>Ваш доступ</b>\n\n"
             "Статус: <b>активен</b>\n"
             "Действует до: <b>{fecha}</b> ({dias} дн.)\n\n"
             "{enlace}\n\n"
-            "Могу отправить файл конфигурации заново."
+            "Пришлю конфигурацию в любой момент."
         ),
         "boton_reenviar": "📄 Моя конфигурация (.conf)",
         "reenvio": "Вот ваша конфигурация.",
@@ -381,6 +379,7 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "pais_primero": "🌍 <b>Which country do you want your VPN in?</b>\n\nYou can change it later.",
         "mudar_boton": "🌍 Change country",
         "mudar_titulo": "🌍 <b>Which country do you want to move to?</b>\n\nYour expiry date does not change.",
         "mudar_hecho": "✅ You are now in {pais}.\n\nHere is your new configuration. The previous one stops working.",
@@ -458,13 +457,11 @@ TEXTOS = {
         "prueba_cabecera": "⚠️ You already have access until {fecha}.",
         "mi_vpn_sin": "No active access.\n\nStart with 🎁 Free trial.",
         "mi_vpn_activo": (
-            "📱 <b>Your access</b>\n\n"
-            "Server: <b>{pais}</b>\n"
-            "Address: <code>{ip}</code>\n"
+            "🔐 <b>Your access</b>\n\n"
             "Status: <b>active</b>\n"
             "Expires: <b>{fecha}</b> ({dias} days)\n\n"
             "{enlace}\n\n"
-            "I can send the configuration file again."
+            "I can resend the configuration whenever you want."
         ),
         "boton_reenviar": "📄 My configuration (.conf)",
         "reenvio": "Here is your configuration again.",

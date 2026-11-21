@@ -211,57 +211,91 @@ def _destino(evento: Message | CallbackQuery) -> int:
 # Accesos
 # --------------------------------------------------------------------------- #
 def activar(tg_id: int, dias: int) -> dict:
-    """Crea el peer en el nodo elegido (o extiende la caducidad)."""
+    """Crea (si falta) un perfil en CADA pais y extiende la caducidad."""
     usuario = db.obtener(tg_id) or {}
     ahora = int(time.time())
+    disponibles = nodos.lista()
+    existentes = {f["nodo"]: f for f in db.perfiles(tg_id)}
 
-    if usuario.get("ip"):
-        base = max(ahora, int(usuario.get("expira") or 0))
-        db.guardar(tg_id, expira=base + dias * DIA)
-        return db.obtener(tg_id)
+    for nodo in disponibles:
+        if nodo["id"] in existentes:
+            continue
+        try:
+            cliente = nodos.crear(nodo, usuario.get("usuario") or str(tg_id))
+        except Exception:  # noqa: BLE001
+            log.exception("no se pudo crear el perfil en %s", nodo["nombre"])
+            continue
+        db.guardar_perfil(
+            tg_id, nodo["id"], cliente["ip"],
+            cliente["privada"], cliente["publica"], cliente["preshared"],
+        )
 
-    nodo = nodos.por_id(usuario.get("servidor"))
-    try:
-        cliente = nodos.crear(nodo, usuario.get("usuario") or str(tg_id))
-    except Exception:  # noqa: BLE001
-        log.exception("no se pudo crear el cliente en %s; se usa el nodo local", nodo["nombre"])
-        cliente = nodos.crear(nodos.por_id("fi"), usuario.get("usuario") or str(tg_id))
+    perfiles = db.perfiles(tg_id)
+    principal = next((f for f in perfiles if f["nodo"] == "fi"), perfiles[0] if perfiles else None)
 
-    db.guardar(
-        tg_id,
-        ip=cliente["ip"],
-        privada=cliente["privada"],
-        publica=cliente["publica"],
-        preshared=cliente["preshared"],
-        expira=ahora + dias * DIA,
-        servidor=cliente["servidor"],
-    )
+    if principal:
+        db.guardar(
+            tg_id,
+            ip=principal["ip"],
+            privada=principal["privada"],
+            publica=principal["publica"],
+            preshared=principal["preshared"],
+            servidor=principal["nodo"],
+            expira=max(ahora, int(usuario.get("expira") or 0)) + dias * DIA,
+            pais_compra=None,
+        )
+    elif usuario.get("ip"):
+        db.guardar(
+            tg_id,
+            expira=max(ahora, int(usuario.get("expira") or 0)) + dias * DIA,
+            pais_compra=None,
+        )
     return db.obtener(tg_id)
 
 
 async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
+    """Manda un .conf por cada pais disponible."""
     plan = "pago" if db.ha_pagado(tg_id) else "prueba"
-    nodo = nodos.por_id(usuario.get("servidor"))
-    contenido = provision.generar_conf(
-        usuario["privada"],
-        usuario["preshared"],
-        usuario["ip"],
-        plan=plan,
-        expira=int(usuario.get("expira") or 0),
-        endpoint=nodo["endpoint"],
-        dns=nodo["dns"],
-        mtu=nodo["mtu"],
-    )
-    archivo = BufferedInputFile(
-        contenido.encode("utf-8"),
-        filename=f"geoid-{usuario['ip'].replace('.', '-')}.conf",
-    )
-    await bot.send_document(
-        chat_id=tg_id,
-        document=archivo,
-        caption=texto,
-        parse_mode=ParseMode.HTML,
-    )
+    expira = int(usuario.get("expira") or 0)
+    lista = db.perfiles(tg_id)
+
+    # Clientes antiguos sin tabla de perfiles: se usa el perfil unico de siempre.
+    if not lista and usuario.get("ip"):
+        lista = [{
+            "nodo": usuario.get("servidor") or "fi",
+            "ip": usuario["ip"],
+            "privada": usuario.get("privada"),
+            "preshared": usuario.get("preshared"),
+        }]
+
+    enviados = 0
+    for fila in lista:
+        nodo = nodos.por_id(fila["nodo"])
+        contenido = provision.generar_conf(
+            fila["privada"],
+            fila["preshared"],
+            fila["ip"],
+            plan=plan,
+            expira=expira,
+            endpoint=nodo["endpoint"],
+            dns=nodo["dns"],
+            mtu=nodo["mtu"],
+        )
+        archivo = BufferedInputFile(
+            contenido.encode("utf-8"),
+            filename=f"geoid-{nodo['id']}-{fila['ip'].replace('.', '-')}.conf",
+        )
+        leyenda = f"{nodo['bandera']} <b>{nodo['nombre']}</b>"
+        pie = f"{texto}\n\n{leyenda}" if enviados == 0 else leyenda
+        await bot.send_document(
+            chat_id=tg_id,
+            document=archivo,
+            caption=pie,
+            parse_mode=ParseMode.HTML,
+        )
+        enviados += 1
+
+    return enviados
 
 
 # --------------------------------------------------------------------------- #
@@ -306,6 +340,17 @@ async def accion_prueba(bot: Bot, tg_id: int) -> None:
     await enviar_conf(bot, tg_id, actualizado, t(idi, "pais"))
 
 
+def _teclado_paises(prefijo: str) -> InlineKeyboardMarkup:
+    """Botones con los paises disponibles."""
+    filas = []
+    for nodo in nodos.lista():
+        filas.append([InlineKeyboardButton(
+            text=f"{nodo['bandera']} {nodo['nombre']}",
+            callback_data=f"{prefijo}:{nodo['id']}",
+        )])
+    return InlineKeyboardMarkup(inline_keyboard=filas)
+
+
 async def accion_comprar(bot: Bot, tg_id: int) -> None:
     idi = idioma(tg_id)
     await bot.send_message(
@@ -336,6 +381,17 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
         filas.append([InlineKeyboardButton(
             text=t(idi, "proxy_boton"), callback_data="proxy")])
     teclado = InlineKeyboardMarkup(inline_keyboard=filas)
+    lista_perfiles = db.perfiles(tg_id)
+    if lista_perfiles:
+        lineas_pais = [
+            f"{nodos.por_id(f['nodo'])['bandera']} {nodos.por_id(f['nodo'])['nombre']}: "
+            f"<code>{f['ip']}</code>"
+            for f in lista_perfiles
+        ]
+        lineas_pais = "\n".join(lineas_pais)
+    else:
+        lineas_pais = ""
+
     await bot.send_message(
         tg_id,
         t(idi, "mi_vpn_activo",
@@ -343,7 +399,7 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
           ip=usuario["ip"],
           fecha=fecha(usuario["expira"]),
           dias=dias_restantes(usuario["expira"]),
-          enlace=""),
+          enlace=lineas_pais),
         reply_markup=teclado,
         parse_mode=ParseMode.HTML,
     )
@@ -779,12 +835,32 @@ async def volver_menu(llamada: CallbackQuery, bot: Bot):
 @router.callback_query(F.data == "comprar")
 async def cb_comprar(llamada: CallbackQuery, bot: Bot):
     idi = idioma(llamada.from_user.id)
+    await llamada.answer()
     await llamada.message.edit_text(
         t(idi, "comprar_titulo"),
         reply_markup=teclado_planes(llamada.from_user.id),
         parse_mode=ParseMode.HTML,
     )
+
+
+@router.callback_query(F.data.startswith("pc:"))
+async def cb_pais_compra(llamada: CallbackQuery, bot: Bot):
+    """Guarda el pais elegido y muestra los planes."""
     await llamada.answer()
+
+    _, nodo_id = llamada.data.split(":")
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+
+    if nodos.existe(nodo_id):
+        db.guardar(tg_id, pais_compra=nodo_id)
+
+    nodo = nodos.por_id(nodo_id)
+    await llamada.message.edit_text(
+        t(idi, "comprar_titulo") + f"\n\n🌍 {nodo['bandera']} <b>{nodo['nombre']}</b>",
+        reply_markup=teclado_planes(tg_id),
+        parse_mode=ParseMode.HTML,
+    )
 
 
 async def _menu_metodos(llamada: CallbackQuery, meses: int) -> None:
@@ -827,36 +903,9 @@ async def _menu_metodos(llamada: CallbackQuery, meses: int) -> None:
 
 @router.callback_query(F.data.startswith("plan:"))
 async def cb_plan(llamada: CallbackQuery, bot: Bot):
-    """Plan elegido: pais (si hay varios) y formas de pago."""
+    """Plan elegido: formas de pago."""
     await llamada.answer()
-
     meses = int(llamada.data.split(":")[1])
-    tg_id = llamada.from_user.id
-    idi = idioma(tg_id)
-    usuario = db.obtener(tg_id) or {}
-    disponibles = nodos.lista()
-
-    # Si hay varios nodos y el cliente aun no tiene perfil, se le pregunta el pais.
-    if len(disponibles) > 1 and not usuario.get("ip"):
-        filas = []
-        for nodo in disponibles:
-            filas.append([InlineKeyboardButton(
-                text=f"{nodo['bandera']} {nodo['nombre']}",
-                callback_data=f"pais:{nodo['id']}:{meses}",
-            )])
-        filas.append([InlineKeyboardButton(text="◀️", callback_data="comprar")])
-        texto = (
-            t(idi, "plan_linea", duracion=_duracion(meses, idi))
-            + "\n\n"
-            + t(idi, "elegir_pais")
-        )
-        dialogo = InlineKeyboardMarkup(inline_keyboard=filas)
-        try:
-            await llamada.message.edit_text(texto, reply_markup=dialogo, parse_mode=ParseMode.HTML)
-        except Exception:  # noqa: BLE001
-            await bot.send_message(tg_id, texto, reply_markup=dialogo, parse_mode=ParseMode.HTML)
-        return
-
     await _menu_metodos(llamada, meses)
 
 
@@ -1682,9 +1731,13 @@ async def vigilar_caducidades(bot: Bot):
         ahora = int(time.time())
         try:
             for usuario in db.caducados(ahora):
-                if usuario.get("publica"):
-                    nodo = nodos.por_id(usuario.get("servidor"))
-                    nodos.borrar(nodo, usuario.get("ip") or "")
+                for fila in db.perfiles(usuario["tg_id"]):
+                    try:
+                        nodos.borrar(nodos.por_id(fila["nodo"]), fila["ip"])
+                    except Exception:  # noqa: BLE001
+                        log.warning("no se pudo borrar el perfil %s de %s",
+                                    fila["ip"], usuario["tg_id"])
+                db.borrar_perfiles(usuario["tg_id"])
                 db.guardar(
                     usuario["tg_id"],
                     ip=None, privada=None, publica=None, preshared=None,
