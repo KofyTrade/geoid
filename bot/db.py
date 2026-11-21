@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     codigo_ref  TEXT UNIQUE,
     proxy       INTEGER DEFAULT 0,
     nivel_ref   INTEGER DEFAULT 0,
+    servidor    TEXT DEFAULT 'fi',
     proxy_puerto INTEGER,
     proxy_secreto TEXT,
     proxy2_puerto INTEGER,
@@ -105,6 +106,8 @@ def _migrar(con) -> None:
         con.execute("ALTER TABLE usuarios ADD COLUMN proxy_puerto INTEGER")
     if "proxy_secreto" not in columnas:
         con.execute("ALTER TABLE usuarios ADD COLUMN proxy_secreto TEXT")
+    if "servidor" not in columnas:
+        con.execute("ALTER TABLE usuarios ADD COLUMN servidor TEXT DEFAULT 'fi'")
     if "proxy2_puerto" not in columnas:
         con.execute("ALTER TABLE usuarios ADD COLUMN proxy2_puerto INTEGER")
     if "proxy2_secreto" not in columnas:

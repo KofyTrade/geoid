@@ -2,6 +2,7 @@
 
 TEXTOS = {
     "es": {
+        "elegir_pais": "🌍 ¿Desde qué país quieres conectarte?",
         "plan_precios": "⭐ {estrellas} estrellas · {rub} ₽",
         "metodo_web": "🌐 Web",
         "estrellas_ir": "💳 Comprar {cantidad} estrellas",
@@ -188,6 +189,7 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "elegir_pais": "🌍 Из какой страны подключаться?",
         "plan_precios": "⭐ {estrellas} звёзд · {rub} ₽",
         "metodo_web": "🌐 Сайт",
         "estrellas_ir": "💳 Купить {cantidad} звёзд",
@@ -371,6 +373,7 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "elegir_pais": "🌍 Which country do you want to connect from?",
         "plan_precios": "⭐ {estrellas} stars · {rub} ₽",
         "metodo_web": "🌐 Website",
         "estrellas_ir": "💳 Buy {cantidad} stars",

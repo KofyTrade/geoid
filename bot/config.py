@@ -159,3 +159,12 @@ ESTRELLAS_SERVICIO = os.environ.get(
 # Telegram solo permite cobrar con estrellas dentro de los bots, así que la
 # tarjeta rusa y el SBP se cobran en una página web propia.
 WEB_PAGOS = os.environ.get("GEOID_WEB_PAGOS", "").strip()
+
+# --- Nodo de Suecia ------------------------------------------------------
+# El bot crea los perfiles de Suecia llamando al agente de ese servidor.
+NODO_SE_URL = os.environ.get("GEOID_NODO_SE_URL", "").strip()
+NODO_SE_TOKEN = os.environ.get("GEOID_NODO_SE_TOKEN", "").strip()
+NODO_SE_NOMBRE = os.environ.get("GEOID_NODO_SE_NOMBRE", "Suecia").strip()
+NODO_SE_ENDPOINT = os.environ.get("GEOID_NODO_SE_ENDPOINT", "").strip()
+NODO_SE_DNS = os.environ.get("GEOID_NODO_SE_DNS", "10.9.10.1").strip()
+NODO_SE_MTU = int(os.environ.get("GEOID_NODO_SE_MTU", "1280"))

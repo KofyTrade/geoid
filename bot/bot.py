@@ -49,6 +49,7 @@ try:  # opcional: avisos por correo
 except Exception:  # noqa: BLE001
     avisos = None  # type: ignore[assignment]
 
+import nodos
 import provision
 from textos import IDIOMAS, t
 
@@ -210,7 +211,7 @@ def _destino(evento: Message | CallbackQuery) -> int:
 # Accesos
 # --------------------------------------------------------------------------- #
 def activar(tg_id: int, dias: int) -> dict:
-    """Crea el peer si hace falta y extiende la caducidad."""
+    """Crea el peer en el nodo elegido (o extiende la caducidad)."""
     usuario = db.obtener(tg_id) or {}
     ahora = int(time.time())
 
@@ -219,7 +220,13 @@ def activar(tg_id: int, dias: int) -> dict:
         db.guardar(tg_id, expira=base + dias * DIA)
         return db.obtener(tg_id)
 
-    cliente = provision.crear_cliente()
+    nodo = nodos.por_id(usuario.get("servidor"))
+    try:
+        cliente = nodos.crear(nodo, usuario.get("usuario") or str(tg_id))
+    except Exception:  # noqa: BLE001
+        log.exception("no se pudo crear el cliente en %s; se usa el nodo local", nodo["nombre"])
+        cliente = nodos.crear(nodos.por_id("fi"), usuario.get("usuario") or str(tg_id))
+
     db.guardar(
         tg_id,
         ip=cliente["ip"],
@@ -227,18 +234,23 @@ def activar(tg_id: int, dias: int) -> dict:
         publica=cliente["publica"],
         preshared=cliente["preshared"],
         expira=ahora + dias * DIA,
+        servidor=cliente["servidor"],
     )
     return db.obtener(tg_id)
 
 
 async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
     plan = "pago" if db.ha_pagado(tg_id) else "prueba"
+    nodo = nodos.por_id(usuario.get("servidor"))
     contenido = provision.generar_conf(
         usuario["privada"],
         usuario["preshared"],
         usuario["ip"],
         plan=plan,
         expira=int(usuario.get("expira") or 0),
+        endpoint=nodo["endpoint"],
+        dns=nodo["dns"],
+        mtu=nodo["mtu"],
     )
     archivo = BufferedInputFile(
         contenido.encode("utf-8"),
@@ -313,6 +325,8 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
         await bot.send_message(tg_id, texto, reply_markup=teclado_fijo(tg_id))
         return
 
+    nodo = nodos.por_id(usuario.get("servidor"))
+
     filas = [[InlineKeyboardButton(
         text=t(idi, "boton_reenviar"), callback_data="reenviar")]]
     if usuario.get("proxy"):
@@ -322,7 +336,7 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
     await bot.send_message(
         tg_id,
         t(idi, "mi_vpn_activo",
-          pais=t(idi, "pais"),
+          pais=f"{nodo['bandera']} {nodo['nombre']}",
           ip=usuario["ip"],
           fecha=fecha(usuario["expira"]),
           dias=dias_restantes(usuario["expira"]),
@@ -770,12 +784,8 @@ async def cb_comprar(llamada: CallbackQuery, bot: Bot):
     await llamada.answer()
 
 
-@router.callback_query(F.data.startswith("plan:"))
-async def cb_plan(llamada: CallbackQuery, bot: Bot):
-    """Formas de pago de un plan. Nunca deja el botón pensando."""
-    await llamada.answer()          # primero se quita el relojito
-
-    meses = int(llamada.data.split(":")[1])
+async def _menu_metodos(llamada: CallbackQuery, meses: int) -> None:
+    """Pantalla con las formas de pago del plan elegido."""
     tg_id = llamada.from_user.id
     idi = idioma(tg_id)
 
@@ -785,7 +795,6 @@ async def cb_plan(llamada: CallbackQuery, bot: Bot):
             callback_data=f"metodo:stars:{meses}")],
     ]
 
-    # La web se cobra fuera de Telegram (norma de noviembre de 2026).
     enlace = ""
     base = _web_pagos().rstrip("/")
     if base.startswith("https://") or base.startswith("http://"):
@@ -806,15 +815,61 @@ async def cb_plan(llamada: CallbackQuery, bot: Bot):
         + t(idi, "metodo_titulo")
     )
     teclado = InlineKeyboardMarkup(inline_keyboard=filas)
-
     try:
         await llamada.message.edit_text(texto, reply_markup=teclado, parse_mode=ParseMode.HTML)
     except Exception:  # noqa: BLE001
         log.exception("no se pudo editar el mensaje del plan %s", meses)
+        await llamada.bot.send_message(tg_id, texto, reply_markup=teclado, parse_mode=ParseMode.HTML)
+
+
+@router.callback_query(F.data.startswith("plan:"))
+async def cb_plan(llamada: CallbackQuery, bot: Bot):
+    """Plan elegido: pais (si hay varios) y formas de pago."""
+    await llamada.answer()
+
+    meses = int(llamada.data.split(":")[1])
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+    usuario = db.obtener(tg_id) or {}
+    disponibles = nodos.lista()
+
+    # Si hay varios nodos y el cliente aun no tiene perfil, se le pregunta el pais.
+    if len(disponibles) > 1 and not usuario.get("ip"):
+        filas = []
+        for nodo in disponibles:
+            filas.append([InlineKeyboardButton(
+                text=f"{nodo['bandera']} {nodo['nombre']}",
+                callback_data=f"pais:{nodo['id']}:{meses}",
+            )])
+        filas.append([InlineKeyboardButton(text="◀️", callback_data="comprar")])
+        texto = (
+            t(idi, "plan_linea", duracion=_duracion(meses, idi))
+            + "\n\n"
+            + t(idi, "elegir_pais")
+        )
+        dialogo = InlineKeyboardMarkup(inline_keyboard=filas)
         try:
-            await bot.send_message(tg_id, texto, reply_markup=teclado, parse_mode=ParseMode.HTML)
+            await llamada.message.edit_text(texto, reply_markup=dialogo, parse_mode=ParseMode.HTML)
         except Exception:  # noqa: BLE001
-            log.exception("tampoco se pudo enviar el plan %s", meses)
+            await bot.send_message(tg_id, texto, reply_markup=dialogo, parse_mode=ParseMode.HTML)
+        return
+
+    await _menu_metodos(llamada, meses)
+
+
+@router.callback_query(F.data.startswith("pais:"))
+async def cb_pais(llamada: CallbackQuery, bot: Bot):
+    """Guarda el pais elegido y sigue con las formas de pago."""
+    await llamada.answer()
+
+    _, nodo_id, meses_texto = llamada.data.split(":")
+    meses = int(meses_texto)
+    tg_id = llamada.from_user.id
+
+    if nodos.existe(nodo_id):
+        db.guardar(tg_id, servidor=nodo_id)
+
+    await _menu_metodos(llamada, meses)
 
 
 @router.callback_query(F.data.startswith("metodo:stars:"))
@@ -1540,7 +1595,8 @@ async def vigilar_caducidades(bot: Bot):
         try:
             for usuario in db.caducados(ahora):
                 if usuario.get("publica"):
-                    provision.eliminar_cliente(usuario["publica"])
+                    nodo = nodos.por_id(usuario.get("servidor"))
+                    nodos.borrar(nodo, usuario.get("ip") or "")
                 db.guardar(
                     usuario["tg_id"],
                     ip=None, privada=None, publica=None, preshared=None,

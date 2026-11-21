@@ -25,3 +25,6 @@ __pycache__/
 
 # La pagina de pagos es su propio repositorio
 web-pagos/
+
+# Librerias de prueba
+tools/libs-prueba/

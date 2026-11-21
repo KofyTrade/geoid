@@ -144,6 +144,9 @@ def generar_conf(
     ip: str,
     plan: str = "",
     expira: int = 0,
+    endpoint: str | None = None,
+    dns: str | None = None,
+    mtu: int | None = None,
 ) -> str:
     """Devuelve el fichero .conf listo para el cliente.
 
@@ -176,8 +179,8 @@ def generar_conf(
         "[Interface]",
         f"PrivateKey = {privada}",
         f"Address = {ip}/32",
-        f"DNS = {config.DNS}",
-        f"MTU = {config.MTU}",
+        f"DNS = {dns or config.DNS}",
+        f"MTU = {mtu or config.MTU}",
     ]
     for clave in ofuscacion:
         if clave in parametros:
@@ -188,7 +191,7 @@ def generar_conf(
         "[Peer]",
         f"PublicKey = {servidor}",
         f"PresharedKey = {preshared}",
-        f"Endpoint = {config.ENDPOINT}",
+        f"Endpoint = {endpoint or config.ENDPOINT}",
         "AllowedIPs = 0.0.0.0/0",
         "PersistentKeepalive = 25",
         "",
