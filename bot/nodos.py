@@ -18,7 +18,7 @@ def lista() -> list[dict]:
         "nombre": "Finlandia",
         "bandera": "🇫🇮",
         "local": True,
-        "endpoint": config.ENDPOINT,
+        "endpoint": config.ENDPOINT or f"{getattr(config, 'SERVIDOR', '')}:{getattr(config, 'PUERTO', '')}",
         "dns": config.DNS,
         "mtu": config.MTU,
     }]

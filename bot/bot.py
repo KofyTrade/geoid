@@ -271,6 +271,9 @@ async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
     enviados = 0
     for fila in lista:
         nodo = nodos.por_id(fila["nodo"])
+        if not nodo.get("endpoint"):
+            log.error("el nodo %s no tiene endpoint; no se envia su configuracion", nodo["nombre"])
+            continue
         contenido = provision.generar_conf(
             fila["privada"],
             fila["preshared"],
