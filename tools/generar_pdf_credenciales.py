@@ -410,6 +410,31 @@ tabla([
 aviso("Estos tokens dan control total del bot y del dinero. Si el PDF se filtra: "
       "@BotFather → /revoke para el del bot, y @CryptoBot → Revoke para el de pagos.")
 
+# ---------------------------------------------------------------- 10c. cuentas
+titulo("10c · Contraseñas de las cuentas", 1)
+parrafo("Las de los servicios desde los que se controla todo. Sin estas no se "
+        "puede entrar a arreglar nada si se pierde el PC.")
+
+tabla([
+    ("Aeza (panel del VPS)", "contraseña: 9Sq0!pUILs7y"),
+    ("GitHub (código y descargas)", "cuenta KofyTrade · contraseña: Jia2018*-+"),
+    ("Root del VPS de Finlandia", "ver «dónde está» abajo · se puede resetear"),
+    ("Root del VPS de Suecia", "en el panel del proveedor sueco (NetCrafters)"),
+])
+
+parrafo("Dónde está la contraseña del VPS:", negrita=True, espacio=2)
+parrafo("Es la misma que escribes cada vez que ejecutas ssh root@193.29.224.164. "
+        "Si no la recuerdas, está en el panel de Aeza:")
+tabla([
+    ("1", "Entra en https://my.aeza.net con tu correo y la contraseña de arriba"),
+    ("2", "Servers → tu servidor (193.29.224.164)"),
+    ("3", "Pestaña Information → «Root password» (icono de copiar)"),
+    ("4", "Si no aparece: botón Reset root password → te da una nueva"),
+])
+
+aviso("Después de resetear la contraseña del VPS, el acceso por SSH cambia al "
+      "instante. Apúntala en este documento en cuanto la tengas.")
+
 # ---------------------------------------------------------------- 11. suecia
 titulo("11 · Segundo servidor (Suecia)", 1)
 parrafo("Segundo nodo para ofrecer dos países, con su propia subred y su propia "
@@ -596,9 +621,9 @@ tabla([
     ("Contraseñas de cuentas", "Aeza y GitHub (escríbelas a mano aquí abajo)"),
 ])
 
-parrafo("Contraseña de Aeza: ______________________________________", espacio=6)
-parrafo("Contraseña de GitHub: ____________________________________", espacio=6)
-parrafo("Contraseña del VPS (root): _______________________________", espacio=6)
+parrafo("Contraseña de Aeza: 9Sq0!pUILs7y  (ver sección 10c)", espacio=6)
+parrafo("Contraseña de GitHub: Jia2018*-+  (ver sección 10c)", espacio=6)
+parrafo("Contraseña del VPS (root): panel de Aeza → Information → Reset", espacio=6)
 
 # ---------------------------------------------------------------- anexo A
 titulo("Anexo A · Configuración completa del bot", 1)
