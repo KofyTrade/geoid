@@ -374,9 +374,6 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
 
     filas = [[InlineKeyboardButton(
         text=t(idi, "boton_reenviar"), callback_data="reenviar")]]
-    if len(nodos.lista()) > 1:
-        filas.append([InlineKeyboardButton(
-            text=t(idi, "mudar_boton"), callback_data="mudar")])
     if usuario.get("proxy"):
         filas.append([InlineKeyboardButton(
             text=t(idi, "proxy_boton"), callback_data="proxy")])
@@ -1219,91 +1216,6 @@ async def cb_proxy(llamada: CallbackQuery, bot: Bot):
 async def cb_mi_vpn(llamada: CallbackQuery, bot: Bot):
     await llamada.answer()
     await accion_mi_vpn(bot, llamada.from_user.id)
-
-
-@router.callback_query(F.data == "mudar")
-async def cb_mudar(llamada: CallbackQuery):
-    """Elige el pais nuevo."""
-    await llamada.answer()
-
-    tg_id = llamada.from_user.id
-    idi = idioma(tg_id)
-    usuario = db.obtener(tg_id) or {}
-    actual = usuario.get("servidor") or "fi"
-
-    filas = []
-    for nodo in nodos.lista():
-        if nodo["id"] == actual:
-            continue
-        filas.append([InlineKeyboardButton(
-            text=f"{nodo['bandera']} {nodo['nombre']}",
-            callback_data=f"mudar:{nodo['id']}")])
-    filas.append([InlineKeyboardButton(text="◀️", callback_data="mivpn")])
-
-    try:
-        await llamada.message.edit_text(
-            t(idi, "mudar_titulo"),
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
-            parse_mode=ParseMode.HTML,
-        )
-    except Exception:  # noqa: BLE001
-        await llamada.message.answer(
-            t(idi, "mudar_titulo"),
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=filas),
-            parse_mode=ParseMode.HTML,
-        )
-
-
-@router.callback_query(F.data.startswith("mudar:"))
-async def cb_mudar_pais(llamada: CallbackQuery, bot: Bot):
-    """Mueve el perfil al nodo elegido conservando la fecha de caducidad."""
-    await llamada.answer()
-
-    _, nodo_id = llamada.data.split(":")
-    tg_id = llamada.from_user.id
-    idi = idioma(tg_id)
-    usuario = db.obtener(tg_id) or {}
-
-    if not usuario.get("ip"):
-        await bot.send_message(tg_id, t(idi, "mi_vpn_sin"), reply_markup=teclado_fijo(tg_id))
-        return
-    if not nodos.existe(nodo_id) or nodo_id == (usuario.get("servidor") or "fi"):
-        return
-
-    anterior = nodos.por_id(usuario.get("servidor"))
-    nuevo = nodos.por_id(nodo_id)
-
-    # 1) dar de baja en el nodo viejo
-    try:
-        nodos.borrar(anterior, usuario["ip"])
-    except Exception:  # noqa: BLE001
-        log.warning("no se pudo borrar el perfil antiguo en %s", anterior["nombre"])
-
-    # 2) crear en el nodo nuevo
-    try:
-        cliente = nodos.crear(nuevo, usuario.get("usuario") or str(tg_id))
-    except Exception:  # noqa: BLE001
-        log.exception("no se pudo mover el perfil a %s", nuevo["nombre"])
-        await bot.send_message(tg_id, t(idi, "mudar_fallo"), reply_markup=teclado_fijo(tg_id))
-        return
-
-    db.guardar(
-        tg_id,
-        ip=cliente["ip"],
-        privada=cliente["privada"],
-        publica=cliente["publica"],
-        preshared=cliente["preshared"],
-        servidor=cliente["servidor"],
-    )
-
-    await bot.send_message(
-        tg_id,
-        t(idi, "mudar_hecho", pais=f"{nuevo['bandera']} {nuevo['nombre']}"),
-        reply_markup=teclado_fijo(tg_id),
-        parse_mode=ParseMode.HTML,
-    )
-    actualizado = db.obtener(tg_id) or usuario
-    await enviar_conf(bot, tg_id, actualizado, t(idi, "reenvio_texto"))
 
 
 @router.callback_query(F.data == "reenviar")
