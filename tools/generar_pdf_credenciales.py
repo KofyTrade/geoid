@@ -39,7 +39,18 @@ def valor_env(clave: str) -> str:
     return ""
 
 
-TOKEN_BOT = valor_env("GEOID_TOKEN")
+SECRETOS = pathlib.Path(r"E:\PC\vpn\.secretos")
+
+
+def leer_secreto(nombre: str) -> str:
+    """Lee un secreto local (carpeta ignorada por git)."""
+    ruta = SECRETOS / nombre
+    if ruta.exists():
+        return ruta.read_text(encoding="utf-8", errors="ignore").strip()
+    return ""
+
+
+TOKEN_BOT = valor_env("GEOID_TOKEN") or leer_secreto("bot-token.txt")
 TOKEN_CRIPTO = valor_env("GEOID_CRYPTO_TOKEN") or "6784775:AAj67eg3YQhmou2GexKrzwEwyPFta7F05wt"
 ADMIN_ID = valor_env("GEOID_ADMIN") or "6887964554"
 
@@ -226,7 +237,7 @@ tabla([
     ("Proveedor", "Aeza · https://my.aeza.net"),
     ("IP", "193.29.224.164"),
     ("Usuario SSH", "root"),
-    ("Contraseña SSH", "[FALTA] → en el panel de Aeza (se muestra una vez; se puede resetear)"),
+    ("Contraseña SSH", "XsH3OsmVSm03 (se puede resetear desde Aeza)"),
     ("Puerto SSH", "22"),
     ("Sistema", "Ubuntu 26.04 LTS · 1 vCPU · ~2 GB RAM · 29 GB"),
 ])
@@ -386,7 +397,7 @@ codigo(
 titulo("10 · Datos que faltan en este documento", 1)
 parrafo("Son datos solo tuyos; apúntalos a mano cuando los tengas:", color=GRIS, tam=9.5)
 tabla([
-    ("Contraseña del VPS", "panel de Aeza (se puede resetear)"),
+    ("Contraseña del VPS", "ver sección 10c (ya incluida)"),
     ("Correo y contraseña de Aeza", "con los que creaste la cuenta"),
     ("Token del bot de Telegram", "grep GEOID_TOKEN /etc/geoid-bot.env"),
     ("Contraseña de GitHub", "la tuya"),
@@ -418,8 +429,8 @@ parrafo("Las de los servicios desde los que se controla todo. Sin estas no se "
 tabla([
     ("Aeza (panel del VPS)", "contraseña: 9Sq0!pUILs7y"),
     ("GitHub (código y descargas)", "cuenta KofyTrade · contraseña: Jia2018*-+"),
-    ("Root del VPS de Finlandia", "ver «dónde está» abajo · se puede resetear"),
-    ("Root del VPS de Suecia", "en el panel del proveedor sueco (NetCrafters)"),
+    ("Root del VPS de Finlandia", "XsH3OsmVSm03"),
+    ("Root del VPS de Suecia", "2UGTCkTiLPjJ"),
 ])
 
 parrafo("Dónde está la contraseña del VPS:", negrita=True, espacio=2)
@@ -452,6 +463,7 @@ tabla([
     ("Agente", "http://194.76.136.210:8443 (token obligatorio)"),
     ("Token del agente", "ixDWEdMiiOwB3YfiBa4qUsIfvha1r8njkJI10o7GgBqkNHR"),
     ("IP autorizada", "193.29.224.164 (solo el bot de Finlandia)"),
+    ("Contraseña root", "2UGTCkTiLPjJ"),
 ])
 
 parrafo("Servicios que corren allí:", negrita=True, espacio=2)
@@ -623,7 +635,7 @@ tabla([
 
 parrafo("Contraseña de Aeza: 9Sq0!pUILs7y  (ver sección 10c)", espacio=6)
 parrafo("Contraseña de GitHub: Jia2018*-+  (ver sección 10c)", espacio=6)
-parrafo("Contraseña del VPS (root): panel de Aeza → Information → Reset", espacio=6)
+parrafo("Contraseña del VPS (root): Finlandia XsH3OsmVSm03 · Suecia 2UGTCkTiLPjJ", espacio=6)
 
 # ---------------------------------------------------------------- anexo A
 titulo("Anexo A · Configuración completa del bot", 1)

@@ -32,3 +32,6 @@ tools/libs-prueba/
 # Copia del env del servidor
 env-finlandia.txt
 *.env
+
+# Secretos locales para regenerar el PDF
+.secretos/
