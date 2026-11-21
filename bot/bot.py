@@ -271,7 +271,8 @@ async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
     enviados = 0
     for fila in lista:
         nodo = nodos.por_id(fila["nodo"])
-        if not nodo.get("endpoint"):
+        endpoint = nodos.endpoint_de(nodo)
+        if not endpoint:
             log.error("el nodo %s no tiene endpoint; no se envia su configuracion", nodo["nombre"])
             continue
         contenido = provision.generar_conf(
@@ -280,13 +281,13 @@ async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
             fila["ip"],
             plan=plan,
             expira=expira,
-            endpoint=nodo["endpoint"],
+            endpoint=endpoint,
             dns=nodo["dns"],
             mtu=nodo["mtu"],
         )
         archivo = BufferedInputFile(
             contenido.encode("utf-8"),
-            filename=f"geoid-{nodo['id']}-{fila['ip'].replace('.', '-')}.conf",
+            filename=f"GeoiD-{nodo['nombre']}.conf",
         )
         leyenda = f"{nodo['bandera']} <b>{nodo['nombre']}</b>"
         pie = f"{texto}\n\n{leyenda}" if enviados == 0 else leyenda

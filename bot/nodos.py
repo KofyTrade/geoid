@@ -52,6 +52,21 @@ def existe(nodo_id: str) -> bool:
     return any(nodo["id"] == nodo_id for nodo in lista())
 
 
+def endpoint_de(nodo: dict) -> str:
+    """Endpoint del nodo; si falta, se lo pregunta al agente."""
+    if nodo.get("endpoint"):
+        return nodo["endpoint"]
+    if nodo["local"]:
+        return config.ENDPOINT
+    try:
+        salud = _pedir(nodo, "/salud")
+        ip = salud.get("ip_publica") or ""
+        puerto = getattr(config, "NODO_SE_PUERTO", 21766)
+        return f"{ip}:{puerto}" if ip else ""
+    except Exception:  # noqa: BLE001
+        return ""
+
+
 def _pedir(nodo: dict, ruta: str, datos: dict | None = None) -> dict:
     """Llamada al agente de un nodo remoto."""
     cuerpo = None
