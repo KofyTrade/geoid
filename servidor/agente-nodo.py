@@ -193,7 +193,10 @@ class Manejador(BaseHTTPRequestHandler):
     server_version = "GeoiDAgente/1"
 
     def _autorizado(self) -> bool:
-        if PERMITIDOS and self.client_address[0] not in PERMITIDOS:
+        # La propia maquina siempre puede consultarse (comprobaciones locales).
+        origen = self.client_address[0]
+        locales = {"127.0.0.1", "::1", "localhost"}
+        if PERMITIDOS and origen not in PERMITIDOS and origen not in locales:
             return False
         cabecera = self.headers.get("Authorization", "")
         return TOKEN and cabecera == f"Bearer {TOKEN}"
