@@ -4,7 +4,9 @@ No guarda secretos en el repositorio: el .docx y el .pdf se crean en la raiz
 del proyecto, que esta en .gitignore para estos archivos.
 """
 
+import base64
 import pathlib
+import textwrap
 
 from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT
@@ -534,6 +536,115 @@ tabla([
 
 aviso("Si un cliente dice que no le abre el enlace, casi siempre es que su "
       "operadora bloquea dominios raros: GitHub sí funciona en Rusia, DuckDNS no.")
+
+def bloque_b64(ruta) -> str:
+    """Convierte un archivo pequeno a base64 en lineas cortas."""
+    if not ruta.exists():
+        return ""
+    datos = base64.b64encode(ruta.read_bytes()).decode()
+    return "\n".join(textwrap.wrap(datos, 76))
+
+
+# ---------------------------------------------------------------- 16. kit
+titulo("16 · Kit de reconstrucción (si se pierde el PC)", 1)
+parrafo("Qué hacer, en orden, para volver a tener todo funcionando con este PDF "
+        "en la mano. Los servidores y el bot NO se pierden si se rompe el PC: "
+        "siguen en Aeza y NetCrafters.")
+
+parrafo("1. El código", negrita=True, espacio=2)
+tabla([
+    ("App y bot", "github.com/KofyTrade/geoid (privado) · rama main"),
+    ("Página de pago", "github.com/KofyTrade/geoid-pagos (público)"),
+    ("Descargas publicadas", "github.com/KofyTrade/geoid/releases/latest"),
+    ("Si no hay GitHub", "copia de seguridad: ver apartado «pendrive» abajo"),
+])
+
+parrafo("2. Volver a publicar la app (necesita el keystore, abajo)", negrita=True, espacio=2)
+tabla([
+    ("Instalar", "Flutter 3.50 · Android SDK · Git"),
+    ("Clonar", "git clone https://github.com/KofyTrade/geoid"),
+    ("Restaurar firma", "pegar el keystore del anexo B en app/android-proyecto/geoid-release.jks"),
+    ("Compilar", "se hace en GitHub Actions al subir una etiqueta: git tag vX.Y.Z && git push origin vX.Y.Z"),
+    ("Secretos en GitHub", "KEYSTORE_BASE64 · KEYSTORE_PASSWORD · KEY_ALIAS · KEY_PASSWORD"),
+])
+
+parrafo("3. Reconstruir un servidor desde cero", negrita=True, espacio=2)
+tabla([
+    ("Nodo VPN (Finlandia o Suecia)", "servidor/instalar-nodo-suecia.sh (cambiar IP y subred si es Finlandia)"),
+    ("DNS con bloqueo", "servidor/instalar-adblock.sh awg0 10.9.x.1"),
+    ("Agente del nodo", "servidor/instalar-agente.sh <Nombre> <prefijo de subred>"),
+    ("Proxy de Telegram", "servidor/instalar-proxy-telegram.sh 443"),
+    ("Respaldo automático", "servidor/instalar-respaldo.sh"),
+    ("Bot en espera", "servidor/instalar-espera.sh"),
+])
+
+parrafo("4. Reconstruir el bot", negrita=True, espacio=2)
+tabla([
+    ("Instalar", "apt install python3-venv · pip install aiogram cryptography aiohttp"),
+    ("Copiar", "los .py del repositorio a /opt/geoid-bot"),
+    ("Configuración", "el env del anexo A en /etc/geoid-bot.env"),
+    ("Datos", "la base de datos sale del respaldo (sección 12)"),
+    ("Arrancar", "systemctl enable --now geoid-bot"),
+])
+
+parrafo("5. Pendrive de emergencia (esto NO puede ir en un PDF)", negrita=True, espacio=2)
+tabla([
+    ("Este documento", "CREDENCIALES-GeoiD.pdf"),
+    ("Firma de la app", "geoid-release.jks (también va en base64 en el anexo B)"),
+    ("Página de pago", "carpeta web-pagos completa (index.html + qr.png)"),
+    ("Copia del código", "git bundle create geoid.bundle --all (desde el repositorio)"),
+    ("Contraseñas de cuentas", "Aeza y GitHub (escríbelas a mano aquí abajo)"),
+])
+
+parrafo("Contraseña de Aeza: ______________________________________", espacio=6)
+parrafo("Contraseña de GitHub: ____________________________________", espacio=6)
+parrafo("Contraseña del VPS (root): _______________________________", espacio=6)
+
+# ---------------------------------------------------------------- anexo A
+titulo("Anexo A · Configuración completa del bot", 1)
+parrafo("Contenido de /etc/geoid-bot.env. Sin esto el bot no arranca igual: "
+        "guarda los precios, los tokens, el proxy y la página de pago.")
+
+if ENV_FI.exists():
+    texto_env = ENV_FI.read_text(encoding="utf-8", errors="ignore").strip()
+    codigo(texto_env if texto_env else "(el archivo esta vacio)")
+    aviso("Este bloque contiene TODOS los secretos del bot. Trátalo como una "
+          "contraseña maestra.")
+else:
+    aviso("PENDIENTE: para incluirlo, copia el env con  "
+          "scp root@193.29.224.164:/etc/geoid-bot.env E:\\PC\\vpn\\env-finlandia.txt  "
+          "y vuelve a generar el PDF.")
+
+# ---------------------------------------------------------------- anexo B
+titulo("Anexo B · Firma de la app en base64 (anexo B)", 1)
+parrafo("El archivo geoid-release.jks convertido a texto. Si se pierde el PC, "
+        "se reconstruye con el comando de abajo y se firma la app igual que siempre.")
+parrafo("Alas: geoid · Contraseña: G9WcYrUZopdROulib7AFN1mk", espacio=2)
+
+JKS = pathlib.Path(r"E:\PC\vpn\app\android-proyecto\geoid-release.jks")
+datos_jks = bloque_b64(JKS)
+if datos_jks:
+    codigo(datos_jks)
+    parrafo("Para recuperarlo (en PowerShell):", negrita=True, espacio=2)
+    codigo("""$b64 = Get-Content keystore.b64 -Raw
+[IO.File]::WriteAllBytes("geoid-release.jks", [Convert]::FromBase64String($b64))
+Get-FileHash geoid-release.jks -Algorithm SHA256
+# debe dar: 8037FBBB1CAFACABA7C0E0A9682643F59B6077A58FD9C7EC0E2282A7359B8787""")
+else:
+    aviso("No se encontró el keystore en este PC.")
+
+# ---------------------------------------------------------------- anexo C
+titulo("Anexo C · QR de cobro en base64", 1)
+parrafo("El qr.png de la página de pago, para poder reponerlo si se pierde.")
+
+QR = pathlib.Path(r"E:\PC\vpn\web-pagos\qr.png")
+datos_qr = bloque_b64(QR)
+if datos_qr:
+    codigo(datos_qr)
+    parrafo("Recuperarlo igual que el keystore, guardando el texto en qr.b64 y "
+            "escribiendo el resultado como qr.png.", espacio=2)
+else:
+    aviso("No se encontró el QR en este PC.")
 
 # ---------------------------------------------------------------- 15. fugas
 
