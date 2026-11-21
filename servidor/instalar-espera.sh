@@ -23,7 +23,6 @@ if [ ! -f "$LLAVE" ]; then rojo "Falta la llave SSH de respaldo."; exit 1; fi
 if [ ! -d "$ORIGEN" ]; then rojo "No existe $ORIGEN."; exit 1; fi
 
 SSH="ssh -o StrictHostKeyChecking=no -i $LLAVE $DESTINO"
-RSYNC="rsync -az -e \"ssh -o StrictHostKeyChecking=no -i $LLAVE\""
 
 azul "1/5 - Comprobando la conexion"
 if ! $SSH true 2>/dev/null; then
@@ -34,10 +33,9 @@ verde "   conexion correcta"
 
 azul "2/5 - Copiando el codigo del bot"
 $SSH "mkdir -p /opt/geoid-bot"
-eval "$RSYNC $ORIGEN/'*.py' $DESTINO:/opt/geoid-bot/"
-if [ -f "$ORIGEN/requirements.txt" ]; then
-  eval "$RSYNC $ORIGEN/requirements.txt $DESTINO:/opt/geoid-bot/"
-fi
+rsync -az -e "ssh -o StrictHostKeyChecking=no -i $LLAVE" \
+  --include='*.py' --include='requirements.txt' --exclude='*' \
+  "$ORIGEN/" "$DESTINO:/opt/geoid-bot/"
 $SSH "ls /opt/geoid-bot/*.py | wc -l"
 verde "   codigo copiado"
 
