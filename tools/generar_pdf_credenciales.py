@@ -369,8 +369,136 @@ tabla([
     ("Correo del proyecto", "el que usaste para Aeza y el bot"),
 ])
 
-# ---------------------------------------------------------------- 11. fugas
-titulo("11 · Si algo se filtra", 1)
+# ---------------------------------------------------------------- 11. suecia
+titulo("11 · Segundo servidor (Suecia)", 1)
+parrafo("Segundo nodo para ofrecer dos países, con su propia subred y su propia "
+        "clave, independiente del de Finlandia.")
+
+tabla([
+    ("IP pública", "194.76.136.210"),
+    ("Proveedor / país", "NetCrafters OU · Estocolmo (Suecia)"),
+    ("Sistema", "Ubuntu 26.04"),
+    ("Interfaz del túnel", "awg0 (misma ofuscación que Finlandia)"),
+    ("Subred", "10.9.10.0/24 · servidor 10.9.10.1 · clientes desde 10.9.10.2"),
+    ("Puerto", "21766/udp"),
+    ("MTU", "1280"),
+    ("DNS con bloqueo", "10.9.10.1 (dnsmasq + listas de anuncios, actualización diaria)"),
+    ("Agente", "http://194.76.136.210:8443 (token obligatorio)"),
+    ("Token del agente", "ixDWEdMiiOwB3YfiBa4qUsIfvha1r8njkJI10o7GgBqkNHR"),
+    ("IP autorizada", "193.29.224.164 (solo el bot de Finlandia)"),
+])
+
+parrafo("Servicios que corren allí:", negrita=True, espacio=2)
+tabla([
+    ("awg-quick@awg0", "el túnel VPN"),
+    ("geoid-agente", "API para crear y borrar perfiles (crear con instalar-agente.sh)"),
+    ("dnsmasq", "DNS con bloqueo de anuncios"),
+    ("geoid-bot", "bot EN ESPERA, desactivado a propósito"),
+    ("geoid-adblock.timer", "actualiza la lista de anuncios cada día a las 04:30"),
+])
+
+parrafo("Crear perfiles en Suecia:", negrita=True, espacio=2)
+codigo("""bash /root/cliente.sh ana          # crea el cliente "ana"
+bash /root/cliente.sh --listar     # quien esta conectado
+bash /root/cliente.sh --borrar 10.9.10.3
+# los .conf quedan en /root/clientes-suecia/""")
+
+aviso("El agente está protegido por token y por IP. Si alguna vez se cambia el "
+      "token, hay que actualizarlo en /etc/geoid-bot.env de Finlandia "
+      "(GEOID_NODO_SE_TOKEN) y reiniciar el bot.")
+
+# ---------------------------------------------------------------- 12. respaldo
+titulo("12 · Respaldo y plan de rescate", 1)
+parrafo("Lo que evita perder clientes si un servidor muere. Se montó el 21.11.2026.")
+
+tabla([
+    ("Origen", "Finlandia · /root/respaldos/"),
+    ("Destino", "Suecia · /root/respaldos-finlandia/"),
+    ("Cuándo", "todos los días a las 03:30 (systemd: geoid-respaldo.timer)"),
+    ("Qué guarda", "bot.sqlite comprimido + /etc/geoid-bot.env con los secretos"),
+    ("Retención", "7 días en local y en remoto"),
+    ("Acceso", "solo root · permisos 600"),
+    ("Llave SSH", "/root/.ssh/id_ed25519 (Finlandia → Suecia, sin contraseña)"),
+])
+
+parrafo("Comandos útiles (en Finlandia):", negrita=True, espacio=2)
+codigo("""systemctl list-timers geoid-respaldo        # proximo respaldo
+systemctl start geoid-respaldo             # hacer uno ahora
+journalctl -u geoid-respaldo -n 20         # ver el ultimo
+ls -lh /root/respaldos/                     # copias locales
+ssh root@194.76.136.210 'ls -lh /root/respaldos-finlandia/'""")
+
+parrafo("RESCATE si Finlandia deja de funcionar (en Suecia):", negrita=True, espacio=2)
+codigo("""mkdir -p /var/lib/geoid-bot
+gunzip -c $(ls -t /root/respaldos-finlandia/bot-*.sqlite.gz | head -1) > /var/lib/geoid-bot/bot.sqlite
+cp $(ls -t /root/respaldos-finlandia/geoid-bot-*.env | head -1) /etc/geoid-bot.env
+
+# decirle que ahora ESTE servidor es el nodo local
+sed -i 's|^GEOID_RED=.*|GEOID_RED=10.9.10.|; s|^GEOID_IP_MIN=.*|GEOID_IP_MIN=2|; \
+s|^GEOID_ENDPOINT=.*|GEOID_ENDPOINT=194.76.136.210:21766|; s|^GEOID_DNS=.*|GEOID_DNS=10.9.10.1|' /etc/geoid-bot.env
+sed -i '/^GEOID_NODO_SE_/d' /etc/geoid-bot.env
+
+systemctl enable --now geoid-bot
+journalctl -u geoid-bot -n 10 --no-pager""")
+
+aviso("NUNCA dos bots activos a la vez: Telegram rechaza a los dos y el servicio "
+      "queda mudo aunque el proceso siga vivo. Si Finlandia revive, en Suecia hay "
+      "que ejecutar: systemctl disable --now geoid-bot")
+
+parrafo("Qué sobrevive si cae Finlandia:", negrita=True, espacio=2)
+tabla([
+    ("Túneles de Suecia", "SÍ · los peers están en su propio awg0.conf"),
+    ("Página de pago", "SÍ · está en GitHub Pages, no depende de tus servidores"),
+    ("Bot de Telegram", "NO · hay que levantarlo en Suecia (2 minutos)"),
+    ("Corte de caducados", "NO · hasta que el bot vuelva, los caducados mantienen acceso"),
+])
+
+# ---------------------------------------------------------------- 13. planes
+titulo("13 · Planes, países y dispositivos", 1)
+parrafo("Cada compra entrega los DOS países. El cliente recibe dos archivos y usa "
+        "el que quiera; puede cambiar de país con el perfil.")
+
+tabla([
+    ("Plan 1 mes", "150 ₽ · 115 ⭐ · 1,9 USDT"),
+    ("Plan 3 meses", "399 ₽ · 300 ⭐ · 4,8 USDT · 1 proxy de Telegram"),
+    ("Plan 6 meses", "699 ₽ · 520 ⭐ · 8 USDT · 2 proxies + 20 días extra"),
+    ("Prueba gratis", "3 días, un solo uso, sin tarjeta"),
+    ("Dispositivo extra", "40 ⭐ (≈50 ₽) · 30 días · máximo 5 dispositivos"),
+])
+
+parrafo("Archivos que recibe el cliente:", negrita=True, espacio=2)
+tabla([
+    ("GeoiD-Finlandia.conf", "nodo de Finlandia (193.29.224.164)"),
+    ("GeoiD-Suecia.conf", "nodo de Suecia (194.76.136.210)"),
+    ("…-2.conf", "si compró un segundo dispositivo"),
+])
+
+parrafo("Cómo funciona la prueba de 3 días:", negrita=True, espacio=2)
+parrafo("El .conf lleva «plan=prueba» y la fecha; pero lo que de verdad corta el "
+        "acceso es el servidor: el bot borra el peer al caducar (revisión cada 10 "
+        "minutos). Sin peer, la clave no conecta aunque el archivo siga en el móvil.")
+
+# ---------------------------------------------------------------- 14. pagina web
+titulo("14 · Página de pago (fuera de Telegram)", 1)
+parrafo("Desde noviembre de 2026 Telegram solo permite cobrar con estrellas dentro "
+        "de los bots. El cobro con tarjeta rusa o SBP se hace en una página web "
+        "propia, para no arriesgar un bloqueo.")
+
+tabla([
+    ("Dirección", "https://kofytrade.github.io/geoid-pagos/?p=<meses>&u=<id>"),
+    ("Repositorio", "KofyTrade/geoid-pagos (público · index.html + qr.png)"),
+    ("Idiomas", "ruso por defecto · botones РУ / ES / EN"),
+    ("QR", "el del banco, en qr.png · para cambiarlo se sube otro con el mismo nombre"),
+    ("Flujo", "paga → «Ya he pagado» → abre el bot con /start pagado_N → aviso al grupo → ✅ Activar"),
+    ("Variable del bot", "GEOID_WEB_PAGOS=https://kofytrade.github.io/geoid-pagos/"),
+])
+
+aviso("Si un cliente dice que no le abre el enlace, casi siempre es que su "
+      "operadora bloquea dominios raros: GitHub sí funciona en Rusia, DuckDNS no.")
+
+# ---------------------------------------------------------------- 15. fugas
+
+titulo("15 · Si algo se filtra", 1)
 tabla([
     ("Token del bot", "@BotFather → /revoke → pegarlo en /etc/geoid-bot.env y reiniciar"),
     ("Token de Crypto Pay", "@CryptoBot → GeoiD → Revoke Token (igual)"),
@@ -384,7 +512,7 @@ tabla([
 p = doc.add_paragraph()
 p.paragraph_format.space_before = Pt(16)
 p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-r = p.add_run("Documento privado · GeoiD VPN · versión 4.0.0")
+r = p.add_run("Documento privado · GeoiD VPN · versión 4.1.3")
 r.font.size = Pt(8.5)
 r.font.color.rgb = GRIS
 
