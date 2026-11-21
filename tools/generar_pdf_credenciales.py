@@ -19,6 +19,28 @@ TURQUESA = RGBColor(0x0E, 0x8C, 0x7F)
 GRIS = RGBColor(0x44, 0x55, 0x55)
 ROJO = RGBColor(0xB0, 0x30, 0x20)
 
+
+# --------------------------------------------------- secretos del servidor
+# Si existe E:\PC\vpn\env-finlandia.txt (copia de /etc/geoid-bot.env),
+# el PDF incluye los valores reales. Si no, indica donde mirarlos.
+ENV_FI = pathlib.Path(r"E:\PC\vpn\env-finlandia.txt")
+
+
+def valor_env(clave: str) -> str:
+    """Lee una variable del env copiado del servidor."""
+    if not ENV_FI.exists():
+        return ""
+    for linea in ENV_FI.read_text(encoding="utf-8", errors="ignore").splitlines():
+        linea = linea.strip()
+        if linea.startswith(clave + "="):
+            return linea.split("=", 1)[1].strip()
+    return ""
+
+
+TOKEN_BOT = valor_env("GEOID_TOKEN")
+TOKEN_CRIPTO = valor_env("GEOID_CRYPTO_TOKEN") or "6784775:AAj67eg3YQhmou2GexKrzwEwyPFta7F05wt"
+ADMIN_ID = valor_env("GEOID_ADMIN") or "6887964554"
+
 doc = Document()
 
 # ---------------------------------------------------------------- estilos base
@@ -368,6 +390,23 @@ tabla([
     ("Contraseña de GitHub", "la tuya"),
     ("Correo del proyecto", "el que usaste para Aeza y el bot"),
 ])
+
+# ---------------------------------------------------------------- 10b. tokens
+titulo("10b · Tokens del bot y de los servicios", 1)
+parrafo("El bot es uno solo (@geoidvpn_bot) y usa el MISMO token en los dos "
+        "servidores: Finlandia lo tiene activo y Suecia lo tiene en espera.")
+
+tabla([
+    ("Token del bot de Telegram",
+     TOKEN_BOT if TOKEN_BOT else "ver sección 10 · grep GEOID_TOKEN /etc/geoid-bot.env"),
+    ("ID del administrador", ADMIN_ID),
+    ("Token de Crypto Pay", TOKEN_CRIPTO),
+    ("Token del agente de Suecia", "ixDWEdMiiOwB3YfiBa4qUsIfvha1r8njkJI10o7GgBqkNHR"),
+    ("Nombre del bot", "@geoidvpn_bot · id 9195295915"),
+])
+
+aviso("Estos tokens dan control total del bot y del dinero. Si el PDF se filtra: "
+      "@BotFather → /revoke para el del bot, y @CryptoBot → Revoke para el de pagos.")
 
 # ---------------------------------------------------------------- 11. suecia
 titulo("11 · Segundo servidor (Suecia)", 1)

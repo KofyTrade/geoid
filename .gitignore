@@ -28,3 +28,7 @@ web-pagos/
 
 # Librerias de prueba
 tools/libs-prueba/
+
+# Copia del env del servidor
+env-finlandia.txt
+*.env
