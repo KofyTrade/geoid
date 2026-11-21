@@ -2,6 +2,11 @@
 
 TEXTOS = {
     "es": {
+        "mas_dispositivo": "➕ Añadir otro dispositivo · {estrellas} ⭐",
+        "extra_titulo": "{marca} · dispositivo extra",
+        "extra_desc": "Un dispositivo más durante {dias} días, con los dos países incluidos.",
+        "extra_ok": "✅ Dispositivo {numero} activo.\n\nTe envío sus {cuantos} archivos de configuración.",
+        "extra_max": "Has llegado al máximo de {maximo} dispositivos. Escríbenos si necesitas más.",
         "pais_primero": "🌍 <b>¿En qué país quieres tu VPN?</b>\n\nPuedes cambiarlo después cuando quieras.",
         "mudar_boton": "🌍 Cambiar de país",
         "mudar_titulo": "🌍 <b>¿A qué país quieres moverte?</b>\n\nTu fecha de caducidad no cambia.",
@@ -191,6 +196,11 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "mas_dispositivo": "➕ Добавить устройство · {estrellas} ⭐",
+        "extra_titulo": "{marca} · дополнительное устройство",
+        "extra_desc": "Ещё одно устройство на {dias} дней, обе страны включены.",
+        "extra_ok": "✅ Устройство {numero} активировано.\n\nОтправляю {cuantos} файла конфигурации.",
+        "extra_max": "Достигнут максимум {maximo} устройств. Напишите нам, если нужно больше.",
         "pais_primero": "🌍 <b>В какой стране нужен VPN?</b>\n\nСтрану можно поменять позже.",
         "mudar_boton": "🌍 Сменить страну",
         "mudar_titulo": "🌍 <b>В какую страну перейти?</b>\n\nДата окончания не меняется.",
@@ -377,6 +387,11 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "mas_dispositivo": "➕ Add another device · {estrellas} ⭐",
+        "extra_titulo": "{marca} · extra device",
+        "extra_desc": "One more device for {dias} days, both countries included.",
+        "extra_ok": "✅ Device {numero} is active.\n\nSending its {cuantos} configuration files.",
+        "extra_max": "You have reached the maximum of {maximo} devices. Message us if you need more.",
         "pais_primero": "🌍 <b>Which country do you want your VPN in?</b>\n\nYou can change it later.",
         "mudar_boton": "🌍 Change country",
         "mudar_titulo": "🌍 <b>Which country do you want to move to?</b>\n\nYour expiry date does not change.",

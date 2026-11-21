@@ -169,3 +169,11 @@ NODO_SE_ENDPOINT = os.environ.get("GEOID_NODO_SE_ENDPOINT", "").strip()
 NODO_SE_DNS = os.environ.get("GEOID_NODO_SE_DNS", "10.9.10.1").strip()
 NODO_SE_MTU = int(os.environ.get("GEOID_NODO_SE_MTU", "1280"))
 NODO_SE_PUERTO = int(os.environ.get("GEOID_NODO_SE_PUERTO", "21766"))
+
+# --- Dispositivo extra ---------------------------------------------------
+# Un plan incluye 1 dispositivo (un .conf por pais). Cada dispositivo
+# adicional se compra aparte.
+PRECIO_DISPOSITIVO_ESTRELLAS = int(os.environ.get("GEOID_EXTRA_ESTRELLAS", "40"))
+PRECIO_DISPOSITIVO_RUB = int(os.environ.get("GEOID_EXTRA_RUB", "50"))
+DIAS_DISPOSITIVO = int(os.environ.get("GEOID_EXTRA_DIAS", "30"))
+MAX_DISPOSITIVOS = int(os.environ.get("GEOID_EXTRA_MAX", "5"))

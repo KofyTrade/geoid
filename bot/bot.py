@@ -211,27 +211,19 @@ def _destino(evento: Message | CallbackQuery) -> int:
 # Accesos
 # --------------------------------------------------------------------------- #
 def activar(tg_id: int, dias: int) -> dict:
-    """Crea (si falta) un perfil en CADA pais y extiende la caducidad."""
+    """Da de alta los perfiles que falten y extiende la caducidad."""
     usuario = db.obtener(tg_id) or {}
     ahora = int(time.time())
-    disponibles = nodos.lista()
-    existentes = {f["nodo"]: f for f in db.perfiles(tg_id)}
 
-    for nodo in disponibles:
-        if nodo["id"] in existentes:
-            continue
-        try:
-            cliente = nodos.crear(nodo, usuario.get("usuario") or str(tg_id))
-        except Exception:  # noqa: BLE001
-            log.exception("no se pudo crear el perfil en %s", nodo["nombre"])
-            continue
-        db.guardar_perfil(
-            tg_id, nodo["id"], cliente["ip"],
-            cliente["privada"], cliente["publica"], cliente["preshared"],
-        )
+    if not usuario.get("ip"):
+        db.guardar(tg_id, ip="pendiente",
+                   dispositivos=max(1, int(usuario.get("dispositivos") or 1)))
 
-    perfiles = db.perfiles(tg_id)
-    principal = next((f for f in perfiles if f["nodo"] == "fi"), perfiles[0] if perfiles else None)
+    crear_perfiles_faltantes(tg_id)
+
+    lista = db.perfiles(tg_id)
+    principal = next((f for f in lista if int(f["dispositivo"]) == 1 and f["nodo"] == "fi"),
+                     lista[0] if lista else None)
 
     if principal:
         db.guardar(
@@ -251,23 +243,26 @@ def activar(tg_id: int, dias: int) -> dict:
             pais_compra=None,
         )
     return db.obtener(tg_id)
-
-
-async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
-    """Manda un .conf por cada pais disponible."""
+async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str,
+                     dispositivo: int | None = None):
+    """Manda un .conf por pais (y por dispositivo si tiene varios)."""
     plan = "pago" if db.ha_pagado(tg_id) else "prueba"
     expira = int(usuario.get("expira") or 0)
     lista = db.perfiles(tg_id)
 
-    # Clientes antiguos sin tabla de perfiles: se usa el perfil unico de siempre.
     if not lista and usuario.get("ip"):
         lista = [{
             "nodo": usuario.get("servidor") or "fi",
+            "dispositivo": 1,
             "ip": usuario["ip"],
             "privada": usuario.get("privada"),
             "preshared": usuario.get("preshared"),
         }]
 
+    if dispositivo is not None:
+        lista = [f for f in lista if int(f.get("dispositivo") or 1) == dispositivo]
+
+    total = int(usuario.get("dispositivos") or 1)
     enviados = 0
     for fila in lista:
         nodo = nodos.por_id(fila["nodo"])
@@ -275,21 +270,22 @@ async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
         if not endpoint:
             log.error("el nodo %s no tiene endpoint; no se envia su configuracion", nodo["nombre"])
             continue
+
         contenido = provision.generar_conf(
-            fila["privada"],
-            fila["preshared"],
-            fila["ip"],
-            plan=plan,
-            expira=expira,
-            endpoint=endpoint,
-            dns=nodo["dns"],
-            mtu=nodo["mtu"],
+            fila["privada"], fila["preshared"], fila["ip"],
+            plan=plan, expira=expira,
+            endpoint=endpoint, dns=nodo["dns"], mtu=nodo["mtu"],
         )
+
+        numero = int(fila.get("dispositivo") or 1)
+        sufijo = "" if total <= 1 else f"-{numero}"
         archivo = BufferedInputFile(
             contenido.encode("utf-8"),
-            filename=f"GeoiD-{nodo['nombre']}.conf",
+            filename=f"GeoiD-{nodo['nombre']}{sufijo}.conf",
         )
         leyenda = f"{nodo['bandera']} <b>{nodo['nombre']}</b>"
+        if total > 1:
+            leyenda += f" · dispositivo {numero}"
         pie = f"{texto}\n\n{leyenda}" if enviados == 0 else leyenda
         await bot.send_document(
             chat_id=tg_id,
@@ -300,11 +296,6 @@ async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str):
         enviados += 1
 
     return enviados
-
-
-# --------------------------------------------------------------------------- #
-# Acciones (las usan tanto el teclado fijo como los botones internos)
-# --------------------------------------------------------------------------- #
 async def accion_prueba(bot: Bot, tg_id: int) -> None:
     usuario = db.obtener(tg_id) or {}
     idi = usuario.get("idioma") or "es"
@@ -364,29 +355,34 @@ async def accion_comprar(bot: Bot, tg_id: int) -> None:
     )
 
 
-def crear_perfiles_faltantes(tg_id: int) -> int:
-    """Crea el perfil de los paises que le falten al cliente."""
+def crear_perfiles_faltantes(tg_id: int, dispositivo: int | None = None) -> int:
+    """Crea los perfiles que falten (de un dispositivo concreto o de todos)."""
     usuario = db.obtener(tg_id) or {}
     if not usuario.get("ip"):
         return 0
-    existentes = {f["nodo"] for f in db.perfiles(tg_id)}
+
+    existentes = {(f["nodo"], int(f["dispositivo"])) for f in db.perfiles(tg_id)}
+    total = int(usuario.get("dispositivos") or 1)
+    numeros = [dispositivo] if dispositivo else list(range(1, total + 1))
     creados = 0
-    for nodo in nodos.lista():
-        if nodo["id"] in existentes:
-            continue
-        try:
-            cliente = nodos.crear(nodo, usuario.get("usuario") or str(tg_id))
-        except Exception:  # noqa: BLE001
-            log.exception("no se pudo crear el perfil de %s para %s", nodo["nombre"], tg_id)
-            continue
-        db.guardar_perfil(
-            tg_id, nodo["id"], cliente["ip"],
-            cliente["privada"], cliente["publica"], cliente["preshared"],
-        )
-        creados += 1
+
+    for numero in numeros:
+        for nodo in nodos.lista():
+            if (nodo["id"], numero) in existentes:
+                continue
+            try:
+                cliente = nodos.crear(nodo, usuario.get("usuario") or str(tg_id))
+            except Exception:  # noqa: BLE001
+                log.exception("no se pudo crear %s (dispositivo %s) para %s",
+                              nodo["nombre"], numero, tg_id)
+                continue
+            db.guardar_perfil(
+                tg_id, nodo["id"], cliente["ip"],
+                cliente["privada"], cliente["publica"], cliente["preshared"],
+                dispositivo=numero,
+            )
+            creados += 1
     return creados
-
-
 async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
     usuario = db.obtener(tg_id) or {}
     idi = usuario.get("idioma") or "es"
@@ -397,10 +393,14 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
         await bot.send_message(tg_id, texto, reply_markup=teclado_fijo(tg_id))
         return
 
-    # Si le falta el perfil de algun pais, se crea ahora mismo.
     crear_perfiles_faltantes(tg_id)
 
     filas = []
+    if int(usuario.get("dispositivos") or 1) < config.MAX_DISPOSITIVOS:
+        filas.append([InlineKeyboardButton(
+            text=t(idi, "mas_dispositivo",
+                   estrellas=config.PRECIO_DISPOSITIVO_ESTRELLAS),
+            callback_data="dispositivo")])
     if usuario.get("proxy"):
         filas.append([InlineKeyboardButton(
             text=t(idi, "proxy_boton"), callback_data="proxy")])
@@ -408,8 +408,9 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
 
     lista = db.perfiles(tg_id)
     lineas_pais = "\n".join(
-        f"{nodos.por_id(f['nodo'])['bandera']} {nodos.por_id(f['nodo'])['nombre']}: "
-        f"<code>{f['ip']}</code>"
+        f"{nodos.por_id(f['nodo'])['bandera']} {nodos.por_id(f['nodo'])['nombre']}"
+        + (f" · {f['dispositivo']}" if int(f["dispositivo"]) > 1 else "")
+        + f": <code>{f['ip']}</code>"
         for f in lista
     )
 
@@ -424,10 +425,7 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
         parse_mode=ParseMode.HTML,
     )
 
-    # Y los archivos, sin pedir nada mas.
     await enviar_conf(bot, tg_id, usuario, t(idi, "reenvio_texto"))
-
-
 async def accion_pais(bot: Bot, tg_id: int) -> None:
     idi = idioma(tg_id)
     texto = t(idi, "pais_unico")
@@ -1286,10 +1284,66 @@ async def preparar_pago(consulta: PreCheckoutQuery, bot: Bot):
     await bot.answer_pre_checkout_query(consulta.id, ok=True)
 
 
+@router.callback_query(F.data == "dispositivo")
+async def cb_dispositivo(llamada: CallbackQuery, bot: Bot):
+    """Factura de un dispositivo adicional."""
+    await llamada.answer()
+
+    tg_id = llamada.from_user.id
+    idi = idioma(tg_id)
+    usuario = db.obtener(tg_id) or {}
+
+    if not usuario.get("ip") or usuario.get("expira", 0) <= int(time.time()):
+        await bot.send_message(tg_id, t(idi, "mi_vpn_sin"), reply_markup=teclado_fijo(tg_id))
+        return
+
+    await bot.send_invoice(
+        chat_id=tg_id,
+        title=t(idi, "extra_titulo", marca=config.MARCA),
+        description=t(idi, "extra_desc", dias=config.DIAS_DISPOSITIVO),
+        payload="extra:1",
+        provider_token="",
+        currency="XTR",
+        prices=[LabeledPrice(label="+1", amount=config.PRECIO_DISPOSITIVO_ESTRELLAS)],
+    )
+
+
 @router.message(F.successful_payment)
 async def pago_recibido(mensaje: Message, bot: Bot):
     pago = mensaje.successful_payment
-    if not pago or not pago.invoice_payload.startswith("plan:"):
+    if not pago:
+        return
+
+    if pago.invoice_payload.startswith("extra:"):
+        tg_id = mensaje.from_user.id
+        idi = idioma(tg_id)
+        usuario = db.obtener(tg_id) or {}
+        actuales = int(usuario.get("dispositivos") or 1)
+
+        if actuales >= config.MAX_DISPOSITIVOS:
+            await mensaje.answer(t(idi, "extra_max", maximo=config.MAX_DISPOSITIVOS))
+            return
+
+        nuevo = actuales + 1
+        db.guardar(tg_id, dispositivos=nuevo)
+        creados = crear_perfiles_faltantes(tg_id, dispositivo=nuevo)
+
+        if avisos is not None:
+            await avisos.avisar(
+                f"DISPOSITIVO EXTRA - {tg_id}",
+                f"El cliente {tg_id} compro un dispositivo adicional "
+                f"({nuevo} en total). Estrellas: {pago.total_amount}",
+            )
+
+        await mensaje.answer(
+            t(idi, "extra_ok", numero=nuevo, cuantos=max(1, creados)),
+            parse_mode=ParseMode.HTML,
+        )
+        await enviar_conf(bot, tg_id, db.obtener(tg_id) or usuario,
+                          t(idi, "reenvio_texto"), dispositivo=nuevo)
+        return
+
+    if not pago.invoice_payload.startswith("plan:"):
         return
 
     meses = int(pago.invoice_payload.split(":")[1])

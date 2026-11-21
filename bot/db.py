@@ -56,14 +56,15 @@ CREATE TABLE IF NOT EXISTS ajustes (
 );
 
 CREATE TABLE IF NOT EXISTS perfiles (
-    tg_id      INTEGER NOT NULL,
-    nodo       TEXT    NOT NULL,
-    ip         TEXT,
-    privada    TEXT,
-    publica    TEXT,
-    preshared  TEXT,
-    creado     INTEGER,
-    PRIMARY KEY (tg_id, nodo)
+    tg_id       INTEGER NOT NULL,
+    nodo        TEXT    NOT NULL,
+    dispositivo INTEGER NOT NULL DEFAULT 1,
+    ip          TEXT,
+    privada     TEXT,
+    publica     TEXT,
+    preshared   TEXT,
+    creado      INTEGER,
+    PRIMARY KEY (tg_id, nodo, dispositivo)
 );
 
 CREATE TABLE IF NOT EXISTS pagos (
@@ -82,6 +83,9 @@ def conectar() -> sqlite3.Connection:
     con = sqlite3.connect(config.DB, timeout=10)
     con.row_factory = sqlite3.Row
     con.executescript(ESQUEMA)
+    # Las migraciones se aplican en cada conexion: asi ninguna consulta
+    # puede encontrar una tabla a medio actualizar.
+    _migrar(con)
     return con
 
 
@@ -118,6 +122,29 @@ def _migrar(con) -> None:
         con.execute("ALTER TABLE usuarios ADD COLUMN proxy_puerto INTEGER")
     if "proxy_secreto" not in columnas:
         con.execute("ALTER TABLE usuarios ADD COLUMN proxy_secreto TEXT")
+    if "dispositivos" not in columnas:
+        con.execute("ALTER TABLE usuarios ADD COLUMN dispositivos INTEGER DEFAULT 1")
+
+    columnas_perfiles = {f[1] for f in con.execute("PRAGMA table_info(perfiles)")}
+    if "dispositivo" not in columnas_perfiles:
+        con.execute("ALTER TABLE perfiles RENAME TO perfiles_viejo")
+        con.execute("""CREATE TABLE perfiles (
+            tg_id       INTEGER NOT NULL,
+            nodo        TEXT    NOT NULL,
+            dispositivo INTEGER NOT NULL DEFAULT 1,
+            ip          TEXT,
+            privada     TEXT,
+            publica     TEXT,
+            preshared   TEXT,
+            creado      INTEGER,
+            PRIMARY KEY (tg_id, nodo, dispositivo)
+        )""")
+        con.execute("""INSERT INTO perfiles
+            (tg_id, nodo, dispositivo, ip, privada, publica, preshared, creado)
+            SELECT tg_id, nodo, 1, ip, privada, publica, preshared, creado
+            FROM perfiles_viejo""")
+        con.execute("DROP TABLE perfiles_viejo")
+
     if "pais_compra" not in columnas:
         con.execute("ALTER TABLE usuarios ADD COLUMN pais_compra TEXT")
     if "servidor" not in columnas:
@@ -350,14 +377,14 @@ def guardar_ajuste(clave: str, valor: str | None) -> None:
 # Perfiles por pais (cada plan incluye Finlandia y Suecia)
 # --------------------------------------------------------------------------- #
 def guardar_perfil(tg_id: int, nodo: str, ip: str, privada: str,
-                   publica: str, preshared: str) -> None:
-    """Guarda o reemplaza el perfil de un pais."""
+                   publica: str, preshared: str, dispositivo: int = 1) -> None:
+    """Guarda o reemplaza el perfil de un pais para un dispositivo."""
     with conectar() as con:
         con.execute(
             "INSERT OR REPLACE INTO perfiles "
-            "(tg_id, nodo, ip, privada, publica, preshared, creado) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (tg_id, nodo, ip, privada, publica, preshared, int(time.time())),
+            "(tg_id, nodo, dispositivo, ip, privada, publica, preshared, creado) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (tg_id, nodo, dispositivo, ip, privada, publica, preshared, int(time.time())),
         )
 
 
@@ -365,8 +392,8 @@ def perfiles(tg_id: int) -> list[dict]:
     """Todos los perfiles del cliente, uno por pais."""
     with conectar() as con:
         filas = con.execute(
-            "SELECT nodo, ip, privada, publica, preshared "
-            "FROM perfiles WHERE tg_id = ? ORDER BY nodo",
+            "SELECT nodo, dispositivo, ip, privada, publica, preshared "
+            "FROM perfiles WHERE tg_id = ? ORDER BY dispositivo, nodo",
             (tg_id,),
         ).fetchall()
     return [dict(f) for f in filas]
