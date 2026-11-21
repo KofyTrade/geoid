@@ -2,6 +2,10 @@
 
 TEXTOS = {
     "es": {
+        "mudar_boton": "🌍 Cambiar de país",
+        "mudar_titulo": "🌍 <b>¿A qué país quieres moverte?</b>\n\nTu fecha de caducidad no cambia.",
+        "mudar_hecho": "✅ Ya estás en {pais}.\n\nAquí tienes tu configuración nueva. La anterior deja de funcionar.",
+        "mudar_fallo": "⚠️ No se pudo cambiar de país ahora mismo. Inténtalo más tarde o escríbenos.",
         "elegir_pais": "🌍 ¿Desde qué país quieres conectarte?",
         "plan_precios": "⭐ {estrellas} estrellas · {rub} ₽",
         "metodo_web": "🌐 Web",
@@ -189,6 +193,10 @@ TEXTOS = {
         "activar_ok": "Activado {id} hasta {fecha}.",        "pais": "Finlandia",
     },
     "ru": {
+        "mudar_boton": "🌍 Сменить страну",
+        "mudar_titulo": "🌍 <b>В какую страну перейти?</b>\n\nДата окончания не меняется.",
+        "mudar_hecho": "✅ Теперь вы в {pais}.\n\nВот новая конфигурация. Прежняя больше не работает.",
+        "mudar_fallo": "⚠️ Сейчас не удалось сменить страну. Попробуйте позже или напишите нам.",
         "elegir_pais": "🌍 Из какой страны подключаться?",
         "plan_precios": "⭐ {estrellas} звёзд · {rub} ₽",
         "metodo_web": "🌐 Сайт",
@@ -373,6 +381,10 @@ TEXTOS = {
         "activar_ok": "Активирован {id} до {fecha}.",        "pais": "Финляндия",
     },
     "en": {
+        "mudar_boton": "🌍 Change country",
+        "mudar_titulo": "🌍 <b>Which country do you want to move to?</b>\n\nYour expiry date does not change.",
+        "mudar_hecho": "✅ You are now in {pais}.\n\nHere is your new configuration. The previous one stops working.",
+        "mudar_fallo": "⚠️ Could not change country right now. Try later or message us.",
         "elegir_pais": "🌍 Which country do you want to connect from?",
         "plan_precios": "⭐ {estrellas} stars · {rub} ₽",
         "metodo_web": "🌐 Website",
