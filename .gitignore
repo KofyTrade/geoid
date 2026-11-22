@@ -35,3 +35,6 @@ env-finlandia.txt
 
 # Secretos locales para regenerar el PDF
 .secretos/
+
+# Perfiles .conf sueltos en la raiz del proyecto (llevan claves)
+/*.conf
