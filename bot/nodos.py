@@ -124,6 +124,7 @@ def crear(nodo: dict, nombre: str = "cliente") -> dict:
         "dns": _leer_conf(conf, "DNS") or nodo["dns"],
         "mtu": int(_leer_conf(conf, "MTU") or nodo["mtu"]),
         "servidor": nodo["id"],
+        "conf": conf,
     }
 
 

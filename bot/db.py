@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS perfiles (
     privada     TEXT,
     publica     TEXT,
     preshared   TEXT,
+    conf        TEXT,
     creado      INTEGER,
     PRIMARY KEY (tg_id, nodo, dispositivo)
 );
@@ -126,6 +127,8 @@ def _migrar(con) -> None:
         con.execute("ALTER TABLE usuarios ADD COLUMN dispositivos INTEGER DEFAULT 1")
 
     columnas_perfiles = {f[1] for f in con.execute("PRAGMA table_info(perfiles)")}
+    if columnas_perfiles and "conf" not in columnas_perfiles:
+        con.execute("ALTER TABLE perfiles ADD COLUMN conf TEXT")
     if "dispositivo" not in columnas_perfiles:
         con.execute("ALTER TABLE perfiles RENAME TO perfiles_viejo")
         con.execute("""CREATE TABLE perfiles (
@@ -377,14 +380,20 @@ def guardar_ajuste(clave: str, valor: str | None) -> None:
 # Perfiles por pais (cada plan incluye Finlandia y Suecia)
 # --------------------------------------------------------------------------- #
 def guardar_perfil(tg_id: int, nodo: str, ip: str, privada: str,
-                   publica: str, preshared: str, dispositivo: int = 1) -> None:
-    """Guarda o reemplaza el perfil de un pais para un dispositivo."""
+                   publica: str, preshared: str, dispositivo: int = 1,
+                   conf: str | None = None) -> None:
+    """Guarda o reemplaza el perfil de un pais para un dispositivo.
+
+    Si el nodo es remoto se guarda tambien su .conf tal cual lo genero el
+    agente: asi no se reconstruye con datos del servidor local.
+    """
     with conectar() as con:
         con.execute(
             "INSERT OR REPLACE INTO perfiles "
-            "(tg_id, nodo, dispositivo, ip, privada, publica, preshared, creado) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (tg_id, nodo, dispositivo, ip, privada, publica, preshared, int(time.time())),
+            "(tg_id, nodo, dispositivo, ip, privada, publica, preshared, conf, creado) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (tg_id, nodo, dispositivo, ip, privada, publica, preshared,
+             conf, int(time.time())),
         )
 
 
@@ -392,7 +401,7 @@ def perfiles(tg_id: int) -> list[dict]:
     """Todos los perfiles del cliente, uno por pais."""
     with conectar() as con:
         filas = con.execute(
-            "SELECT nodo, dispositivo, ip, privada, publica, preshared "
+            "SELECT nodo, dispositivo, ip, privada, publica, preshared, conf "
             "FROM perfiles WHERE tg_id = ? ORDER BY dispositivo, nodo",
             (tg_id,),
         ).fetchall()

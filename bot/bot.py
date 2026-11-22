@@ -267,15 +267,20 @@ async def enviar_conf(bot: Bot, tg_id: int, usuario: dict, texto: str,
     for fila in lista:
         nodo = nodos.por_id(fila["nodo"])
         endpoint = nodos.endpoint_de(nodo)
-        if not endpoint:
+        if not fila.get("conf") and not endpoint:
             log.error("el nodo %s no tiene endpoint; no se envia su configuracion", nodo["nombre"])
             continue
 
-        contenido = provision.generar_conf(
-            fila["privada"], fila["preshared"], fila["ip"],
-            plan=plan, expira=expira,
-            endpoint=endpoint, dns=nodo["dns"], mtu=nodo["mtu"],
-        )
+        guardado = fila.get("conf")
+        if guardado:
+            # Nodo remoto: se usa su .conf tal cual (trae su clave y su ofuscacion).
+            contenido = _conf_con_cabecera(guardado, plan, expira, nodo["nombre"])
+        else:
+            contenido = provision.generar_conf(
+                fila["privada"], fila["preshared"], fila["ip"],
+                plan=plan, expira=expira,
+                endpoint=endpoint, dns=nodo["dns"], mtu=nodo["mtu"],
+            )
 
         numero = int(fila.get("dispositivo") or 1)
         sufijo = "" if total <= 1 else f"-{numero}"
@@ -355,6 +360,20 @@ async def accion_comprar(bot: Bot, tg_id: int) -> None:
     )
 
 
+def _conf_con_cabecera(texto: str, plan: str, expira: int, servidor: str) -> str:
+    """Pone la cabecera de GeoiD a un .conf que viene de un nodo remoto."""
+    cabecera = ["# GeoiD-vpn"]
+    if plan:
+        cabecera.append(f"# plan={plan}")
+    if expira:
+        dia = datetime.fromtimestamp(int(expira), tz=timezone.utc).strftime("%Y-%m-%d")
+        cabecera.append(f"# expira={dia}")
+    if servidor:
+        cabecera.append(f"# servidor={servidor}")
+    cuerpo = [l for l in texto.splitlines() if not l.strip().startswith("#")]
+    return "\n".join(cabecera + [""] + cuerpo) + "\n"
+
+
 def crear_perfiles_faltantes(tg_id: int, dispositivo: int | None = None) -> int:
     """Crea los perfiles que falten (de un dispositivo concreto o de todos)."""
     usuario = db.obtener(tg_id) or {}
@@ -380,6 +399,7 @@ def crear_perfiles_faltantes(tg_id: int, dispositivo: int | None = None) -> int:
                 tg_id, nodo["id"], cliente["ip"],
                 cliente["privada"], cliente["publica"], cliente["preshared"],
                 dispositivo=numero,
+                conf=cliente.get("conf"),
             )
             creados += 1
     return creados
