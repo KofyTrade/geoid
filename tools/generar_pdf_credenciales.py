@@ -361,7 +361,7 @@ tabla([
     ("Cuenta", "KofyTrade"),
     ("Correo en commits", "133810404+KofyTrade@users.noreply.github.com"),
     ("Repositorio", "https://github.com/KofyTrade/geoid (privado)"),
-    ("Contraseña", "[FALTA] (la tuya, no está en el proyecto)"),
+    ("Contraseña", "ver sección 10c (ya incluida)"),
     ("Descargas", "https://github.com/KofyTrade/geoid/releases/latest"),
 ])
 
