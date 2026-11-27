@@ -47,7 +47,7 @@ except Exception:  # noqa: BLE001
 
 import nodos
 import provision
-from textos import IDIOMAS, t
+from textos import IDIOMAS, TEXTOS, t
 
 logging.basicConfig(
     level=logging.INFO,
@@ -1411,7 +1411,7 @@ async def comando_diag(mensaje: Message, bot: Bot):
         "estrellas_titulo", "estrellas_instrucciones", "estrellas_ir",
         "estrellas_volver", "manual_aviso",
     ]
-    faltan = [c for c in claves if c not in textos.TEXTOS.get("ru", {})]
+    faltan = [c for c in claves if c not in TEXTOS.get("ru", {})]
 
     lineas = [
         "<b>Diagnóstico</b>",
@@ -1773,7 +1773,6 @@ async def main():
     asyncio.create_task(vigilar_caducidades(bot))
     asyncio.create_task(vigilar_cripto(bot))
     asyncio.create_task(vigilar_duplicados(bot))
-    asyncio.create_task(vigilar_proxies(bot))
     asyncio.create_task(vigilar_descargas(bot))
     log.info("bot en marcha · servidor %s", config.ENDPOINT)
     await dp.start_polling(bot)
