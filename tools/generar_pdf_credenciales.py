@@ -345,6 +345,7 @@ tabla([
     ("Cuándo", "todos los días a las 03:30 (cron)"),
     ("Retención", "7 días"),
     ("Script", "/usr/local/bin/geoid-respaldo.sh"),
+    ("Copia FUERA", "Finlandia trae las copias a las 04:15 (temporal, hasta 13.12)"),
 ])
 
 parrafo("Comandos útiles:", negrita=True, espacio=2)
@@ -352,8 +353,15 @@ codigo("""ls -lt /root/respaldos | head -5      # ver copias
 /usr/local/bin/geoid-respaldo.sh     # hacer una ahora
 systemctl status bukinist geoid-bot  # estado de los servicios""")
 
-aviso("Ahora mismo las copias están SOLO en el mismo servidor. Si Suecia se "
-      "pierde, se pierden. Pendiente: copia fuera (PC o almacenamiento externo).")
+parrafo("Copia fuera del servidor (mientras Finlandia siga vivo):", negrita=True, espacio=2)
+codigo("""# en Finlandia
+/usr/local/bin/geoid-traer-respaldo.sh     # traer ahora
+ls -lh /root/respaldos-suecia              # ver las copias
+cat /etc/cron.d/geoid-respaldo-suecia      # el horario (04:15)""")
+
+aviso("Esa copia vive en Finlandia y caduca el 13.12.2026. Antes de esa fecha hay "
+      "que llevar las copias al PC (o a otro servidor): si no, todo quedará "
+      "otra vez solo en Suecia.")
 
 parrafo("Recuperar la base desde una copia:", negrita=True, espacio=2)
 codigo("""systemctl stop geoid-bot
