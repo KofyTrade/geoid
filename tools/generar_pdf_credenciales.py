@@ -578,7 +578,7 @@ tabla([
 ])
 
 aviso("Si un cliente dice que no le abre el enlace, casi siempre es que su "
-      "operadora bloquea dominios raros: GitHub sí funciona en Rusia, DuckDNS no.")
+      "operadora bloquea dominios raros. Los dominios gratuitos (tipo DuckDNS) sí suelen estar bloqueados; GitHub no.")
 
 def bloque_b64(ruta) -> str:
     """Convierte un archivo pequeno a base64 en lineas cortas."""
@@ -698,7 +698,7 @@ tabla([
     ("Clave de firma Android", "no se puede cambiar: habría que publicar una app nueva"),
     ("Contraseña del VPS", "resetear desde el panel de Aeza"),
     ("Perfil .conf filtrado", "awg set awg0 peer <clave_pública> remove y quitar su bloque del .conf"),
-    ("Clave del proxy", "rm -f /etc/mtg.secret && bash /root/instalar-proxy-telegram.sh 443"),
+    ("Clave del proxy", "en Suecia: rm -f /etc/mtg.secret && bash /root/proxy.sh 2053 tls www.cloudflare.com"),
 ])
 
 # ---------------------------------------------------------------- pie
