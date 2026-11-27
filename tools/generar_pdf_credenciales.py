@@ -319,30 +319,36 @@ tabla([
 ])
 
 # ---------------------------------------------------------------- 6. proxy
-titulo("6 · Proxy de Telegram propio", 1)
-tabla([
-    ("Para que", "usar Telegram sin encender la VPN"),
-    ("Servidor", "SUECIA · 194.76.136.210 (se movio desde Finlandia)"),
-    ("Servicio", "mtg · systemctl status mtg"),
-    ("Puerto", "2053/tcp (el 443 lo usa la web de caddy)"),
-    ("Disfraz", "www.cloudflare.com (no caduca: no depende de DuckDNS)"),
-    ("Configuracion", "/etc/mtg.toml · clave en /etc/mtg.secret"),
-    ("Instalador", "bash /root/proxy.sh 2053 tls www.cloudflare.com"),
-    ("Puertos alternativos", "2083 · 2087 · 2096 si un operador filtra"),
-])
-parrafo("Clave del proxy:", negrita=True)
-codigo("ee99eb24a133d87b9aaf1b65b71edecc7d7777772e636c6f7564666c6172652e636f6d")
-aviso("El proxy ya NO esta en Finlandia: se movio a Suecia el 27.11.2026. El "
-      "enlace viejo (193.29.224.164 con geoidvpn.duckdns.org) dejo de funcionar "
-      "porque DuckDNS borro el dominio a los 30 dias sin actualizar.")
+titulo("6 · Proxy de Telegram (RETIRADO)", 1)
+parrafo("Existio un proxy MTProto para usar Telegram sin encender la VPN. Se "
+        "retiro el 27.11.2026: el filtro del estado ruso (TSPU) ya reconoce y "
+        "corta el protocolo MTProto, aunque vaya disfrazado de HTTPS.")
 
-parrafo("Enlace para el móvil (tocar con Telegram instalado):", negrita=True)
-codigo("tg://proxy?server=194.76.136.210&port=2053&secret=ee99eb24a133d87b9aaf1b65b71edecc7d7777772e636c6f7564666c6172652e636f6d")
-parrafo(
-    "En Telegram: Ajustes → Datos y almacenamiento → Proxy → Usar proxy → "
-    "Añadir proxy → MTPROTO.",
-    color=GRIS, tam=9.5,
-)
+parrafo("Las pruebas que lo demostraron:", negrita=True, espacio=2)
+tabla([
+    ("Navegador a la IP del proxy", "conecta (el TCP pasa)"),
+    ("Telegram por el proxy, sin VPN", "se queda en «conectando» para siempre"),
+    ("Telegram por el proxy, con VPN", "conecta al instante"),
+    ("Conclusion", "el corte ocurre al reconocer el protocolo, no por puerto ni IP"),
+])
+
+parrafo("Como queda ahora:", negrita=True, espacio=2)
+tabla([
+    ("Suecia", "mtg detenido y desactivado · el 443 volvio a caddy (la web)"),
+    ("Finlandia", "mtg detenido y desactivado · 443 libre"),
+    ("Archivos", "siguen instalados por si se quiere usar fuera de Rusia"),
+    ("Reactivar", "systemctl enable --now mtg (libera el 443 de caddy antes)"),
+])
+
+aviso("No vender «Telegram sin VPN»: en Rusia no funciona y genera soporte. "
+      "Telegram va perfectamente con la VPN encendida, que ya esta incluida "
+      "en todos los planes.")
+
+parrafo("Si algun dia hace falta de verdad:", negrita=True, espacio=2)
+parrafo("El unico protocolo que hoy aguanta ese filtro es VLESS + Reality "
+        "(imitacion real de TLS). Esta en servidor/instalar-xray-reality.sh, "
+        "pero el cliente necesita una app aparte (v2rayNG o NekoBox) y 8 pasos "
+        "de configuracion: no sirve para clientes sin conocimientos.")
 
 # ---------------------------------------------------------------- 7. firma
 titulo("7 · Firma de la app Android (no se puede perder)", 1)
