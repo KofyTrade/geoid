@@ -321,17 +321,23 @@ tabla([
 # ---------------------------------------------------------------- 6. proxy
 titulo("6 · Proxy de Telegram propio", 1)
 tabla([
-    ("Para qué", "usar Telegram sin encender la VPN"),
+    ("Para que", "usar Telegram sin encender la VPN"),
+    ("Servidor", "SUECIA · 194.76.136.210 (se movio desde Finlandia)"),
     ("Servicio", "mtg · systemctl status mtg"),
-    ("Puerto", "443/tcp"),
-    ("Configuración", "/etc/mtg.toml · clave en /etc/mtg.secret"),
-    ("Disfraz", "geoidvpn.duckdns.org (crear en duckdns.org → 193.29.224.164)"),
-    ("Instalador", "/root/instalar-proxy-telegram.sh"),
+    ("Puerto", "2053/tcp (el 443 lo usa la web de caddy)"),
+    ("Disfraz", "www.cloudflare.com (no caduca: no depende de DuckDNS)"),
+    ("Configuracion", "/etc/mtg.toml · clave en /etc/mtg.secret"),
+    ("Instalador", "bash /root/proxy.sh 2053 tls www.cloudflare.com"),
+    ("Puertos alternativos", "2083 · 2087 · 2096 si un operador filtra"),
 ])
 parrafo("Clave del proxy:", negrita=True)
-codigo("ee2aafaaad9922e542f900a1fb25c68cfc67656f696476706e2e6475636b646e732e6f7267")
+codigo("ee99eb24a133d87b9aaf1b65b71edecc7d7777772e636c6f7564666c6172652e636f6d")
+aviso("El proxy ya NO esta en Finlandia: se movio a Suecia el 27.11.2026. El "
+      "enlace viejo (193.29.224.164 con geoidvpn.duckdns.org) dejo de funcionar "
+      "porque DuckDNS borro el dominio a los 30 dias sin actualizar.")
+
 parrafo("Enlace para el móvil (tocar con Telegram instalado):", negrita=True)
-codigo("tg://proxy?server=193.29.224.164&port=443&secret=ee2aafaaad9922e542f900a1fb25c68cfc67656f696476706e2e6475636b646e732e6f7267")
+codigo("tg://proxy?server=194.76.136.210&port=2053&secret=ee99eb24a133d87b9aaf1b65b71edecc7d7777772e636c6f7564666c6172652e636f6d")
 parrafo(
     "En Telegram: Ajustes → Datos y almacenamiento → Proxy → Usar proxy → "
     "Añadir proxy → MTPROTO.",
