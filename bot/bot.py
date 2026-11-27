@@ -39,10 +39,6 @@ try:  # opcional
 except Exception:  # noqa: BLE001
     descargas = None  # type: ignore[assignment]
 import pagos
-try:  # opcional: si falta el archivo, el bot sigue funcionando
-    import proxy as proxy_personal
-except Exception:  # noqa: BLE001
-    proxy_personal = None  # type: ignore[assignment]
 
 try:  # opcional: avisos por correo
     import avisos
@@ -86,17 +82,6 @@ def _regalo_dias(meses: int) -> int:
     """Días extra del plan; 0 si el config.py es antiguo."""
     funcion = getattr(config, "dias_de_regalo", None)
     return funcion(meses) if callable(funcion) else 0
-
-
-def _regalo_proxies(meses: int) -> int:
-    """Proxies de regalo; cálculo de reserva si el config.py es antiguo."""
-    funcion = getattr(config, "proxies_de_regalo", None)
-    if callable(funcion):
-        return funcion(meses)
-    minimo = getattr(config, "MIN_MESES_PROXY", 3)
-    if meses < minimo:
-        return 0
-    return 2 if meses >= 6 else 1
 
 
 def _web_pagos() -> str:
@@ -151,9 +136,8 @@ def teclado_planes(tg_id: int) -> InlineKeyboardMarkup:
     for meses in config.PRECIOS:
         duracion = _duracion(meses, idi)
         estrellas = config.PRECIOS[meses]
-        regalo = " 🎁" if meses >= getattr(config, "MIN_MESES_PROXY", 3) else ""
         filas.append([InlineKeyboardButton(
-            text=f"{duracion} · {estrellas} ⭐{regalo}",
+            text=f"{duracion} · {estrellas} ⭐",
             callback_data=f"plan:{meses}",
         )])
     return InlineKeyboardMarkup(inline_keyboard=filas)
@@ -163,11 +147,6 @@ def teclado_volver(tg_id: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="◀️", callback_data="menu")
     ]])
-
-
-def proxies_ok() -> bool:
-    """True solo si el modulo de proxies existe y el servidor esta listo."""
-    return proxy_personal is not None and proxy_personal.disponible()
 
 
 def _dias(cantidad: int, idi: str) -> str:
@@ -421,9 +400,6 @@ async def accion_mi_vpn(bot: Bot, tg_id: int) -> None:
             text=t(idi, "mas_dispositivo",
                    estrellas=config.PRECIO_DISPOSITIVO_ESTRELLAS),
             callback_data="dispositivo")])
-    if usuario.get("proxy"):
-        filas.append([InlineKeyboardButton(
-            text=t(idi, "proxy_boton"), callback_data="proxy")])
     teclado = InlineKeyboardMarkup(inline_keyboard=filas) if filas else None
 
     lista = db.perfiles(tg_id)
@@ -599,109 +575,6 @@ def activar_plan(tg_id: int, meses: int) -> dict:
     """Activa un plan: los meses comprados más los días de regalo."""
     dias = 30 * meses + _regalo_dias(meses)
     return activar(tg_id, dias)
-
-
-async def entregar_proxy(bot: Bot, tg_id: int, meses: int) -> None:
-    """Crea y entrega los proxies de regalo que toquen (1 o 2)."""
-    cantidad = _regalo_proxies(meses)
-    if cantidad <= 0:
-        return
-
-    # Los clientes NUNCA usan el proxy del dueño (puerto 443).
-    if not proxies_ok():
-        log.warning(
-            "proxy personal no disponible: falta ejecutar proxy-multiusuario.sh"
-        )
-        return
-
-    usuario = db.obtener(tg_id) or {}
-    idi = usuario.get("idioma") or getattr(config, "IDIOMA_DEFECTO", "ru")
-
-    for numero in (1, 2):
-        if numero > cantidad:
-            break
-
-        if numero == 1:
-            puerto, secreto = usuario.get("proxy_puerto"), usuario.get("proxy_secreto")
-        else:
-            puerto, secreto = usuario.get("proxy2_puerto"), usuario.get("proxy2_secreto")
-
-        if not (puerto and secreto):
-            datos = proxy_personal.crear(tg_id, numero=numero)
-            puerto, secreto = datos["puerto"], datos["secreto"]
-            if numero == 1:
-                db.guardar(tg_id, proxy=1, proxy_puerto=puerto, proxy_secreto=secreto)
-            else:
-                db.guardar(tg_id, proxy2_puerto=puerto, proxy2_secreto=secreto)
-        elif not proxy_personal.activo(tg_id, numero):
-            datos = proxy_personal.crear(tg_id, secreto, numero=numero)
-            puerto = datos["puerto"]
-
-        enlace = (
-            f"tg://proxy?server={config.PROXY_SERVIDOR}"
-            f"&port={puerto}&secret={secreto}"
-        )
-        texto = t(idi, "proxy_regalo",
-                  enlace=enlace,
-                  servidor=config.PROXY_SERVIDOR,
-                  puerto=puerto,
-                  secreto=secreto)
-        if cantidad > 1:
-            texto = t(idi, "proxy_cual", numero=numero, total=cantidad) + "\n\n" + texto
-
-        try:
-            await bot.send_message(
-                tg_id, texto,
-                parse_mode=ParseMode.HTML,
-                disable_web_page_preview=True,
-            )
-        except Exception:  # noqa: BLE001
-            log.warning("no se pudo entregar el proxy %s a %s", numero, tg_id)
-
-
-async def recompensar_padrino(bot: Bot, comprador: int) -> None:
-    """Si el amigo ha comprado, mira los niveles del padrino y premia."""
-    usuario = db.obtener(comprador) or {}
-    padrino = usuario.get("referido")
-    if not padrino:
-        return
-
-    datos = db.obtener(padrino) or {}
-    nivel_previo = int(datos.get("nivel_ref") or 0)
-    cuantos = db.referidos_pagados(padrino)
-
-    nivel_nuevo = 0
-    for numero, (amigos, _dias) in enumerate(config.NIVELES_INVITACION, start=1):
-        if cuantos >= amigos:
-            nivel_nuevo = numero
-
-    if nivel_nuevo <= nivel_previo:
-        return
-
-    dias = sum(
-        premio
-        for numero, (_amigos, premio) in enumerate(config.NIVELES_INVITACION, start=1)
-        if nivel_previo < numero <= nivel_nuevo
-    )
-    if dias <= 0:
-        return
-
-    db.crear_si_falta(padrino, None)
-    actualizado = activar(padrino, dias)
-    db.guardar(padrino, nivel_ref=nivel_nuevo)
-
-    try:
-        await bot.send_message(
-            padrino,
-            t(idioma(padrino), "premio_invitacion",
-              cuantos=cuantos, dias=dias, fecha=fecha(actualizado["expira"])),
-            parse_mode=ParseMode.HTML,
-            reply_markup=teclado_fijo(padrino),
-        )
-    except Exception:  # noqa: BLE001
-        log.warning("no se pudo avisar del premio a %s", padrino)
-
-    log.info("premio nivel %s (%s dias) para %s", nivel_nuevo, dias, padrino)
 
 
 @router.message(CommandStart())
@@ -1215,47 +1088,7 @@ async def admin_activar(llamada: CallbackQuery, bot: Bot):
     except Exception:  # noqa: BLE001
         log.warning("no se pudo avisar al cliente %s", tg_id)
     await recompensar_padrino(bot, tg_id)
-    await entregar_proxy(bot, tg_id, meses)
     await llamada.answer("Activado")
-@router.callback_query(F.data == "proxy")
-async def cb_proxy(llamada: CallbackQuery, bot: Bot):
-    tg_id = llamada.from_user.id
-    usuario = db.obtener(tg_id) or {}
-    if not usuario.get("proxy") or not usuario.get("proxy_secreto"):
-        await llamada.answer(t(idioma(tg_id), "proxy_sin"), show_alert=True)
-        return
-
-    if not proxies_ok():
-        await llamada.answer("El proxy no está disponible ahora mismo.", show_alert=True)
-        return
-
-    puerto = usuario["proxy_puerto"]
-    secreto = usuario["proxy_secreto"]
-    if not proxy_personal.activo(tg_id):
-        datos = proxy_personal.crear(tg_id, secreto)
-        puerto = datos["puerto"]
-        db.guardar(tg_id, proxy_puerto=puerto)
-
-    ips = proxy_personal.ips_conectadas(tg_id)
-    enlace = (
-        f"tg://proxy?server={config.PROXY_SERVIDOR}"
-        f"&port={puerto}&secret={secreto}"
-    )
-    await bot.send_message(
-        tg_id,
-        t(idioma(tg_id), "proxy_regalo",
-          enlace=enlace,
-          servidor=config.PROXY_SERVIDOR,
-          puerto=puerto,
-          secreto=secreto)
-        + f"\n\n⚙️ Dispositivos conectados ahora: {len(ips)}/"
-        f"{config.PROXY_DISPOSITIVOS}",
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
-    await llamada.answer()
-
-
 @router.callback_query(F.data == "mi_vpn")
 async def cb_mi_vpn(llamada: CallbackQuery, bot: Bot):
     await llamada.answer()
@@ -1396,7 +1229,6 @@ async def pago_recibido(mensaje: Message, bot: Bot):
         parse_mode=ParseMode.HTML,
     )
     await enviar_conf(bot, tg_id, actualizado, f"{config.MARCA} · {meses} m")
-    await entregar_proxy(bot, tg_id, meses)
 
 
 # --------------------------------------------------------------------------- #
@@ -1564,7 +1396,6 @@ async def comando_activar(mensaje: Message, command: CommandObject, bot: Bot):
         )
         await enviar_conf(bot, tg_id, usuario, "GeoiD · transferencia")
         await recompensar_padrino(bot, tg_id)
-        await entregar_proxy(bot, tg_id, meses)
     except Exception:  # noqa: BLE001
         log.warning("no se pudo avisar al cliente %s", tg_id)
 
@@ -1592,7 +1423,6 @@ async def comando_diag(mensaje: Message, bot: Bot):
         f"idioma por defecto: {config.IDIOMA_DEFECTO}",
         f"claves de texto que faltan: {faltan or 'ninguna'}",
         f"QR en el bot: {'sí' if hay_qr() else 'no'}",
-        f"proxy propio: {'listo' if proxies_ok() else 'no disponible'}",
     ]
     await mensaje.answer("\n".join(lineas), parse_mode=ParseMode.HTML)
 
@@ -1754,13 +1584,6 @@ async def vigilar_caducidades(bot: Bot):
                     usuario["tg_id"],
                     ip=None, privada=None, publica=None, preshared=None,
                 )
-                if usuario.get("proxy") and proxy_personal is not None:
-                    try:
-                        proxy_personal.eliminar(usuario["tg_id"])
-                    except Exception:  # noqa: BLE001
-                        log.warning("no se pudo cerrar el proxy de %s", usuario["tg_id"])
-                    db.guardar(usuario["tg_id"], proxy=0, proxy_puerto=None,
-                               proxy_secreto=None)
                 try:
                     await bot.send_message(
                         usuario["tg_id"],
@@ -1815,7 +1638,6 @@ async def vigilar_cripto(bot: Bot):
                     f"Activo hasta: {fecha(usuario['expira'])}",
                 )
                 await recompensar_padrino(bot, tg_id)
-                await entregar_proxy(bot, tg_id, meses)
                 log.info("cripto pagado: %s -> %s meses", tg_id, meses)
         except Exception:  # noqa: BLE001
             log.exception("error revisando pagos con cripto")
@@ -1903,49 +1725,6 @@ async def vigilar_duplicados(bot: Bot):
                 log.info("duplicado detectado en %s (%s cuentas)", ip, len(cuentas))
         except Exception:  # noqa: BLE001
             log.exception("error revisando duplicados")
-
-async def vigilar_proxies(bot: Bot):
-    """Si un proxy personal supera los dispositivos permitidos, avisa y corta."""
-    destino = int(config.AVISOS_ID) if config.AVISOS_ID else ADMIN
-    while True:
-        await asyncio.sleep(300)
-        if not proxies_ok():
-            continue
-        try:
-            with db.conectar() as con:
-                usuarios = con.execute(
-                    "SELECT tg_id, usuario, proxy_puerto FROM usuarios "
-                    "WHERE proxy = 1 AND proxy_puerto IS NOT NULL"
-                ).fetchall()
-
-            for usuario in usuarios:
-                tg_id = usuario["tg_id"]
-                ips = proxy_personal.ips_conectadas(tg_id)
-                if len(ips) <= config.PROXY_DISPOSITIVOS:
-                    continue
-
-                sobra = ips[config.PROXY_DISPOSITIVOS:]
-                if destino:
-                    await bot.send_message(
-                        destino,
-                        "⚠️ <b>Proxy con demasiados dispositivos</b>\n\n"
-                        f"Cliente: {usuario['usuario'] or '—'} "
-                        f"(ID <code>{tg_id}</code>)\n"
-                        f"Conectados: {len(ips)} de {config.PROXY_DISPOSITIVOS}\n"
-                        f"IPs: <code>{', '.join(ips)}</code>\n\n"
-                        "Para cortar el sobrante:\n"
-                        + "\n".join(
-                            f"<code>iptables -I INPUT -p tcp --dport "
-                            f"{usuario['proxy_puerto']} -s {ip} -j DROP</code>"
-                            for ip in sobra
-                        ),
-                        parse_mode=ParseMode.HTML,
-                    )
-                log.info("proxy %s con %s dispositivos", tg_id, len(ips))
-        except Exception:  # noqa: BLE001
-            log.exception("error revisando los proxies personales")
-
-
 
 async def vigilar_descargas(bot: Bot):
     """Cada 6 horas mira si hay versión nueva y actualiza los enlaces."""

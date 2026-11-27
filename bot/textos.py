@@ -24,7 +24,6 @@ TEXTOS = {
         "estrellas_comprar": "💳 Comprar estrellas",
         "estrellas_instrucciones": "💳 <b>Comprar estrellas</b>\n\n1. Abre el servicio y pide <b>{cantidad} estrellas</b>.\n2. Indica tu usuario <b>{usuario}</b> y paga como te indiquen allí.\n3. Vuelve aquí y pulsa «Ya las tengo».\n\n⚠️ Solo te pedirán tu @usuario. Nunca tu contraseña ni un código.",
         "estrellas_volver": "✅ Ya las tengo",
-        "proxy_cual": "🎁 <b>Proxy {numero} de {total}</b>",
         "soporte_invita": "Si necesitas ayuda, escribe tu mensaje aquí abajo y te responderemos en este mismo chat.",
         "soporte_recibido": "Mensaje recibido. Te contestamos aquí en cuanto podamos.",
         "soporte_ticket": "\U0001F3AB Ticket de soporte\n\nDe: {usuario} (ID {id})\n\n{mensaje}\n\nResponde a este mensaje para contestarle.",
@@ -37,31 +36,12 @@ TEXTOS = {
         ),
         "plan_linea": "💳 Plan: <b>{duracion}</b>",
         "manual_plan": "Plan: <b>{duracion}</b>",
-        "plan_6meses": "Acceso 6 meses + proxy de Telegram de regalo",
-        "proxy_boton": "🎁 Mi proxy de Telegram",
-        "proxy_sin": "El proxy de regalo es para planes de 6 meses o más.",
-                "proxy_regalo": (
-            "🎁 <b>Tu regalo: proxy de Telegram</b>\n\n"
-            "Con tu plan de 6 meses o más te llevas un proxy de Telegram "
-            "<b>gratis y exclusivo para ti</b>. Sirve para usar Telegram "
-            "<b>sin VPN encendida</b>.\n\n"
-            "Toca este enlace desde el móvil y Telegram se configura solo:\n"
-            "<code>{enlace}</code>\n\n"
-            "O a mano, en Telegram → Ajustes → Datos y almacenamiento → Proxy:\n"
-            "Servidor: <code>{servidor}</code>\n"
-            "Puerto: <code>{puerto}</code>\n"
-            "Clave: <code>{secreto}</code>\n\n"
-            "⚠️ <b>Este enlace es personal.</b> Puedes compartirlo si quieres, "
-            "pero si lo usa mucha gente irá más lento e incluso podría dejar de "
-            "funcionar bien: en ese caso <b>no nos hacemos responsables</b> del "
-            "rendimiento del proxy. La conexión VPN sí mantiene su garantía."
-        ),
+        "plan_6meses": "Acceso 6 meses",
                 "bienvenida": (
             "¡Hola! Esto es <b>{marca}</b>, una VPN con <b>WireGuard ofuscado</b>: "
             "no se puede bloquear por firma de tráfico.\n\n"
             "🎁 Tienes <b>{dias} días gratis</b> para probarla, sin tarjeta.\n\n"
-            "📱 Con la compra de <b>6 meses</b> te llevas <b>gratis</b> un proxy para "
-            "Telegram, para que puedas usarlo sin VPN.\n\n"
+
             "Aquí mismo recibirás tu configuración. Para usarla necesitas la "
             "aplicación <b>GeoiD-vpn</b>; los enlaces están en ❓ Ayuda.\n\n"
             "Elige una opción 👇"
@@ -218,7 +198,6 @@ TEXTOS = {
         "estrellas_comprar": "💳 Купить звёзды",
         "estrellas_instrucciones": "💳 <b>Купить звёзды</b>\n\n1. Откройте сервис и укажите <b>{cantidad} звёзд</b>.\n2. Введите юзернейм <b>{usuario}</b> и оплатите так, как предложат там.\n3. Вернитесь сюда и нажмите «Звёзды у меня».\n\n⚠️ У вас попросят только @юзернейм. Никогда — пароль или код.",
         "estrellas_volver": "✅ Звёзды у меня",
-        "proxy_cual": "🎁 <b>Прокси {numero} из {total}</b>",
         "soporte_invita": "Если нужна помощь, напишите сообщение здесь — ответим в этом же чате.",
         "soporte_recibido": "Сообщение получено. Ответим здесь, как только сможем.",
         "soporte_ticket": "\U0001F3AB Сообщение в поддержку\n\nОт: {usuario} (ID {id})\n\n{mensaje}\n\nОтветьте на это сообщение, чтобы написать клиенту.",
@@ -231,31 +210,12 @@ TEXTOS = {
         ),
         "plan_linea": "💳 Тариф: <b>{duracion}</b>",
         "manual_plan": "Тариф: <b>{duracion}</b>",
-        "plan_6meses": "Доступ на 6 месяцев + прокси Telegram в подарок",
-        "proxy_boton": "🎁 Мой прокси Telegram",
-        "proxy_sin": "Прокси в подарок — для тарифов от 6 месяцев.",
-                "proxy_regalo": (
-            "🎁 <b>Ваш подарок: прокси Telegram</b>\n\n"
-            "С тарифом от 6 месяцев вы получаете прокси Telegram "
-            "<b>бесплатно и только для вас</b>. Он нужен, чтобы пользоваться "
-            "Telegram <b>без VPN</b>.\n\n"
-            "Нажмите ссылку на телефоне — Telegram настроится сам:\n"
-            "<code>{enlace}</code>\n\n"
-            "Или вручную: Telegram → Настройки → Данные и память → Прокси:\n"
-            "Сервер: <code>{servidor}</code>\n"
-            "Порт: <code>{puerto}</code>\n"
-            "Секрет: <code>{secreto}</code>\n\n"
-            "⚠️ <b>Эта ссылка персональная.</b> Вы можете ею делиться, но если "
-            "ею будет пользоваться много людей, она станет медленнее и может "
-            "работать хуже: в этом случае <b>мы не отвечаем</b> за скорость "
-            "прокси. На VPN это не влияет — его гарантия сохраняется."
-        ),
+        "plan_6meses": "Доступ на 6 месяцев",
                 "bienvenida": (
             "Привет! Это <b>{marca}</b>, VPN на <b>WireGuard с обфускацией</b>: "
             "его нельзя заблокировать по сигнатуре трафика.\n\n"
             "🎁 У вас <b>{dias} дней бесплатно</b>, без карты.\n\n"
-            "📱 При покупке на <b>6 месяцев</b> вы бесплатно получаете прокси для "
-            "Telegram, чтобы пользоваться им без VPN.\n\n"
+
             "Конфигурация придёт сюда же. Для подключения нужно приложение "
             "<b>GeoiD-vpn</b>; ссылки в разделе ❓ Помощь.\n\n"
             "Выберите вариант 👇"
@@ -409,7 +369,6 @@ TEXTOS = {
         "estrellas_comprar": "💳 Buy stars",
         "estrellas_instrucciones": "💳 <b>Buy stars</b>\n\n1. Open the service and ask for <b>{cantidad} stars</b>.\n2. Enter your username <b>{usuario}</b> and pay however they offer there.\n3. Come back and press “I have them”.\n\n⚠️ They will only ask for your @username. Never your password or a code.",
         "estrellas_volver": "✅ I have my stars",
-        "proxy_cual": "🎁 <b>Proxy {numero} of {total}</b>",
         "soporte_invita": "If you need help, write your message below and we will reply in this same chat.",
         "soporte_recibido": "Message received. We will answer here as soon as we can.",
         "soporte_ticket": "\U0001F3AB Support ticket\n\nFrom: {usuario} (ID {id})\n\n{mensaje}\n\nReply to this message to answer.",
@@ -422,31 +381,12 @@ TEXTOS = {
         ),
         "plan_linea": "💳 Plan: <b>{duracion}</b>",
         "manual_plan": "Plan: <b>{duracion}</b>",
-        "plan_6meses": "6 months + free Telegram proxy",
-        "proxy_boton": "🎁 My Telegram proxy",
-        "proxy_sin": "The free proxy is for plans of 6 months or more.",
-                "proxy_regalo": (
-            "🎁 <b>Your gift: Telegram proxy</b>\n\n"
-            "With a 6-month plan or longer you get a Telegram proxy "
-            "<b>free and exclusive to you</b>. It lets you use Telegram "
-            "<b>without a VPN</b>.\n\n"
-            "Tap this link on your phone and Telegram sets it up:\n"
-            "<code>{enlace}</code>\n\n"
-            "Or manually: Telegram → Settings → Data and storage → Proxy:\n"
-            "Server: <code>{servidor}</code>\n"
-            "Port: <code>{puerto}</code>\n"
-            "Secret: <code>{secreto}</code>\n\n"
-            "⚠️ <b>This link is personal.</b> You may share it, but if many "
-            "people use it, it will get slower and may stop working well: in "
-            "that case <b>we are not responsible</b> for the proxy performance. "
-            "The VPN connection keeps its guarantee."
-        ),
+        "plan_6meses": "6 months",
                 "bienvenida": (
             "Hi! This is <b>{marca}</b>, a VPN with <b>obfuscated WireGuard</b>: "
             "it cannot be blocked by traffic signature.\n\n"
             "🎁 You get <b>{dias} days free</b>, no card needed.\n\n"
-            "📱 With a <b>6-month</b> purchase you get a <b>free</b> Telegram proxy, "
-            "so you can use it without VPN.\n\n"
+
             "Your configuration arrives right here. You need the "
             "<b>GeoiD-vpn</b> app; links are under ❓ Help.\n\n"
             "Pick an option 👇"
