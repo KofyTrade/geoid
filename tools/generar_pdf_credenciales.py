@@ -310,11 +310,11 @@ tabla([
     ("Activación", "el cliente pulsa «Ya he pagado» → te llega el aviso → /activar ID MESES"),
 ])
 
-parrafo("Promoción por tramos: el proxy de Telegram es de regalo desde 3 meses.", negrita=True)
+parrafo("Promoción: los planes largos incluyen días de regalo, no proxies.", negrita=True)
 tabla([
     ("1 mes", "150 ₽ · 115 ⭐ · 1,9 USDT"),
-    ("3 meses", "399 ₽ · 300 ⭐ · 4,8 USDT · 1 proxy de regalo"),
-    ("6 meses (máximo)", "699 ₽ · 520 ⭐ · 8 USDT · 2 proxies + 20 días extra"),
+    ("3 meses", "399 ₽ · 300 ⭐ · 4,8 USDT"),
+    ("6 meses (máximo)", "699 ₽ · 520 ⭐ · 8 USDT · 20 días extra"),
     ("Prueba gratis", "3 días, sin tarjeta"),
 ])
 
@@ -398,8 +398,6 @@ codigo(
     "systemctl status geoid-bot       # estado del bot\n"
     "systemctl restart geoid-bot      # reiniciarlo\n"
     "journalctl -u geoid-bot -f       # ver lo que pasa en directo\n"
-    "systemctl status mtg             # estado del proxy\n"
-    "systemctl status mtg-user@<ID>   # proxy personal de un cliente\n"
     "awg show awg0                    # clientes conectados a la VPN\n"
     "cat /etc/geoid-bot.env           # configuración del bot\n"
     "cp /var/lib/geoid-bot/bot.sqlite /root/bot-$(date +%F).sqlite   # copia de la base"
@@ -550,8 +548,8 @@ parrafo("Cada compra entrega los DOS países. El cliente recibe dos archivos y u
 
 tabla([
     ("Plan 1 mes", "150 ₽ · 115 ⭐ · 1,9 USDT"),
-    ("Plan 3 meses", "399 ₽ · 300 ⭐ · 4,8 USDT · 1 proxy de Telegram"),
-    ("Plan 6 meses", "699 ₽ · 520 ⭐ · 8 USDT · 2 proxies + 20 días extra"),
+    ("Plan 3 meses", "399 ₽ · 300 ⭐ · 4,8 USDT"),
+    ("Plan 6 meses", "699 ₽ · 520 ⭐ · 8 USDT · 20 días extra"),
     ("Prueba gratis", "3 días, un solo uso, sin tarjeta"),
     ("Dispositivo extra", "40 ⭐ (≈50 ₽) · 30 días · máximo 5 dispositivos"),
 ])
@@ -622,7 +620,7 @@ tabla([
     ("Nodo VPN (Finlandia o Suecia)", "servidor/instalar-nodo-suecia.sh (cambiar IP y subred si es Finlandia)"),
     ("DNS con bloqueo", "servidor/instalar-adblock.sh awg0 10.9.x.1"),
     ("Agente del nodo", "servidor/instalar-agente.sh <Nombre> <prefijo de subred>"),
-    ("Proxy de Telegram", "servidor/instalar-proxy-telegram.sh 443"),
+    ("Proxy de Telegram", "retirado el 27.11.2026 (ver sección 6)"),
     ("Respaldo automático", "servidor/instalar-respaldo.sh"),
     ("Bot en espera", "servidor/instalar-espera.sh"),
 ])
@@ -652,7 +650,7 @@ parrafo("Contraseña del VPS (root): Finlandia XsH3OsmVSm03 · Suecia 2UGTCkTiLP
 # ---------------------------------------------------------------- anexo A
 titulo("Anexo A · Configuración completa del bot", 1)
 parrafo("Contenido de /etc/geoid-bot.env. Sin esto el bot no arranca igual: "
-        "guarda los precios, los tokens, el proxy y la página de pago.")
+        "guarda los precios, los tokens y la página de pago.")
 
 if ENV_FI.exists():
     texto_env = ENV_FI.read_text(encoding="utf-8", errors="ignore").strip()
@@ -704,7 +702,6 @@ tabla([
     ("Clave de firma Android", "no se puede cambiar: habría que publicar una app nueva"),
     ("Contraseña del VPS", "resetear desde el panel de Aeza"),
     ("Perfil .conf filtrado", "awg set awg0 peer <clave_pública> remove y quitar su bloque del .conf"),
-    ("Clave del proxy", "en Suecia: rm -f /etc/mtg.secret && bash /root/proxy.sh 2053 tls www.cloudflare.com"),
 ])
 
 # ---------------------------------------------------------------- pie
