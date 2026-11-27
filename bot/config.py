@@ -111,6 +111,14 @@ def enlace_proxy() -> str:
         f"&secret={PROXY_SECRETO}"
     )
 
+# --- Identidad del nodo local ---------------------------------------------
+# Permite que el servidor donde corre el bot se presente como Finlandia o
+# Suecia sin tocar el codigo (util al migrar de servidor).
+NODO_ID = os.environ.get("GEOID_NODO_ID", "fi")
+NODO_NOMBRE = os.environ.get("GEOID_NODO_NOMBRE", "Finlandia")
+BANDERAS = {"fi": "🇫🇮", "se": "🇸🇪", "ru": "🇷🇺"}
+NODO_BANDERA = BANDERAS.get(NODO_ID, "🌍")
+
 # --- Paises disponibles ---------------------------------------------------
 # Con un solo pais, el boton "Cambiar pais" no se muestra.
 PAISES = [

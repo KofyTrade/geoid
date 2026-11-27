@@ -14,9 +14,9 @@ _CABECERA = re.compile(r"^#\s*(GeoiD-vpn|plan|expira|servidor)=", re.IGNORECASE)
 def lista() -> list[dict]:
     """Nodos disponibles. Finlandia siempre; Suecia si esta configurada."""
     nodos = [{
-        "id": "fi",
-        "nombre": "Finlandia",
-        "bandera": "🇫🇮",
+        "id": getattr(config, "NODO_ID", "fi"),
+        "nombre": getattr(config, "NODO_NOMBRE", "Finlandia"),
+        "bandera": getattr(config, "NODO_BANDERA", "🌍"),
         "local": True,
         "endpoint": config.ENDPOINT or f"{getattr(config, 'SERVIDOR', '')}:{getattr(config, 'PUERTO', '')}",
         "dns": config.DNS,
